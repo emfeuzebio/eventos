@@ -76,7 +76,8 @@
     loading.value = true
   
     try {
-      const response = await api.post('/auth/forgotpassword', {
+      // const response = await api.post('/auth/forgotpassword', {
+      const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/forgotpassword', {
         email: email.value,
       })
   

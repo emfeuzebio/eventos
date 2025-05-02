@@ -98,7 +98,8 @@ const handleRegister = async () => {
   loading.value = true
   error.value = null
   try {
-    const response = await api.post('/auth/register', {
+    // const response = await api.post('/auth/register', {
+    const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/register', {
       name: username.value,
       email: email.value,
       password: password.value,

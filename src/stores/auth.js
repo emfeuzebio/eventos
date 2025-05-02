@@ -32,7 +32,8 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       this.token = null
       this.user = null
-      const response = await api.get('/auth/logout')
+      // const response = await api.get('/auth/logout')
+      const response = await api.get('https://acl4.fazcomphp.com.br/api/auth/logout')
       localStorage.removeItem('token')
       // sessionStorage.removeItem('token')
       // this.isAuthenticated = false

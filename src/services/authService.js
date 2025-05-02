@@ -30,7 +30,8 @@ export function removeToken() {
  */
 export async function logout() {
   try {
-    const response = await api.post('/auth/logout')
+    // const response = await api.post('/auth/logout')
+    const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/logout')
     const userStore = useUserStore()
     removeToken()
     userStore.clear()

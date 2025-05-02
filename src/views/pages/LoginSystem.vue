@@ -10,7 +10,7 @@
               <!-- Login Form - Full width em mobile -->
               <CCard class="p-4 w-md-50 border-md-end border-1 border-secondary-subtle">
                 <CForm>
-                    <h1>Eventos</h1>
+                    <h1>{{ appName }}</h1>
                     <h2>{{ $t('login.title') }}</h2>
                     <p class="text-body-secondary">{{ $t('login.subtitle') }}</p>
   
@@ -116,6 +116,7 @@
   import { useUserStore } from '@/stores/userStore'
   import { useI18n } from 'vue-i18n'
   
+  const appName = import.meta.env.VITE_APP_NAME
   const email = ref('')
   const emailInput = ref(null)
   const userName = ref('')

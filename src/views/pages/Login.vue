@@ -7,7 +7,7 @@
             <CCard class="p-4">
               <CCardBody>
                 <CForm>
-                  <h1>Login</h1>
+                  <h1>{{ appName }}</h1>
                   <h2>{{ $t('login.title') }}</h2>
                   <p class="text-body-secondary">{{ $t('login.subtitle') }}</p>
 
@@ -83,6 +83,7 @@ import { setToken, decodeToken, getUserNameFromToken } from '@/services/authServ
 import { useUserStore } from '@/stores/userStore'
 import { useI18n } from 'vue-i18n'
 
+const appName = import.meta.env.VITE_APP_NAME
 const email = ref('')
 const userName = ref('')
 const password = ref('')
@@ -124,7 +125,8 @@ const handleLogin = async () => {
 
   try {
     // 1. Obter novo token específico do sistema
-    const response = await api.post('/auth/login', {    
+    // const response = await api.post('/auth/login', {    
+    const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/login', {    
       email: email.value,
       password: password.value,
       systemId: 2 // Site de Eventos

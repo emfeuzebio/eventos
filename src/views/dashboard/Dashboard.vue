@@ -9,6 +9,9 @@ import MainChart from './MainChart.vue'
 import WidgetsStatsA from './../widgets/WidgetsStatsTypeA.vue'
 import WidgetsStatsD from './../widgets/WidgetsStatsTypeD.vue'
 
+import { getToken, removeToken, getIssuer } from '@/services/authService'
+// console.log('getIssuer', getIssuer())
+
 const progressGroupExample1 = [
   { title: 'Monday', value1: 34, value2: 78 },
   { title: 'Tuesday', value1: 56, value2: 94 },
