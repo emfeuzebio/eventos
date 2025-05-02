@@ -89,7 +89,7 @@ onMounted(() => {
 
 
 const goToLogin = () => {
-  router.push('/pages/loginsystem') // ou { name: 'Login' } se estiver usando name
+  router.push('/pages/login') // ou { name: 'Login' } se estiver usando name
 }
 
 const handleRegister = async () => {

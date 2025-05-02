@@ -2,9 +2,8 @@
 
 import { createRouter, createWebHashHistory } from 'vue-router'
 import routes from './routeList'
-// import { isAuthenticated } from '@/services/authService'
 import { isAuthenticated, isTokenExpired, logout } from '@/services/authService'
-
+// import { isAuthenticated } from '@/services/authService'
 // import { getToken } from '@/services/authService'
 
 
@@ -36,20 +35,15 @@ router.beforeEach((to, from, next) => {
   // console.log('isTokenExpired:', isTokenExpired?.())  
 
   // Redireciona usuários autenticados tentando acessar login
-  if (isAuthenticated() && (to.path === '/pages/login' || to.path === '/pages/loginsystem')) {
+  if (isAuthenticated() && (to.path === '/pages/login' || to.path === '/pages/login')) {
     return next('/dashboard')
   }  
 
   // Se precisa de auth e não está logado ou token expirou, faz logout e redireciona
   if (requiresAuth && (!isAuthenticated() || isTokenExpired())) {
     logout()
-    return next({ path: '/pages/loginsystem', replace: true }) // <- Evita deixar no histórico
+    return next({ path: '/pages/login', replace: true }) // <- Evita deixar no histórico
   }  
-  
-  // if (requiresAuth && (!isAuthenticated() || isTokenExpired())) {
-    // logout()
-    // return next('/pages/loginsystem')
-  // }
 
   next()
 })

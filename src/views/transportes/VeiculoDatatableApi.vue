@@ -208,7 +208,7 @@ export default {
               callback({ data: response.data });  // Entrega os dados ao DataTables
             })
             .catch(error => {
-              vm.showAlert('danger', 'Erro ao carregar os dados. Tente novamente: ' + (error.response?.data?.message || error.message));
+              vm.showAlert('danger', 'Erro ao carregar os dados. Tente novamente: ' + (error.response?.data?.error || error.message));
               callback({ data: [] }); // evita que a tabela quebre
             }
           );

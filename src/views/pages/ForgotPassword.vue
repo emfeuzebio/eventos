@@ -67,7 +67,7 @@
   })  
   
   const goToLogin = () => {
-    router.push('/pages/loginsystem') // ajuste conforme sua rota
+    router.push('/pages/login') // ajuste conforme sua rota
   }
   
   const handleForgotPassword = async () => {

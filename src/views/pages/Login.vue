@@ -8,7 +8,8 @@
               <CCardBody>
                 <CForm>
                   <h1>Login</h1>
-                  <p class="text-body-secondary">Sign In to your account</p>
+                  <h2>{{ $t('login.title') }}</h2>
+                  <p class="text-body-secondary">{{ $t('login.subtitle') }}</p>
 
                   <CAlert v-if="errorMessage" color="danger" dismissible>
                     {{ errorMessage }}
@@ -18,49 +19,54 @@
                     <CInputGroupText>
                       <CIcon icon="cil-user" />
                     </CInputGroupText>
-                    <CFormInput
-                      placeholder="Username"
-                      autocomplete="username"
-                      v-model="username"
-                    />
+                    <!-- <CFormInput placeholder="Username" autocomplete="username" v-model="username"/> -->
+                    <div ref="emailWrapper" style="flex: 1">
+                      <CFormInput :placeholder="$t('login.email')" autocomplete="email" v-model="email" ref="emailInput"/>
+                    </div>
                   </CInputGroup>
                   <CInputGroup class="mb-4">
                     <CInputGroupText>
                       <CIcon icon="cil-lock-locked" />
                     </CInputGroupText>
-                    <CFormInput
-                      type="password"
-                      placeholder="Password"
-                      autocomplete="current-password"
-                      v-model="password"
-                    />
+                    <!-- <CFormInput type="password" placeholder="Password" autocomplete="current-password" v-model="password"/> -->
+                    <CFormInput type="password" :placeholder="$t('login.password')" autocomplete="current-password" v-model="password" />                    
                   </CInputGroup>
                   <CRow>
                     <CCol :xs="6">
-                      <CButton color="primary" class="px-4" @click="handleLogin" :disabled="loading"> Login </CButton>
+                      <!-- <CButton color="primary" class="px-4" @click="handleLogin" :disabled="loading"> Login </CButton> -->
+                      <CButton color="primary" class="px-4" @click="handleLogin" :disabled="loading">{{ $t('login.btnLogin') }}</CButton>
                     </CCol>
                     <CCol :xs="6" class="text-right">
-                      <CButton color="link" class="px-0" @click="goToForgotPassword">Forgot password?</CButton>
+                      <!-- <CButton color="link" class="px-0" @click="goToForgotPassword">Forgot password?</CButton> -->
+                      <CButton color="link" class="px-0" @click="goToForgotPassword">{{ $t('login.forgot') }}</CButton>
                     </CCol>
                   </CRow>
                 </CForm>
+
+                <!-- Seletor de idioma -->
+                <CInputGroup class="mb-3 mt-3">
+                  <CInputGroupText as="label" for="inputGroupSelect01">
+                    {{ $t('login.language') }}
+                  </CInputGroupText>
+                  <CFormSelect v-model="locale" @change="changeLocale">
+                    <option value="en">English</option>
+                    <option value="pt">Português</option>                  
+                  </CFormSelect>
+                </CInputGroup>       
+
               </CCardBody>
             </CCard>
+
             <CCard class="text-white bg-primary py-5" style="width: 44%">
               <CCardBody class="text-center">
-                <div>
-                  <h2>Sign up</h2>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                    sed do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua.
-                  </p>
-                  <CButton color="light" variant="outline" class="mt-3" @click="goToRegister">
-                    Register Now!
-                  </CButton>                  
-                </div>
-              </CCardBody>
+                      <h4>{{ $t('login.noAccountTitle') }}</h4>
+                      <p>{{ $t('login.noAccountSubtitle') }}</p>
+                      <CButton color="light" variant="outline" class="mt-1" @click="goToRegister" :disabled="loading">
+                        {{ $t('login.register') }}
+                      </CButton>
+                  </CCardBody>
             </CCard>
+
           </CCardGroup>
         </CCol>
       </CRow>
@@ -70,21 +76,32 @@
 
 <script setup>
 
-import { ref } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/services/api'
-import { setToken } from '@/services/authService'
+import { setToken, decodeToken, getUserNameFromToken } from '@/services/authService'
 import { useUserStore } from '@/stores/userStore'
+import { useI18n } from 'vue-i18n'
 
-const username = ref('')
+const email = ref('')
+const userName = ref('')
 const password = ref('')
-const systemId = ref('')
 const errorMessage = ref('')
+const systems = ref([])
+const isMobile = ref(false);
+const inputWrapper = ref(null)
+const emailWrapper = ref(null)
 
 const userStore = useUserStore()
 const router = useRouter()
 const loading = ref(false)
 const error = ref(null)
+const { locale } = useI18n()
+
+const changeLocale = (event) => {
+  locale.value = event.target.value
+  localStorage.setItem('lang', locale.value)
+}
 
 const goToRegister = () => {
   router.push('/pages/register') // ou o nome da rota que você definiu
@@ -94,28 +111,61 @@ const goToForgotPassword = () => {
   router.push('/pages/forgotpassword') // ou o nome da rota que você definiu
 }
 
-const handleLogin = async () => {
+const focusEmail = async () => {
+  await nextTick()
+  const input = emailWrapper.value?.querySelector('input')
+  input?.focus()
+}
 
-  errorMessage.value = '' // limpa erro antes
+const handleLogin = async () => {   
+
+  errorMessage.value = ''
   loading.value = true
-  error.value = null
-  try {
-    const response = await api.post('/auth/login', {
-      email: username.value,
-      password: password.value,
-      systemId: 1
-    })
-    setToken(response.data.token)
 
-    // carregar os dados do token dentro do Pinia userStore
-    userStore.loadFromToken()
+  try {
+    // 1. Obter novo token específico do sistema
+    const response = await api.post('/auth/login', {    
+      email: email.value,
+      password: password.value,
+      systemId: 2 // Site de Eventos
+    })
+
+    // 2. armazena o token
+    setToken(response.data.token)
+    userStore.loadFromToken();  // carregar os dados do token dentro do Pinia userStore
+
+    const decoded = decodeToken()
+    // console.log('Decoded token:', decoded)
+    systems.value = decoded?.user_systems || []
+    userName.value = getUserNameFromToken()
 
     router.push('/dashboard')
   } catch (error) {
+    if (error.response) {
       errorMessage.value = error.response.status + ' - ' + error.response.data.error
+    } else if (error.request) {
+      errorMessage.value = 'Sem resposta do servidor. Verifique sua conexão.'
+    } else {
+      errorMessage.value = 'Erro inesperado: ' + error.message
+    }
   } finally {
     loading.value = false
   }
 }
+
+onMounted(() => {
+
+  isMobile.value = window.innerWidth < 768;
+
+  // Foca no campo email
+  nextTick(() => {
+    const input = inputWrapper.value?.querySelector('input')
+    input?.focus()
+  })    
+
+  // foca no campo email
+  focusEmail()
+
+})
 
 </script>

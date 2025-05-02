@@ -322,9 +322,9 @@ const routes = [
           component: () => import('@/views/pages/Login'),
         },
         {
-          path: 'loginsystem',
-          name: 'Loginsystem',
-          component: () => import('@/views/pages/LoginSystem'),
+          path: 'login',
+          name: 'Login',
+          component: () => import('@/views/pages/Login'),
         },
         {
           path: 'register',

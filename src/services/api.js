@@ -29,7 +29,7 @@ api.interceptors.response.use(
   error => {
     if (error.response?.status === 401) {
       removeToken()
-      router.push('/pages/loginsystem')
+      router.push('/pages/login')
     }
     return Promise.reject(error)
   }

@@ -17,7 +17,7 @@ const successMessage = ref('')
 const errorMessage = ref('')
 
 const goToLogin = () => {
-  router.push('/pages/loginsystem') // ou { name: 'Login' } se estiver usando name
+  router.push('/pages/login') // ou { name: 'Login' } se estiver usando name
 }
 
 const handleReset = async () => {
@@ -59,7 +59,7 @@ const handleReset = async () => {
 
     successMessage.value = response.data.message || 'Senha redefinida com sucesso!'
     setTimeout(() => {
-        this.$router.push('/pages/loginsystem')
+        this.$router.push('/pages/login')
     }, 2000)
 
   } catch (error) {

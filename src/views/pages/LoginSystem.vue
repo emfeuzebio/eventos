@@ -266,7 +266,7 @@
     // foca no campo email
     focusEmail()
 
-    router.push('/pages/loginsystem')
+    router.push('/pages/login')
   }  
   
   onMounted(() => {

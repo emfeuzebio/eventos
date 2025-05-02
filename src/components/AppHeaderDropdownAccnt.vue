@@ -73,7 +73,7 @@
   const logout = async () => {
     try {
       await doLogout() // sua função do authService.js e aguarda a conclusão do logout
-      router.push('/pages/loginsystem')
+      router.push('/pages/login')
       // router.push('/pages/loginsystem').then(() => {
       //   window.location.reload() // Recarrega se necessário
       // })
