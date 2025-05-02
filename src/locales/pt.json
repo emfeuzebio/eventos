@@ -1,0 +1,39 @@
+{
+    "login": {
+      "title": "Entrar",
+      "subtitle": "Acesse sua conta",
+      "email": "E-mail",
+      "password": "Senha",
+      "btnLogin": "Entrar",
+      "forgot": "Esqueceu a senha?",
+      "register": "Cadastre-se agora!",
+      "noAccountTitle": "Não tem uma conta?",
+      "noAccountSubtitle": "Cadastre-se e venha a bordo!",
+      "selectLanguage": "selecione o Idioma",
+      "language": "Idioma"
+    },
+    "systems": {
+      "greeting": "Olá",
+      "title": "Sistemas disponíveis",
+      "subtitle": "Escolha um sistema para acessar"
+    },
+    "logout": "Sair",
+    "register": {
+      "title": "Criar conta",
+      "subtitle": "Criar sua conta",
+      "user": "Digite seu nome de usuário",
+      "email": "Digite seu E-mail",
+      "password": "Digite sua Senha",
+      "repeatPassword": "Repita sua Senha",
+      "btnCreateAccount": "Criar a conta",
+      "lnkToLogin": "Já têm conta? Ir para o Login"
+    },
+    "forgot": {
+      "title": "Esqueceu a senha",
+      "subtitle": "Enviaremos um e-mail para você redefinir sua senha",
+      "email": "Digite seu e-mail",
+      "btnSendResetLink": "Enviar link de redefinição",
+      "lnkBackToLogin": "Voltar ao login"
+    }
+  }
+  

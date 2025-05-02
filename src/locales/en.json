@@ -1,0 +1,39 @@
+{
+    "login": {
+      "title": "Login",
+      "subtitle": "Sign In to your account",
+      "email": "Email",
+      "password": "Password",
+      "btnLogin": "Login",
+      "forgot": "Forgot password?",
+      "register": "Register Now!",
+      "noAccountTitle": "Don’t have an account?",
+      "noAccountSubtitle": "Sign up and come onboard!",
+      "selectLanguage": "select language",
+      "language": "Language"
+    },
+    "systems": {
+      "greeting": "Hello",
+      "title": "Available Systems",
+      "subtitle": "Choose a system to access"
+    },
+    "logout": "Logout",
+    "register": {
+      "title": "Register",
+      "subtitle": "Create your account",
+      "user": "Enter your Username",
+      "email": "Enter your email",
+      "password": "Enter your Password",
+      "repeatPassword": "Repeat your password",
+      "btnCreateAccount": "Create Account",
+      "lnkToLogin": "Already have an account? Login"
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "subtitle": "We'll send you an email to reset your password",
+      "email": "Enter your email",
+      "btnSendResetLink": "Send Reset Link",
+      "lnkBackToLogin": "Back to Login"
+    }
+  }
+  
