@@ -7,7 +7,7 @@
             <CCard class="p-4">
               <CCardBody>
                 <CForm>
-                  <h1>{{ appName }}</h1>
+                  <h1 class="pb-2">{{ appName }} <span class="fs-6 !text-sm !font-normal">v{{ appVersion }}</span></h1>
                   <h2>{{ $t('login.title') }}</h2>
                   <p class="text-body-secondary">{{ $t('login.subtitle') }}</p>
 
@@ -32,11 +32,11 @@
                     <CFormInput type="password" :placeholder="$t('login.password')" autocomplete="current-password" v-model="password" />                    
                   </CInputGroup>
                   <CRow>
-                    <CCol :xs="6">
+                    <CCol :xs="5">
                       <!-- <CButton color="primary" class="px-4" @click="handleLogin" :disabled="loading"> Login </CButton> -->
                       <CButton color="primary" class="px-4" @click="handleLogin" :disabled="loading">{{ $t('login.btnLogin') }}</CButton>
                     </CCol>
-                    <CCol :xs="6" class="text-right">
+                    <CCol :xs="7" class="text-right">
                       <!-- <CButton color="link" class="px-0" @click="goToForgotPassword">Forgot password?</CButton> -->
                       <CButton color="link" class="px-0" @click="goToForgotPassword">{{ $t('login.forgot') }}</CButton>
                     </CCol>
@@ -57,14 +57,14 @@
               </CCardBody>
             </CCard>
 
-            <CCard class="text-white bg-primary py-5" style="width: 44%">
+            <CCard class="text-white bg-primary py-1">
               <CCardBody class="text-center">
-                      <h4>{{ $t('login.noAccountTitle') }}</h4>
-                      <p>{{ $t('login.noAccountSubtitle') }}</p>
-                      <CButton color="light" variant="outline" class="mt-1" @click="goToRegister" :disabled="loading">
-                        {{ $t('login.register') }}
-                      </CButton>
-                  </CCardBody>
+                <h4>{{ $t('login.noAccountTitle') }}</h4>
+                <p>{{ $t('login.noAccountSubtitle') }}</p>
+                <CButton color="light" variant="outline" class="mt-1" @click="goToRegister" :disabled="loading">
+                  {{ $t('login.register') }}
+                </CButton>
+              </CCardBody>
             </CCard>
 
           </CCardGroup>
@@ -83,7 +83,10 @@ import { setToken, decodeToken, getUserNameFromToken } from '@/services/authServ
 import { useUserStore } from '@/stores/userStore'
 import { useI18n } from 'vue-i18n'
 
+const appId = import.meta.env.VITE_APP_ID
 const appName = import.meta.env.VITE_APP_NAME
+const appVersion = import.meta.env.VITE_APP_VERSION
+
 const email = ref('')
 const userName = ref('')
 const password = ref('')
@@ -129,7 +132,7 @@ const handleLogin = async () => {
     const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/login', {    
       email: email.value,
       password: password.value,
-      systemId: 2 // Site de Eventos
+      systemId: appId.value
     })
 
     // 2. armazena o token

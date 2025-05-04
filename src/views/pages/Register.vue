@@ -6,7 +6,7 @@
           <CCard class="mx-4">
             <CCardBody class="p-4">
               <CForm>
-                <p>{{ locale }}</p>
+                <h1 class="pb-2">{{ appName }} <span class="fs-6 !text-sm !font-normal">v{{ appVersion }}</span></h1>
                 <h1>{{ $t('register.title') }}</h1>
                 <p class="text-body-secondary">{{ $t('register.subtitle') }}</p>
 
@@ -66,6 +66,10 @@ import { useRouter } from 'vue-router'
 import api from '@/services/api'
 import { useI18n } from 'vue-i18n'
 
+const appId = import.meta.env.VITE_APP_ID
+const appName = import.meta.env.VITE_APP_NAME
+const appVersion = import.meta.env.VITE_APP_VERSION
+
 const username = ref('')
 const email = ref('')
 const password = ref('')
@@ -104,6 +108,7 @@ const handleRegister = async () => {
       email: email.value,
       password: password.value,
       password_confirmation: password_confirmation.value,
+      systemId: appId.value     // Id do Site de Eventos
     })
 
     // console.log('Registro OK:', response)

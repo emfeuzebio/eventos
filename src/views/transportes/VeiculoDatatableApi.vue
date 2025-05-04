@@ -14,22 +14,49 @@
         </p> -->
         <!-- <DocsExample href="components/table.html"></DocsExample> -->
 
-        <div class="row mb-3">            
-
-          <div class="col-8 text-start">
-            <div v-if="alertMessage" class="alert alert-dismissible fade show py-1 px-3 mb-0"
+        
+        <div class="row mb-3 mb-0">
+            
+          <div class="col-12 col-md-8 text-start">
+            <div v-if="alertMessage" class="alert alert-dismissible fade show py-1 px-2 mb-1"
               role="alert" :class="`alert-${alertType}`">{{ alertMessage }}
               <button type="button" class="btn btn-sm btn-close py-2" @click="alertMessage = ''" aria-label="Fechar"></button>
             </div>          
           </div>
 
-          <div class="col-4 text-end">
+          <!-- style="background-color: gainsboro" -->
+          <div class="col-12 col-md-4 pb-1 text-end" >
             <button v-if="canInsert" class="btn btn-sm btn-outline-success me-1" @click="insertNewModal">Inserir Novo</button>
             <button class="btn btn-sm btn-outline-info me-1" @click="print">Imprimir</button>
             <button class="btn btn-sm btn-outline-secondary" title="Recarregar" @click="refreshTable"><CIcon icon="cil-task"/> Recarregar</button>            
           </div>
 
+        </div> 
+     
+
+<!--         
+<div class="row mb-3">
+    <div class="col-12 col-md-8 mb-2 mb-md-0">
+        <div v-if="alertMessage" class="alert alert-dismissible fade show py-1 px-3 mb-0" 
+             role="alert" :class="`alert-${alertType}`">
+            {{ alertMessage }}
+            <button type="button" class="btn btn-sm btn-close py-2" @click="alertMessage = ''" aria-label="Fechar"></button>
+        </div>          
+    </div>
+
+    <div class="col-12 col-md-4 d-flex justify-content-end">
+        <div class="btn-group btn-group-sm" role="group">
+            <button v-if="canInsert" class="btn btn-outline-success" @click="insertNewModal">Inserir Novo</button>
+            <button class="btn btn-sm btn-outline-info" @click="print">Imprimir</button>
+            <button class="btn btn-sm btn-outline-secondary" title="Recarregar" @click="refreshTable">
+                <CIcon icon="cil-task"/> Recarregar
+            </button>            
         </div>
+    </div>
+</div>         
+-->
+
+
         <div class="table-responsive col-md-12">
           <table id="dataTable" class="display table table-striped table-bordered table-hover table-sm compact" style="width:100%"></table>
         </div>

@@ -50,7 +50,8 @@ const handleReset = async () => {
   }
 
   try {
-    const response = await api.post('/auth/resetPassword', {
+    // const response = await api.post('/auth/resetPassword', {
+    const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/resetPassword', {
       token: token.value,
       email: email.value,
       password: password.value,

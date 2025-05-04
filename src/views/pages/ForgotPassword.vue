@@ -6,6 +6,7 @@
             <CCard class="mx-4">
               <CCardBody class="p-4">
                 <CForm>
+                  <h1 class="pb-2">{{ appName }} <span class="fs-6 !text-sm !font-normal">v{{ appVersion }}</span></h1>
                   <h1>{{ $t('forgot.title') }}</h1>
                   <p class="text-body-secondary">{{ $t('forgot.subtitle') }}</p>
   
@@ -49,6 +50,10 @@
   import { useRouter } from 'vue-router'
   import { useI18n } from 'vue-i18n'
   import api from '@/services/api'
+
+  const appId = import.meta.env.VITE_APP_ID
+  const appName = import.meta.env.VITE_APP_NAME
+  const appVersion = import.meta.env.VITE_APP_VERSION
     
   const email = ref('')
   const errorMessage = ref('')
@@ -79,6 +84,7 @@
       // const response = await api.post('/auth/forgotpassword', {
       const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/forgotpassword', {
         email: email.value,
+        systemId: appId.value     // Id do Site de Eventos
       })
   
       if (response.status === 200) {

@@ -9,6 +9,7 @@ import { useSidebarStore } from '@/stores/sidebar.js'
 const headerClassNames = ref('mb-4 p-0')
 const { colorMode, setColorMode } = useColorModes('coreui-free-vue-admin-template-theme')
 const sidebar = useSidebarStore()
+const appName = import.meta.env.VITE_APP_NAME
 
 onMounted(() => {
   document.addEventListener('scroll', () => {
@@ -27,9 +28,10 @@ onMounted(() => {
       <CHeaderToggler @click="sidebar.toggleVisible()" style="margin-inline-start: -14px">
         <CIcon icon="cil-menu" size="lg" />
       </CHeaderToggler>
+      <h1 class="h5 m-0">{{ appName }}</h1>
       <CHeaderNav class="d-none d-md-flex">
         <CNavItem>
-          <CNavLink href="/dashboard"> Dashboard </CNavLink>
+          <!-- <CNavLink href="/dashboard"> Dashboard </CNavLink> -->
         </CNavItem>
 <!-- 
         <CNavItem>
