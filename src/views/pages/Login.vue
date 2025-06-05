@@ -132,7 +132,7 @@ const handleLogin = async () => {
     const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/login', {    
       email: email.value,
       password: password.value,
-      systemId: appId.value
+      systemId: appId
     })
 
     // 2. armazena o token

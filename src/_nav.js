@@ -329,8 +329,18 @@ export default [
     items: [
       {
         component: 'CNavItem',
-        name: 'Veiculos',
+        name: 'Veículos',
         to: '/transportes/veiculos',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Rotas',
+        to: '/transportes/rotas',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Viagens',
+        to: '/transportes/viagens',
       },
     ],
   },

@@ -1,0 +1,24 @@
+import { ref } from 'vue'
+import api from '@/services/api'
+import { can } from '@/services/AuthorizationsService'
+
+export function useRotasApi() {
+
+  const canInsert = can('veiculo.store')
+  const canUpdate = can('veiculo.update')
+  const canDelete = can('veiculo.destroy')
+  const canShow   = can('veiculo.show')
+
+  const fetchVeiculos = async () => {
+    const response = await api.get('veiculo')
+    return response.data
+  }
+
+  return {
+    fetchVeiculos,
+    canInsert,
+    canUpdate,
+    canDelete,
+    canShow
+  }
+}
