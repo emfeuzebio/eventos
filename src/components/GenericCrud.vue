@@ -10,6 +10,7 @@
         <!-- Botões -->
         <div class="d-flex justify-content-end mb-2">
           <CButton v-if="canInsert" size="sm" color="success" @click="form.openForCreate">Novo</CButton>
+          <CButton color="secondary" size="sm"   class="ms-2" @click="refreshTable">Recarregar</CButton>
         </div>
 
         <!-- Alerta -->
@@ -24,8 +25,8 @@
       </CCardBody>
     </CCard>
 
-    <!-- Modal Form -->
-    <CModal :visible="form.modalVisible" @close="form.close">
+    <!-- Edit Form Modal -->
+    <CModal :visible="form.editModalVisible" @close="form.close" backdrop="static" keyboard="true">
       <CModalHeader>
         <CModalTitle>{{ form.isEditing ? 'Editar' : 'Novo' }}</CModalTitle>
       </CModalHeader>
@@ -40,11 +41,31 @@
         <CButton color="primary" size="sm" @click="form.save">{{ form.isEditing ? 'Salvar' : 'Criar' }}</CButton>
       </CModalFooter>
     </CModal>
+
+    <!-- Modal de confirmação -->
+    <CModal :visible="form.deleteModalVisible" @close="form.close" backdrop="static" keyboard="true">
+      <CModalHeader>
+        <strong>Confirmar Exclusão</strong>
+      </CModalHeader>
+      <CModalBody>
+        Tem certeza que deseja excluir este Registro: <br />
+        <b>{{ descricaoParaExcluir }}</b> ?
+
+        <pre>{{ JSON.stringify(form.selectedToDelete, null, 2) }}</pre>
+
+      </CModalBody>
+      <CModalFooter>
+        <CButton color="btn btn-secondary btn-sm me-1" @click="form.cancelDelete">Cancelar</CButton>
+        <CButton color="btn btn-danger    btn-sm me-1" @click="form.confirmDelete">Excluir</CButton>
+      </CModalFooter>
+    </CModal>
+
+
   </CCol>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useDataTable } from '@/composables/useDataTable'
 import { useForm } from '@/composables/useForm'
 import $ from 'jquery'
@@ -57,11 +78,14 @@ const props = defineProps({
   columns: Array,
   defaultValues: Object,
   canInsert: Boolean,
+  canUpdate: Boolean,
+  canDelete: Boolean,
 })
 
 // Estados e ações
 const alert = ref({ type: '', message: '' })
 const tableId = `datatable-${props.endpoint}`
+// console.log('canDelete:', canDelete)
 
 function showAlert(type, message) {
   alert.value = { type, message }
@@ -69,7 +93,7 @@ function showAlert(type, message) {
 }
 
 // Tabela
-const { init, reload } = useDataTable({
+const { init, refreshTable, canUpdate, canDelete } = useDataTable({
   tableId,
   endpoint: props.endpoint,
   columns: [
@@ -78,14 +102,19 @@ const { init, reload } = useDataTable({
       title: 'Ações',
       data: null,
       render(data, type, row) {
+
         return `
-          <button class="btnEdit   btn btn-xs btn-outline-primary me-1" data-id="${row.id}">Editar</button>
-          <button class="btnDelete btn btn-xs btn-outline-danger me-1"  data-id="${row.id}">Excluir</button>
+          <button class="btnEdit   btn btn-xs btn-outline-primary me-1" data-id="${row.id}"` + ( true ? '' : 'disabled' ) + ` >Editar</button>
+          <button class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}"` + ( true ? '' : 'disabled' ) + ` >Excluir</button>
         `
       },
     },
   ],
-  onClickEdit: (id) => form.openForEdit(id),
+  // onClickEdit: (id) => form.openForEdit(id),
+
+  onClickEdit:   (id) => form.load(id),
+  onClickDelete: (rowData) => form.confirmModalDelete(rowData),
+
 })
 
 // Formulário
@@ -93,10 +122,22 @@ const form = useForm({
   endpoint: props.endpoint,
   defaultValues: props.defaultValues,
   onSaved: () => {
-    reload()
+    refreshTable()
     showAlert('success', 'Registro salvo com sucesso.')
   },
+  afterDelete: () => {
+    refreshTable()
+    showAlert('success', 'Registro excluído com sucesso.')
+  }  
 })
+
+const descricaoParaExcluir = computed(() => {
+  // TOTO - mostrar descrição do registro selecionado para exclusão
+  // return form.selectedToDelete.value?.descricao || 'Carregando...'
+  // return form.selectedToDelete?.descricao || 'Carregando...'
+  return "qqqqqqqqqqqqqqqqq";
+})
+
 
 // Início
 onMounted(init)

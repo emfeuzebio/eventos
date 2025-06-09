@@ -339,6 +339,11 @@ export default [
       },
       {
         component: 'CNavItem',
+        name: 'Rotas Generic DTables',
+        to: '/transportes/rotasG',
+      },
+      {
+        component: 'CNavItem',
         name: 'Viagens',
         to: '/transportes/viagens',
       },

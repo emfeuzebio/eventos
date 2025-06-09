@@ -66,7 +66,7 @@
   </CCol>    
 
   <!-- Modal de Edição -->
-  <CModal :visible="modalVisible" @close="closeModal" backdrop="static" v-close-on-esc="closeModal" >
+  <CModal :visible="editModalVisible" @close="closeModal" backdrop="static" v-close-on-esc="closeModal" >
   <CModalHeader>
     <CModalTitle>{{ isEditing ? (canUpdate ? 'Editar' : 'Ver') + ' Veículo' : 'Novo Veículo' }}</CModalTitle>
   </CModalHeader>
@@ -156,11 +156,11 @@ export default {
       alertType: '',                // usado para mostrar alertas
       deleteConfirmVisible: false,
       selectedToDelete: null,      
-      modalVisible: false,
+      editModalVisible: false,
       formError: '',                // erros no rodapé do Form
       fieldErrors: {},              // erros erros por campo
       isEditing: false,             // Flag é uma Edição
-      modalVisible: false,
+      editModalVisible: false,
       tipoOptions: [
         { value: '', label: 'Selecione o tipo' },
         { value: 'Automóvel', label: 'Automóvel' },
@@ -310,7 +310,7 @@ export default {
         const response = await api.get(`veiculo/${id}`);
         this.form = response.data;
         this.modalModo = this.isEditing ? 'edit' : 'show';
-        this.modalVisible = true;
+        this.editModalVisible = true;
         this.cleanMessages();
       } catch (error) {
         this.showAlert('danger', 'Erro ao excluir o registro: ' + (error.response?.data?.message || error.message));
@@ -318,7 +318,7 @@ export default {
     },    
 
     closeModal() {
-      this.modalVisible = false;
+      this.editModalVisible = false;
       this.form = {};
     },    
 
@@ -362,7 +362,7 @@ export default {
           await api.post('veiculo', this.form)                          // insere um novo registro
         }
 
-        this.modalVisible = false
+        this.editModalVisible = false
         this.showAlert('success', 'Registro ' + ( this.modalModo === 'edit' ? 'atualizado' : 'Inserido' ) + '  com sucesso!')
         this.refreshTable()
       } catch (error) {
@@ -395,7 +395,7 @@ export default {
         telefone: '',
         ativo: 'Y',
       }
-      this.modalVisible = true
+      this.editModalVisible = true
     },    
 
     showAlert(type, message) {

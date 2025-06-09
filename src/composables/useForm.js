@@ -2,19 +2,19 @@
 import { ref } from 'vue'
 import api from '@/services/api'
 
-export function useForm({ endpoint, fields, afterSubmit }) {
+export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
 
   const form = ref({ ...fields })
   const isEditing = ref(false)
 
-  const modalVisible = ref(false)
-  const confirmeDeleteModal = ref(false)
-
+  const editModalVisible = ref(false)
+ 
   const loading = ref(false)
   const fieldErrors = ref({})
   const formError = ref('')
 
   const selectedToDelete = ref({})
+  const deleteModalVisible = ref(false)
 
   async function load(id) {
     try {
@@ -24,7 +24,7 @@ export function useForm({ endpoint, fields, afterSubmit }) {
       isEditing.value = true
       formError.value = ''
       clearFieldErrors()
-      modalVisible.value = true
+      editModalVisible.value = true
     } catch (err) {
       formError.value = err.response?.data?.message || 'Erro ao carregar dados'
     } finally {
@@ -32,11 +32,69 @@ export function useForm({ endpoint, fields, afterSubmit }) {
     }
   }
 
-  function confirmeDelete(rowData) {
-    console.log(`Confirmação de exclusão para o ID: ${rowData}`)
+  function showAlert(type, message) {
+    // alert.value = { type, message }
+    formError.value = { type, message }
+    setTimeout(() => (alert.value.message = ''), 5000)
+  }
+
+  function reset() {
+    form.value = { ...fields }
+    isEditing.value = false
+    formError.value = ''
+    clearFieldErrors()
+  }
+
+  function openNew() {
+    reset()
+    editModalVisible.value = true
+  }
+
+  function clearFieldErrors() {
+    fieldErrors.value = {}
+  }
+
+  function closeModal() {
+    editModalVisible.value = false
+    reset()
+  }
+
+  function confirmModalDelete(rowData) {
+    // console.log(`Confirmação de exclusão para o ID: ${rowData}`)
     selectedToDelete.value = rowData
-    console.log(selectedToDelete.value)
-    confirmeDeleteModal.value = true
+    deleteModalVisible.value = true
+  }
+
+  function cancelDelete() {
+    selectedToDelete.value = null
+    deleteModalVisible.value = false
+  }
+
+  async function confirmDelete() {
+    try {
+      const id = selectedToDelete.value.id;
+      loading.value = true
+
+      await api.delete(`veiculo/${id}`)
+
+      deleteModalVisible.value = false;
+      if (afterDelete) afterDelete()
+
+        // .then(() => {
+        //   deleteModalVisible.value = false;
+        //   // this.showAlert('success', 'Registro excluído com sucesso!')
+        //   formError.value = 'success', 'Registro excluído com sucesso!'
+        //   refreshTable();
+        // })
+    } catch (error) {
+      // formError.value = err.response?.data?.message || 'Erro ao excluir o registro'
+      // showAlert('danger', 'Erro ao excluir o registro: ' + (error.response?.data?.message || error.message));
+      // deleteModalVisible.value = false;
+      formError.value = 'Erro ao excluir o registro: ' + (error.response?.data?.message || error.message);
+      deleteModalVisible.value = false;
+    } finally {
+      loading.value = false
+    }
   }
 
   async function submit() {
@@ -51,7 +109,7 @@ export function useForm({ endpoint, fields, afterSubmit }) {
         await api.post(endpoint, form.value)
       }
 
-      modalVisible.value = false
+      editModalVisible.value = false
       afterSubmit?.()
     } catch (err) {
       if (err.response?.status === 422) {
@@ -64,37 +122,11 @@ export function useForm({ endpoint, fields, afterSubmit }) {
     }
   }
 
-  function reset() {
-    form.value = { ...fields }
-    isEditing.value = false
-    formError.value = ''
-    clearFieldErrors()
-  }
-
-  function openNew() {
-    reset()
-    modalVisible.value = true
-  }
-
-  function clearFieldErrors() {
-    fieldErrors.value = {}
-  }
-
-  function closeModal() {
-    modalVisible.value = false
-    reset()
-  }
-
-  function cancelDelete() {
-    selectedToDelete.value = null
-    confirmeDeleteModal.value = false
-  }
-  
   return {
     form,
     isEditing,
-    modalVisible,
-    confirmeDeleteModal,
+    editModalVisible,
+    deleteModalVisible,
     selectedToDelete,
     loading,
     fieldErrors,
@@ -103,7 +135,8 @@ export function useForm({ endpoint, fields, afterSubmit }) {
     submit,
     openNew,
     closeModal,
-    confirmeDelete,
-    cancelDelete
+    confirmModalDelete,
+    cancelDelete,
+    confirmDelete
   }
 }

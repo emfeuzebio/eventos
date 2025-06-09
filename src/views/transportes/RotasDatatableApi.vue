@@ -36,7 +36,7 @@
   </CCol>    
 
   <!-- Modal de Edição -->
-  <CModal :visible="modalVisible" @close="closeModal" backdrop="static" v-close-on-esc="closeModal" >
+  <CModal :visible="editModalVisible" @close="closeModal" backdrop="static" v-close-on-esc="closeModal" >
   <CModalHeader>
     <CModalTitle>{{ isEditing ? (canUpdate ? 'Editar' : 'Ver') + ' Veículo' : 'Novo Veículo' }}</CModalTitle>
   </CModalHeader>
@@ -104,12 +104,6 @@ import { useRotasApi } from '@/composables/useRotasApi'
 const { fetchVeiculos, canInsert, canUpdate, canDelete, canShow } = useRotasApi()
 const dataTable = ref(null)
 
-function refreshTable() {
-  if (dataTable.value) {
-    dataTable.value.ajax.reload(null, false)
-  }
-}
-
 function initDataTable() {
   const vm = { canInsert, canUpdate, canDelete, canShow }
 
@@ -153,18 +147,9 @@ function initDataTable() {
   })
 }
 
-// Função para carregar dados no modal de edição
-async function editModal(id) {
-  try {
-    const response = await api.get(`veiculo/${id}`)
-    // Object.assign(form, response.data)
-    // modalModo.value = 'edit'
-    // isEditing.value = true
-    // modalVisible.value = true
-    // formError.value = ''
-    // Object.keys(fieldErrors).forEach(key => delete fieldErrors[key])
-  } catch (err) {
-    // formError.value = err.response?.data?.message || 'Erro ao carregar dados'
+function refreshTable() {
+  if (dataTable.value) {
+    dataTable.value.ajax.reload(null, false)
   }
 }
 

@@ -43,7 +43,7 @@ export function useDataTable({ tableId, endpoint, columns, onClickEdit, onClickD
         })
     }
 
-    function reload() {
+    function refreshTable() {
         if (!dataTable.value) {
             console.warn("DataTable ainda não está inicializado.")
             return
@@ -66,6 +66,7 @@ export function useDataTable({ tableId, endpoint, columns, onClickEdit, onClickD
         table.on('click', '.btnDelete', (e) => {
             const id = $(e.currentTarget).data('id')
             const rowData = dataTable.value.row(`#${id}`).data();
+            // console.log('Linha selecionada para exclusão:', rowData)
             if (onClickDelete) onClickDelete(rowData)
         })
 
@@ -77,7 +78,7 @@ export function useDataTable({ tableId, endpoint, columns, onClickEdit, onClickD
 
     return {
         init,
-        reload,
-        dataTable
+        refreshTable,
+        dataTable,
     }
 }

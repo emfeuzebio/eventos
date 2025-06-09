@@ -260,6 +260,11 @@ const routes = [
               component: () => import('@/views/transportes/RotasDatatableApiv2.vue'),
             },
             {
+              path: '/transportes/rotasG',
+              name: 'RotasG',
+              component: () => import('@/views/transportes/RotasDatatablesGeneric.vue'),
+            },
+            {
               path: '/transportes/viagens',
               name: 'Viagens',
               component: () => import('@/views/transportes/VeiculoDatatableApi.vue'),

@@ -6,17 +6,23 @@
       </CCardHeader>
       <CCardBody>
         <div class="d-flex justify-content-between mb-2">
+
           <div>
+            <!-- Alerta -->
             <CAlert v-if="formError" color="danger" dismissible>
               {{ formError }}
             </CAlert>
+            
           </div>
+
+          <!-- Botões -->
           <div>
             <CButton color="success" size="sm" @click="openNew">Novo</CButton>
             <CButton color="secondary" size="sm" class="ms-2" @click="refreshTable">Recarregar</CButton>
           </div>
         </div>
 
+        <!-- Tabela -->
         <div class="table-responsive">
           <table id="dataTable" class="table table-striped table-bordered table-sm w-100"></table>
         </div>
@@ -24,7 +30,7 @@
     </CCard>
 
     <!-- Modal -->
-    <CModal :visible="modalVisible" @close="closeModal">
+    <CModal :visible="editModalVisible" @close="closeModal" backdrop="static" keyboard="true">
       <CModalHeader>
         <CModalTitle>{{ isEditing ? 'Editar Veículo' : 'Novo Veículo' }}</CModalTitle>
       </CModalHeader>
@@ -52,7 +58,7 @@
   </CCol>
 
   <!-- Modal de confirmação -->
-  <CModal :visible="confirmeDeleteModal" @close="cancelDelete">
+  <CModal :visible="deleteModalVisible" @close="cancelDelete" backdrop="static" keyboard="true">
     <CModalHeader>
       <strong>Confirmar Exclusão</strong>
     </CModalHeader>
@@ -68,19 +74,20 @@
 </template>
 
 <script setup>
+
 import { onMounted } from 'vue'
 import { useForm } from '@/composables/useForm'
 import { useDataTable } from '@/composables/useDataTable'
 
 function refreshTable() {
-  datatable.reload()
+  datatable.refreshTable()
 }
 
 // Formulário de criação/edição
 const {
-  form, isEditing, modalVisible, loading,
-  fieldErrors, formError, selectedToDelete,
-  load, submit, openNew, closeModal, confirmeDelete, confirmeDeleteModal, cancelDelete
+  isEditing, loading, editModalVisible, deleteModalVisible,
+  form, fieldErrors, formError, selectedToDelete,
+  load, submit, openNew, closeModal, confirmModalDelete, cancelDelete, confirmDelete
 } = useForm({
   endpoint: 'veiculo',
   fields: {
@@ -100,8 +107,10 @@ const {
 const datatable = useDataTable({
   tableId: 'dataTable',
   endpoint: 'veiculo',
+
   onClickEdit: (id) => load(id),
-  onClickDelete: (id) => confirmeDelete(id),
+  onClickDelete: (id) => confirmModalDelete(id),
+
   columns: [
     { title: 'ID', data: 'id' },
     { title: 'Descrição', data: 'descricao' },
@@ -131,4 +140,5 @@ const datatable = useDataTable({
 onMounted(() => {
   datatable.init()
 })
+
 </script>
