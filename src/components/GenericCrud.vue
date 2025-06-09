@@ -19,14 +19,17 @@
         </div>
 
         <!-- Tabela -->
+        <!-- <div class="table-responsive col-md-12">
+          <table id="dataTable" class="display table table-striped table-bordered table-hover table-sm compact" style="width:100%"></table> -->
+
         <div class="table-responsive">
-          <table :id="tableId" class="display table table-bordered table-hover w-100"></table>
+          <table :id="tableId" class="display table table-striped table-bordered table-hover table-sm compact w-100"></table>
         </div>
       </CCardBody>
     </CCard>
 
     <!-- Edit Form Modal -->
-    <CModal :visible="form.editModalVisible" @close="form.close" backdrop="static" keyboard="true">
+    <CModal :visible="form.editModalVisible" @close="form.closeModal" backdrop="static" keyboard="true">
       <CModalHeader>
         <CModalTitle>{{ form.isEditing ? 'Editar' : 'Novo' }}</CModalTitle>
       </CModalHeader>
@@ -37,29 +40,26 @@
         <div class="text-danger small mt-2" v-if="form.formError">{{ form.formError }}</div>
       </CModalBody>
       <CModalFooter>
-        <CButton color="secondary" size="sm" @click="form.close">Cancelar</CButton>
-        <CButton color="primary" size="sm" @click="form.save">{{ form.isEditing ? 'Salvar' : 'Criar' }}</CButton>
+        <CButton color="secondary" size="sm" @click="form.closeModal">Cancelar</CButton>
+        <CButton color="primary" size="sm" @click="form.saveModal">{{ form.isEditing ? 'Salvar' : 'Criar' }}</CButton>
       </CModalFooter>
     </CModal>
 
-    <!-- Modal de confirmação -->
-    <CModal :visible="form.deleteModalVisible" @close="form.close" backdrop="static" keyboard="true">
+    <!-- Modal Excluir -->
+    <CModal :visible="form.deleteModalVisible" @close="form.closeModal" backdrop="static" keyboard="true">
       <CModalHeader>
         <strong>Confirmar Exclusão</strong>
       </CModalHeader>
       <CModalBody>
         Tem certeza que deseja excluir este Registro: <br />
-        <b>{{ descricaoParaExcluir }}</b> ?
-
-        <pre>{{ JSON.stringify(form.selectedToDelete, null, 2) }}</pre>
-
+        <b>{{ form.selectedToDelete.value?.descricao || 'Carregando...' }}</b> ?
+        <!-- <pre>{{ JSON.stringify(form.selectedToDelete.value, null, 2) }}</pre> -->
       </CModalBody>
       <CModalFooter>
         <CButton color="btn btn-secondary btn-sm me-1" @click="form.cancelDelete">Cancelar</CButton>
         <CButton color="btn btn-danger    btn-sm me-1" @click="form.confirmDelete">Excluir</CButton>
       </CModalFooter>
     </CModal>
-
 
   </CCol>
 </template>
@@ -92,6 +92,24 @@ function showAlert(type, message) {
   setTimeout(() => (alert.value.message = ''), 5000)
 }
 
+// const objetoMaster = {
+//   a:1,
+//   b:2,
+//   c:3,
+// }
+
+// const copia = {...objetoMaster, d:4}
+
+
+// const {a} = objetoMaster
+// const a = objetoMaster.a
+// const init = useDataTable.init
+
+// {
+//         init,
+//         refreshTable,
+//         dataTable,
+//     }
 // Tabela
 const { init, refreshTable, canUpdate, canDelete } = useDataTable({
   tableId,
@@ -110,6 +128,7 @@ const { init, refreshTable, canUpdate, canDelete } = useDataTable({
       },
     },
   ],
+
   // onClickEdit: (id) => form.openForEdit(id),
 
   onClickEdit:   (id) => form.load(id),
@@ -134,8 +153,8 @@ const form = useForm({
 const descricaoParaExcluir = computed(() => {
   // TOTO - mostrar descrição do registro selecionado para exclusão
   // return form.selectedToDelete.value?.descricao || 'Carregando...'
-  // return form.selectedToDelete?.descricao || 'Carregando...'
-  return "qqqqqqqqqqqqqqqqq";
+  return JSON.stringify(form.selectedToDelete.value.descricao)
+  // return "qqqqqqqqqqqqqqqqq";
 })
 
 

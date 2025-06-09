@@ -7,7 +7,7 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
   const form = ref({ ...fields })
   const isEditing = ref(false)
 
-  const editModalVisible = ref(false)
+  const editModalVisible = ref(false) 
  
   const loading = ref(false)
   const fieldErrors = ref({})
@@ -60,8 +60,10 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
   }
 
   function confirmModalDelete(rowData) {
-    // console.log(`Confirmação de exclusão para o ID: ${rowData}`)
-    selectedToDelete.value = rowData
+    // console.log(`Confirmação de exclusão para o ID:`)
+    // console.log(rowData)
+    selectedToDelete.value = {...rowData}
+    console.log(selectedToDelete.value)
     deleteModalVisible.value = true
   }
 
@@ -97,7 +99,7 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
     }
   }
 
-  async function submit() {
+  async function saveModal() {
     try {
       loading.value = true
       formError.value = ''
@@ -132,7 +134,7 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
     fieldErrors,
     formError,
     load,
-    submit,
+    saveModal,
     openNew,
     closeModal,
     confirmModalDelete,
