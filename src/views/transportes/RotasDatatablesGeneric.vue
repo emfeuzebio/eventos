@@ -28,13 +28,29 @@ const defaultValues = {
     :canDelete="true"
   >
     <template #form="{ form, errors }">
-      <CFormInput v-model="form.descricao" label="Descrição" :class="{ 'is-invalid': errors.descricao }" />
+      <CFormInput v-model="form.value.descricao" label="Descrição" :class="{ 'is-invalid': errors.descricao }" />
       <div class="invalid-feedback">{{ errors.descricao }}</div>
 
-      <CFormInput v-model="form.tipo" label="Tipo" :class="{ 'is-invalid': errors.tipo }" />
+      <CFormInput v-model="form.value.tipo" label="Tipo" :class="{ 'is-invalid': errors.tipo }" />
       <div class="invalid-feedback">{{ errors.tipo }}</div>
 
-      <CFormInput v-model="form.motorista" label="Motorista" />
+      <CFormInput v-model="form.value.marca_modelo" label="Marca/Modelo" :class="{ 'is-invalid': errors.marca_modelo }" />
+      <div class="invalid-feedback">{{ errors.marca_modelo }}</div>
+
+      <CFormInput v-model="form.value.capacidade" label="Capacidade" :class="{ 'is-invalid': errors.capacidade }" />
+      <div class="invalid-feedback">{{ errors.capacidade }}</div>
+
+      <CFormInput v-model="form.value.motorista" label="Motorista" :class="{ 'is-invalid': errors.motorista }" />
+      <div class="invalid-feedback">{{ errors.motorista }}</div>
+
+      <CFormInput v-model="form.value.telefone" label="Telefone" :class="{ 'is-invalid': errors.telefone }" />
+      <div class="invalid-feedback">{{ errors.telefone }}</div>
+
+      <CFormInput v-model="form.value.observacao" label="Observação" :class="{ 'is-invalid': errors.observacao }" />
+      <div class="invalid-feedback">{{ errors.observacao }}</div>
+
+      <CFormSelect v-model="form.value.ativo" :options="[{ value: 'Y', label: 'SIM' }, { value: 'N', label: 'NÃO' }]" label="Ativo" />
+
     </template>
   </GenericCrud>
 </template>

@@ -1,11 +1,12 @@
 // src/services/api.js
 import axios from 'axios'
-import { getToken, removeToken, getIssuer } from './authService'
+import { getToken, removeToken, getCookie, getIssuer } from './authService'
 import router from '@/router/router'
  '@/router'
-import { useGlobalStore } from '@/stores/globalStore'
+import { useGlobalError } from '@/composables/useGlobalError'
 
 // console.log('xxx' + getIssuer());
+const { showError } = useGlobalError() // fora do interceptor
 
 const api = axios.create({
   // baseURL: import.meta.env.VITE_API_BASE_URL || 'https://sua-api.com/api',
@@ -17,7 +18,8 @@ const api = axios.create({
   // TODO o backend está colocando no Issuer a URL dp site, mas deve colocar a URL da API
   // como abaixo. Estou forçando abaixo, mas o backend deve corrigir isso.
   baseURL: ( 'https://apieventos.fazcomphp.com.br/api/' ),
-  timeout: 10000,   // aguarda a resposta por 10s
+  timeout: 10000,         // aguarda a resposta por 10s
+  withCredentials: false  // Desative CSRF quando usar JWT
 })
 
 // Adiciona o token a cada request
@@ -34,6 +36,9 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       removeToken()
       router.push('/pages/login')
+    } else if (error.response?.status !== 419) {
+      // showError(error.response?.data?.message || 'Erro inesperado.')
+      showError(error.response?.data?.error || 'Erro inesperado.')
     }
     return Promise.reject(error)
   }

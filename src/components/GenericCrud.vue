@@ -9,7 +9,7 @@
 
         <!-- Botões -->
         <div class="d-flex justify-content-end mb-2">
-          <CButton v-if="canInsert" size="sm" color="success" @click="form.openForCreate">Novo</CButton>
+          <CButton v-if="canInsert" size="sm" color="success" @click="form.insertNewModal">Novo</CButton>
           <CButton color="secondary" size="sm"   class="ms-2" @click="refreshTable">Recarregar</CButton>
         </div>
 
@@ -18,10 +18,7 @@
           {{ alert.message }}
         </div>
 
-        <!-- Tabela -->
-        <!-- <div class="table-responsive col-md-12">
-          <table id="dataTable" class="display table table-striped table-bordered table-hover table-sm compact" style="width:100%"></table> -->
-
+        <!-- Tabela de dados -->
         <div class="table-responsive">
           <table :id="tableId" class="display table table-striped table-bordered table-hover table-sm compact w-100"></table>
         </div>
@@ -45,7 +42,7 @@
       </CModalFooter>
     </CModal>
 
-    <!-- Modal Excluir -->
+    <!-- Confirma Excluir Modal  -->
     <CModal :visible="form.deleteModalVisible" @close="form.closeModal" backdrop="static" keyboard="true">
       <CModalHeader>
         <strong>Confirmar Exclusão</strong>
@@ -68,7 +65,6 @@
 import { onMounted, ref, computed } from 'vue'
 import { useDataTable } from '@/composables/useDataTable'
 import { useForm } from '@/composables/useForm'
-import $ from 'jquery'
 
 // Props configuráveis
 const props = defineProps({
@@ -92,24 +88,6 @@ function showAlert(type, message) {
   setTimeout(() => (alert.value.message = ''), 5000)
 }
 
-// const objetoMaster = {
-//   a:1,
-//   b:2,
-//   c:3,
-// }
-
-// const copia = {...objetoMaster, d:4}
-
-
-// const {a} = objetoMaster
-// const a = objetoMaster.a
-// const init = useDataTable.init
-
-// {
-//         init,
-//         refreshTable,
-//         dataTable,
-//     }
 // Tabela
 const { init, refreshTable, canUpdate, canDelete } = useDataTable({
   tableId,

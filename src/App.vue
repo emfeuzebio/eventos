@@ -3,6 +3,7 @@ import { onBeforeMount } from 'vue'
 import { useColorModes } from '@coreui/vue'
 
 import { useThemeStore } from '@/stores/theme.js'
+import GlobalErrorModal from '@/components/GlobalErrorModal.vue'
 
 const { isColorModeSet, setColorMode } = useColorModes(
   'coreui-free-vue-admin-template-theme',
@@ -32,6 +33,7 @@ onBeforeMount(() => {
 
 <template>
   <router-view />
+  <GlobalErrorModal />
 </template>
 
 <style lang="scss">

@@ -45,7 +45,8 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
     clearFieldErrors()
   }
 
-  function openNew() {
+  function insertNewModal() {
+    // console.log('Abrindo modal para inserir novo registro')
     reset()
     editModalVisible.value = true
   }
@@ -63,7 +64,7 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
     // console.log(`Confirmação de exclusão para o ID:`)
     // console.log(rowData)
     selectedToDelete.value = {...rowData}
-    console.log(selectedToDelete.value)
+    // console.log(selectedToDelete.value)
     deleteModalVisible.value = true
   }
 
@@ -88,12 +89,9 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
         //   formError.value = 'success', 'Registro excluído com sucesso!'
         //   refreshTable();
         // })
-    } catch (error) {
-      // formError.value = err.response?.data?.message || 'Erro ao excluir o registro'
-      // showAlert('danger', 'Erro ao excluir o registro: ' + (error.response?.data?.message || error.message));
-      // deleteModalVisible.value = false;
-      formError.value = 'Erro ao excluir o registro: ' + (error.response?.data?.message || error.message);
-      deleteModalVisible.value = false;
+    // } catch (error) {
+    //   formError.value = 'Erro ao excluir o registro: ' + (error.response?.data?.message || error.message);
+    //   deleteModalVisible.value = false;
     } finally {
       loading.value = false
     }
@@ -116,8 +114,8 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
     } catch (err) {
       if (err.response?.status === 422) {
         fieldErrors.value = err.response.data.errors || {}
-      } else {
-        formError.value = err.response?.data?.message || 'Erro ao salvar dados'
+      // } else {
+      //   formError.value = err.response?.data?.message || 'Erro ao salvar dados'
       }
     } finally {
       loading.value = false
@@ -135,7 +133,7 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
     formError,
     load,
     saveModal,
-    openNew,
+    insertNewModal,
     closeModal,
     confirmModalDelete,
     cancelDelete,
