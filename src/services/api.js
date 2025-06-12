@@ -22,7 +22,7 @@ const api = axios.create({
   withCredentials: false  // Desative CSRF quando usar JWT
 })
 
-// Adiciona o token a cada request
+// Adiciona o token JWT a cada request
 api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) config.headers.Authorization = `Bearer ${token}`
@@ -36,10 +36,12 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       removeToken()
       router.push('/pages/login')
-    } else if (error.response?.status !== 419) {
-      // showError(error.response?.data?.message || 'Erro inesperado.')
-      showError(error.response?.data?.error || 'Erro inesperado.')
-    }
+    } else if (error.response?.status == 419) {
+      showError(error.response?.data?.error || '419 - Erro inesperado.')
+    } 
+    // else if (error.response?.status == 422) {
+    //   showError(error.response?.data?.error || 'Erro inesperado.')
+    // }
     return Promise.reject(error)
   }
 )

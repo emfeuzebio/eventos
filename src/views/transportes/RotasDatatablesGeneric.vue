@@ -1,17 +1,24 @@
 <script setup>
 
 import GenericCrud from '@/components/GenericCrud.vue'
+import 'datatables.net-dt';
 
+
+// define as colunas da tabela
 const columns = [
   { title: 'ID', data: 'id' },
-  { title: 'Descrição', data: 'descricao' },
+  { title: 'Descrição do Veículo', data: 'descricao' },
   { title: 'Tipo', data: 'tipo' },
+  { title: 'Capacidade', data: 'capacidade', render: (data) => `${data} p`, className: 'text-center' },
   { title: 'Motorista', data: 'motorista' },
+  { title: 'Ativo', data: 'ativo', render: (data) => (data === 'Y' ? 'SIM' : 'NÃO'), className: 'text-center' },
 ]
 
+// define os valores padrão dos campos do formulário
 const defaultValues = {
   descricao: '',
   tipo: '',
+  capacidade: '',
   motorista: '',
 }
 </script>
@@ -28,8 +35,9 @@ const defaultValues = {
     :canDelete="true"
   >
     <template #form="{ form, errors }">
+
       <CFormInput v-model="form.value.descricao" label="Descrição" :class="{ 'is-invalid': errors.descricao }" />
-      <div class="invalid-feedback">{{ errors.descricao }}</div>
+      <div class="invalid-feedback" v-if="errors.descricao" >{{ errors.descricao[0] }}</div>
 
       <CFormInput v-model="form.value.tipo" label="Tipo" :class="{ 'is-invalid': errors.tipo }" />
       <div class="invalid-feedback">{{ errors.tipo }}</div>

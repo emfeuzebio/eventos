@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import api from '@/services/api'
 
-export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
+export function useForm({ endpoint, fields, onSaved, afterDelete }) {
 
   const form = ref({ ...fields })
   const isEditing = ref(false)
@@ -62,9 +62,7 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
 
   function confirmModalDelete(rowData) {
     // console.log(`Confirmação de exclusão para o ID:`)
-    // console.log(rowData)
     selectedToDelete.value = {...rowData}
-    // console.log(selectedToDelete.value)
     deleteModalVisible.value = true
   }
 
@@ -81,17 +79,7 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
       await api.delete(`veiculo/${id}`)
 
       deleteModalVisible.value = false;
-      if (afterDelete) afterDelete()
-
-        // .then(() => {
-        //   deleteModalVisible.value = false;
-        //   // this.showAlert('success', 'Registro excluído com sucesso!')
-        //   formError.value = 'success', 'Registro excluído com sucesso!'
-        //   refreshTable();
-        // })
-    // } catch (error) {
-    //   formError.value = 'Erro ao excluir o registro: ' + (error.response?.data?.message || error.message);
-    //   deleteModalVisible.value = false;
+      afterDelete?.()
     } finally {
       loading.value = false
     }
@@ -110,12 +98,11 @@ export function useForm({ endpoint, fields, afterSubmit, afterDelete }) {
       }
 
       editModalVisible.value = false
-      afterSubmit?.()
-    } catch (err) {
-      if (err.response?.status === 422) {
-        fieldErrors.value = err.response.data.errors || {}
-      // } else {
-      //   formError.value = err.response?.data?.message || 'Erro ao salvar dados'
+      onSaved?.()
+    } catch (error) {
+      if (error.response?.status === 422) {
+        fieldErrors.value = error.response.data.errors || {}
+        console.log(fieldErrors.value)
       }
     } finally {
       loading.value = false

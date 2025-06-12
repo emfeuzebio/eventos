@@ -7,19 +7,27 @@
       </CCardHeader>
       <CCardBody>
 
-        <!-- Botões -->
-        <div class="d-flex justify-content-end mb-2">
-          <CButton v-if="canInsert" size="sm" color="success" @click="form.insertNewModal">Novo</CButton>
-          <CButton color="secondary" size="sm"   class="ms-2" @click="refreshTable">Recarregar</CButton>
-        </div>
+        <div class="row mb-1 mb-0">
 
-        <!-- Alerta -->
-        <div v-if="alert.message" :class="`alert alert-${alert.type}`">
-          {{ alert.message }}
+          <!-- Alerta de Confirmações -->
+          <div class="col-12 col-md-8 text-start">
+            <div v-if="alert.message" :class="`alert alert-success`" class="alert alert-dismissible fade show py-1 px-2 mb-0" role="alert">
+              {{ alert.message }}
+              <button type="button" class="btn btn-sm btn-close py-2" @click="closeAlert" aria-label="Fechar"></button>
+            </div>
+          </div>
+
+          <!-- Botões -->
+          <div class="col-12 col-md-4 pb-1 text-end" >
+            <CButton class="btn btn-sm btn-outline-info me-1"      @click="btnImprimir">Imprimir</CButton>
+            <CButton class="btn btn-sm btn-outline-success me-1"   @click="form.insertNewModal" v-if="canInsert">Inserir Novo</CButton>
+            <CButton class="btn btn-sm btn-outline-secondary me-1" @click="refreshTable">Recarregar</CButton>
+          </div>
+
         </div>
 
         <!-- Tabela de dados -->
-        <div class="table-responsive">
+        <div class="table-responsive col-md-12">
           <table :id="tableId" class="display table table-striped table-bordered table-hover table-sm compact w-100"></table>
         </div>
       </CCardBody>
@@ -88,6 +96,14 @@ function showAlert(type, message) {
   setTimeout(() => (alert.value.message = ''), 5000)
 }
 
+function closeAlert() {
+  alert.value.message = ''
+}
+
+function btnImprimir() {
+  alert.value = { type: 'info', message: 'Imprimir não implementado.' }    
+}
+
 // Tabela
 const { init, refreshTable, canUpdate, canDelete } = useDataTable({
   tableId,
@@ -97,8 +113,10 @@ const { init, refreshTable, canUpdate, canDelete } = useDataTable({
     {
       title: 'Ações',
       data: null,
+      sortable: false,
+      className: 'text-center',
+      width: '120px',
       render(data, type, row) {
-
         return `
           <button class="btnEdit   btn btn-xs btn-outline-primary me-1" data-id="${row.id}"` + ( true ? '' : 'disabled' ) + ` >Editar</button>
           <button class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}"` + ( true ? '' : 'disabled' ) + ` >Excluir</button>
@@ -132,7 +150,6 @@ const descricaoParaExcluir = computed(() => {
   // TOTO - mostrar descrição do registro selecionado para exclusão
   // return form.selectedToDelete.value?.descricao || 'Carregando...'
   return JSON.stringify(form.selectedToDelete.value.descricao)
-  // return "qqqqqqqqqqqqqqqqq";
 })
 
 
