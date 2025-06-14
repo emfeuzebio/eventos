@@ -87,7 +87,7 @@ function refreshTable() {
 const {
   isEditing, loading, editModalVisible, deleteModalVisible,
   form, fieldErrors, formError, selectedToDelete,
-  load, submit, openNew, closeModal, confirmModalDelete, cancelDelete, confirmDelete
+  load, submit, openNew, closeModal, confirmDeleteModal, cancelDelete, confirmDelete
 } = useForm({
   endpoint: 'veiculo',
   fields: {
@@ -109,7 +109,7 @@ const datatable = useDataTable({
   endpoint: 'veiculo',
 
   onClickEdit: (id) => load(id),
-  onClickDelete: (id) => confirmModalDelete(id),
+  onClickDelete: (id) => confirmDeleteModal(id),
 
   columns: [
     { title: 'ID', data: 'id' },

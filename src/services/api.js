@@ -2,7 +2,7 @@
 import axios from 'axios'
 import { getToken, removeToken, getCookie, getIssuer } from './authService'
 import router from '@/router/router'
- '@/router'
+;('@/router')
 import { useGlobalError } from '@/composables/useGlobalError'
 
 // console.log('xxx' + getIssuer());
@@ -17,31 +17,34 @@ const api = axios.create({
 
   // TODO o backend está colocando no Issuer a URL dp site, mas deve colocar a URL da API
   // como abaixo. Estou forçando abaixo, mas o backend deve corrigir isso.
-  baseURL: ( 'https://apieventos.fazcomphp.com.br/api/' ),
-  timeout: 10000,         // aguarda a resposta por 10s
-  withCredentials: false  // Desative CSRF quando usar JWT
+  baseURL: 'https://apieventos.fazcomphp.com.br/api/',
+  timeout: 10000, // aguarda a resposta por 10s
+  withCredentials: false, // Desative CSRF quando usar JWT
 })
 
 // Adiciona o token JWT a cada request
 api.interceptors.request.use((config) => {
-  const token = getToken();
+  const token = getToken()
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
 // Se a resposta for 401, redireciona para login
 api.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response?.status === 401) {
+  (response) => response,
+  (error) => {
+    // if (error.response?.status === 401) {
+    if (error.response && error.response.status === 401) {      
       removeToken()
       router.push('/pages/login')
     } else if (error.response?.status == 419) {
       showError(error.response?.data?.error || '419 - Erro inesperado.')
-    } 
-    // else if (error.response?.status == 422) {
-    //   showError(error.response?.data?.error || 'Erro inesperado.')
-    // }
+    } // Não sendo erros de campos do formulário (422), exibe o erro
+    else if (error.response?.status != 422) {
+      showError(error.response?.data?.error || 'Erro inesperado.')
+    }
+    // demais erros são capturados noutro local
+
     return Promise.reject(error)
   }
 )

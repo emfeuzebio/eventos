@@ -334,13 +334,13 @@ export default [
       },
       {
         component: 'CNavItem',
-        name: 'Rotas',
-        to: '/transportes/rotas',
+        name: 'Veículos Generic DTables',
+        to: '/transportes/rotasG',
       },
       {
         component: 'CNavItem',
         name: 'Rotas Generic DTables',
-        to: '/transportes/rotasG',
+        to: '/transportes/rotas',
       },
       {
         component: 'CNavItem',
