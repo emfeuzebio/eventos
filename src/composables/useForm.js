@@ -1,6 +1,7 @@
 // src/composables/useForm.js
 import { ref } from 'vue';
 import api from '@/services/api';
+import { checkAuthBeforeSensitiveAction } from '@/composables/useAuthGuard';
 
 export function useForm({
    endpoint,
@@ -56,9 +57,14 @@ export function useForm({
       clearFieldErrors();
    }
 
+   async function onInsertNewClicked() {
+      const ok = await checkAuthBeforeSensitiveAction();
+      if (!ok) return;
+
+      insertNewModal(); // agora você pode abrir o modal com segurança
+   }
+
    function insertNewModal() {
-      // console.log('Abrindo modal para inserir novo registro')
-      // clearFieldData()
       clearFieldData();
       editModalVisible.value = true;
    }
@@ -84,7 +90,7 @@ export function useForm({
          const id = selectedToDelete.value.id;
          loading.value = true;
 
-         await api.delete(`veiculo/${id}`);
+         await api.delete(`${endpoint}/${id}`);
 
          deleteModalVisible.value = false;
          afterDelete?.();
@@ -129,6 +135,7 @@ export function useForm({
       load,
       confirmSave,
       insertNewModal,
+      onInsertNewClicked,
       closeModal,
       confirmDeleteModal,
       cancelDelete,

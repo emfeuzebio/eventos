@@ -36,7 +36,7 @@
                   <CButton
                      class="btn btn-sm btn-outline-success me-1"
                      v-if="canInsert"
-                     @click="form.insertNewModal"
+                     @click="form.onInsertNewClicked"
                      >Inserir Novo</CButton
                   >
                   <CButton
@@ -99,7 +99,9 @@
             Tem certeza que deseja excluir este Registro:
             <br />
             <b>{{
-               form.selectedToDelete.value?.descricao || 'Carregando...'
+               form.selectedToDelete.value?.descricao ||
+               form.selectedToDelete.value?.nome ||
+               'Nome ou Descrição não encontrada.'
             }}</b>
             ?
             <!-- <pre>{{ JSON.stringify(form.selectedToDelete.value, null, 2) }}</pre> -->

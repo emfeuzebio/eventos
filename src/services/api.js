@@ -35,6 +35,7 @@ api.interceptors.response.use(
   (error) => {
     // if (error.response?.status === 401) {
     if (error.response && error.response.status === 401) {      
+      // console.log('Token não fornecido ou malformado > Go to Page Login"')
       removeToken()
       router.push('/pages/login')
     } else if (error.response?.status == 419) {

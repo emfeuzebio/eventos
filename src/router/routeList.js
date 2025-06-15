@@ -257,17 +257,18 @@ const routes = [
             {
               path: '/transportes/rotas',
               name: 'Rotas',
-              component: () => import('@/views/transportes/RotasDatatableApiv2.vue'),
+              component: () => import('@/views/transportes/RotasDatatablesGeneric.vue'),
             },
             {
               path: '/transportes/rotasG',
               name: 'RotasG',
-              component: () => import('@/views/transportes/RotasDatatablesGeneric.vue'),
+              component: () => import('@/views/transportes/VeiculosDatatablesGeneric.vue'),
             },
             {
               path: '/transportes/viagens',
               name: 'Viagens',
-              component: () => import('@/views/transportes/VeiculoDatatableApi.vue'),
+              component: () => import('@/views/transportes/ViagensDatatablesGeneric.vue'),
+              meta: { requiresAuth: true }, // Protege esta rota
             },
           ],
         },

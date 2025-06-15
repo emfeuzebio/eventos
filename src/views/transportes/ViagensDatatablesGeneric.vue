@@ -1,13 +1,14 @@
 <script setup>
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
+import { formatToBrDateTime } from '@/utils/dateFormat';
 import 'datatables.net-dt';
 
 import { useEventos } from '@/composables/useEventos';
 const { eventos, loading, error } = useEventos();
 
 // define a Entidade Principal da View
-const entity = 'rota';
+const entity = 'viagem';
 
 // recuperas as Autorizações (abilities) do JWT
 const { can } = useAbilities();
@@ -35,39 +36,41 @@ console.log('canPrint:', canPrint); // Isso deve ser true ou false
 // define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Nome da Rota', data: 'nome' },
-   { title: 'Tipo', data: 'tipo' },
+   { title: 'Nome da Rota', data: 'rota.nome' },
    {
-      title: 'Origem',
-      data: 'origem',
+      title: 'Data da Viagem',
+      data: 'data_hora',
+      render: (data) => formatToBrDateTime(`${data}`),
+      className: 'text-center',
+   },
+   {
+      title: 'Qts Pessoas',
+      data: null,
+      render: (data) => `?`,
+      className: 'text-center',
+   },
+   {
+      title: 'Veículo',
+      data: 'veiculo.descricao',
       render: (data) => `${data} `,
       className: 'text-left',
-   },
-   { title: 'Destino', data: 'destino' },
-   {
-      title: 'Ativo',
-      data: 'ativo',
-      render: (data) => (data === 'SIM' ? 'SIM' : 'NÃO'),
-      className: 'text-center',
    },
 ];
 
 // define os valores padrão dos campos do formulário
 const defaultValues = {
    evento_id: '1',
-   nome: 'De origem para destino',
-   tipo: 'Chegada',
-   origem: 'Nome do Ponto de origem',
-   destino: 'Nome do Ponto de destino',
-   ativo: 'SIM',
+   rota_id: '',
+   data_hora: '',
+   veiculo_id: '',
 };
 </script>
 
 <template>
    <GenericCrud
-      title="Lista de Rotas de Viagens "
-      description="Gerenciamento de Rotas de Viagens"
-      endpoint="rota"
+      title="Lista de Viagens "
+      description="Gerenciamento de Viagens"
+      endpoint="viagem"
       :columns="columns"
       :defaultValues="defaultValues"
       :abilities="abilities"
@@ -90,51 +93,31 @@ const defaultValues = {
          </div>
 
          <CFormInput
-            v-model="form.value.nome"
-            label="Nome da Rota"
-            :class="{ 'is-invalid': errors.nome }"
+            v-model="form.value.rota_id"
+            label="Rota ID"
+            :class="{ 'is-invalid': errors.rota_id }"
          />
-         <div class="form-error" v-if="errors.value.nome">
-            {{ errors.value.nome[0] }}
+         <div class="form-error" v-if="errors.value.rota_id">
+            {{ errors.value.rota_id[0] }}
          </div>
 
          <CFormInput
-            v-model="form.value.tipo"
-            label="Tipo"
-            :class="{ 'is-invalid': errors.tipo }"
+            v-model="form.value.data_hora"
+            type="datetime-local"
+            label="Data e Hora"
+            :class="{ 'is-invalid': errors.data_hora }"
          />
-         <div class="form-error" v-if="errors.value.tipo">
-            {{ errors.value.tipo[0] }}
+         <div class="form-error" v-if="errors.value.data_hora">
+            {{ errors.value.data_hora[0] }}
          </div>
 
          <CFormInput
-            v-model="form.value.origem"
-            label="Local de Origem"
-            :class="{ 'is-invalid': errors.origem }"
+            v-model="form.value.veiculo_id"
+            label="Veículo ID"
+            :class="{ 'is-invalid': errors.rota_id }"
          />
-         <div class="form-error" v-if="errors.value.origem">
-            {{ errors.value.origem[0] }}
-         </div>
-
-         <CFormInput
-            v-model="form.value.destino"
-            label="Local de Destino"
-            :class="{ 'is-invalid': errors.destino }"
-         />
-         <div class="form-error" v-if="errors.value.destino">
-            {{ errors.value.destino[0] }}
-         </div>
-
-         <CFormSelect
-            v-model="form.value.ativo"
-            :options="[
-               { value: 'SIM', label: 'SIM' },
-               { value: 'NÃO', label: 'NÃO' },
-            ]"
-            label="Ativo"
-         />
-         <div class="form-error" v-if="errors.value.ativo">
-            {{ errors.value.ativo[0] }}
+         <div class="form-error" v-if="errors.value.rota_id">
+            {{ errors.value.rota_id[0] }}
          </div>
       </template>
    </GenericCrud>

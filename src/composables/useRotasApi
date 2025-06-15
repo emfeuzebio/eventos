@@ -1,24 +1,35 @@
-import { ref } from 'vue'
+// src/composables/useRotas.js
+import { ref, onMounted } from 'vue'
 import api from '@/services/api'
-import { can } from '@/services/AuthorizationsService'
 
-export function useRotasApi() {
+export function useRotas(ativo = true) {
+  const rotas = ref([])
+  const loading = ref(false)
+  const error = ref(null)
 
-  const canInsert = can('veiculo.store')
-  const canUpdate = can('veiculo.update')
-  const canDelete = can('veiculo.destroy')
-  const canShow   = can('veiculo.show')
+  const fetchRotas = async () => {
+    loading.value = true
+    error.value = null
 
-  const fetchVeiculos = async () => {
-    const response = await api.get('veiculo')
-    return response.data
+    try {
+      const res = await api.get('/rota', {
+        params: ativo ? { ativo: 'SIM' } : {},
+      })
+      rotas.value = res.data
+    } catch (err) {
+      console.error('Erro ao carregar a lista de Rotas ativas:', err)
+      error.value = err
+    } finally {
+      loading.value = false
+    }
   }
 
+  onMounted(fetchRotas)
+
   return {
-    fetchVeiculos,
-    canInsert,
-    canUpdate,
-    canDelete,
-    canShow
+    rotas,
+    loading,
+    error,
+    fetchRotas, // caso queira recarregar manualmente
   }
 }

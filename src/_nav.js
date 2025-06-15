@@ -344,7 +344,7 @@ export default [
       },
       {
         component: 'CNavItem',
-        name: 'Viagens',
+        name: 'Viagens Generic DTables',
         to: '/transportes/viagens',
       },
     ],

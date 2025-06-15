@@ -3,11 +3,8 @@ import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import 'datatables.net-dt';
 
-import { useEventos } from '@/composables/useEventos';
-const { eventos, loading, error } = useEventos();
-
 // define a Entidade Principal da View
-const entity = 'rota';
+const entity = 'veiculo';
 
 // recuperas as Autorizações (abilities) do JWT
 const { can } = useAbilities();
@@ -35,39 +32,40 @@ console.log('canPrint:', canPrint); // Isso deve ser true ou false
 // define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Nome da Rota', data: 'nome' },
+   { title: 'Descrição do Veículo', data: 'descricao' },
    { title: 'Tipo', data: 'tipo' },
    {
-      title: 'Origem',
-      data: 'origem',
-      render: (data) => `${data} `,
-      className: 'text-left',
+      title: 'Capacidade',
+      data: 'capacidade',
+      render: (data) => `${data} p`,
+      className: 'text-center',
    },
-   { title: 'Destino', data: 'destino' },
+   { title: 'Motorista', data: 'motorista' },
    {
       title: 'Ativo',
       data: 'ativo',
-      render: (data) => (data === 'SIM' ? 'SIM' : 'NÃO'),
+      render: (data) => (data === 'Y' ? 'SIM' : 'NÃO'),
       className: 'text-center',
    },
 ];
 
 // define os valores padrão dos campos do formulário
 const defaultValues = {
-   evento_id: '1',
-   nome: 'De origem para destino',
-   tipo: 'Chegada',
-   origem: 'Nome do Ponto de origem',
-   destino: 'Nome do Ponto de destino',
-   ativo: 'SIM',
+   descricao: 'Carro cor 2 lugares do José',
+   tipo: 'Automóvel',
+   marca_modelo: 'Deconhecido',
+   capacidade: '3',
+   motorista: 'Sem Nome',
+   telefone: '(61) 90000-0000',
+   ativo: 'Y',
 };
 </script>
 
 <template>
    <GenericCrud
-      title="Lista de Rotas de Viagens "
-      description="Gerenciamento de Rotas de Viagens"
-      endpoint="rota"
+      title="Lista de Veículos"
+      description="Gerenciamento da frota de Veículos"
+      endpoint="veiculo"
       :columns="columns"
       :defaultValues="defaultValues"
       :abilities="abilities"
@@ -79,23 +77,13 @@ const defaultValues = {
       :canPrint="canPrint"
    >
       <template #form="{ form, errors }">
-         <CFormSelect
-            v-model="form.value.evento_id"
-            :options="eventos.map((ev) => ({ value: ev.id, label: ev.nome }))"
-            label="Evento"
-            :disabled="eventos.length === 0"
-         />
-         <div class="form-error" v-if="errors.value.evento_id">
-            {{ errors.value.evento_id[0] }}
-         </div>
-
          <CFormInput
-            v-model="form.value.nome"
-            label="Nome da Rota"
-            :class="{ 'is-invalid': errors.nome }"
+            v-model="form.value.descricao"
+            label="Descrição"
+            :class="{ 'is-invalid': errors.descricao }"
          />
-         <div class="form-error" v-if="errors.value.nome">
-            {{ errors.value.nome[0] }}
+         <div class="form-error" v-if="errors.value.descricao">
+            {{ errors.value.descricao[0] }}
          </div>
 
          <CFormInput
@@ -108,28 +96,55 @@ const defaultValues = {
          </div>
 
          <CFormInput
-            v-model="form.value.origem"
-            label="Local de Origem"
-            :class="{ 'is-invalid': errors.origem }"
+            v-model="form.value.marca_modelo"
+            label="Marca/Modelo"
+            :class="{ 'is-invalid': errors.marca_modelo }"
          />
-         <div class="form-error" v-if="errors.value.origem">
-            {{ errors.value.origem[0] }}
+         <div class="form-error" v-if="errors.value.marca_modelo">
+            {{ errors.value.marca_modelo[0] }}
          </div>
 
          <CFormInput
-            v-model="form.value.destino"
-            label="Local de Destino"
-            :class="{ 'is-invalid': errors.destino }"
+            v-model="form.value.capacidade"
+            label="Capacidade"
+            :class="{ 'is-invalid': errors.capacidade }"
          />
-         <div class="form-error" v-if="errors.value.destino">
-            {{ errors.value.destino[0] }}
+         <div class="form-error" v-if="errors.value.capacidade">
+            {{ errors.value.capacidade[0] }}
+         </div>
+
+         <CFormInput
+            v-model="form.value.motorista"
+            label="Motorista"
+            :class="{ 'is-invalid': errors.motorista }"
+         />
+         <div class="form-error" v-if="errors.value.motorista">
+            {{ errors.value.motorista[0] }}
+         </div>
+
+         <CFormInput
+            v-model="form.value.telefone"
+            label="Telefone"
+            :class="{ 'is-invalid': errors.telefone }"
+         />
+         <div class="form-error" v-if="errors.value.telefone">
+            {{ errors.value.telefone[0] }}
+         </div>
+
+         <CFormInput
+            v-model="form.value.observacao"
+            label="Observação"
+            :class="{ 'is-invalid': errors.observacao }"
+         />
+         <div class="form-error" v-if="errors.value.observacao">
+            {{ errors.value.observacao[0] }}
          </div>
 
          <CFormSelect
             v-model="form.value.ativo"
             :options="[
-               { value: 'SIM', label: 'SIM' },
-               { value: 'NÃO', label: 'NÃO' },
+               { value: 'Y', label: 'SIM' },
+               { value: 'N', label: 'NÃO' },
             ]"
             label="Ativo"
          />
