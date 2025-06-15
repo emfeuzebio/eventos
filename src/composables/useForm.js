@@ -71,7 +71,7 @@ export function useForm({
 
    function closeModal() {
       editModalVisible.value = false;
-      clearFieldData();
+      clearFieldData();  
    }
 
    function confirmDeleteModal(rowData) {
