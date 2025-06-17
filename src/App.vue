@@ -5,6 +5,11 @@ import { useColorModes } from '@coreui/vue'
 import { useThemeStore } from '@/stores/theme.js'
 import GlobalErrorModal from '@/components/GlobalErrorModal.vue'
 
+import { useGlobalLoading } from '@/stores/loading';
+import { CSpinner } from '@coreui/vue';
+
+const { globalLoading } = useGlobalLoading();
+
 const { isColorModeSet, setColorMode } = useColorModes(
   'coreui-free-vue-admin-template-theme',
 )
@@ -32,9 +37,28 @@ onBeforeMount(() => {
 </script>
 
 <template>
+  <div v-if="globalLoading" class="global-loader">
+    <CSpinner color="primary" />
+  </div>
   <router-view />
   <GlobalErrorModal />
 </template>
+
+<style scoped>
+.global-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255,255,255,0.1);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+
 
 <style lang="scss">
 // Import Main styles for this application

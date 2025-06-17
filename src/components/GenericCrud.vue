@@ -205,7 +205,7 @@ const form = useForm({
 
 // console.log('defaultValues recebidos', props.defaultValues);
 // console.log('canUpdate', props.canUpdate);
-console.log('Todas as abilities:', props.abilities);
+// console.log('Todas as abilities:', props.abilities);
 
 const descricaoParaExcluir = computed(() => {
    // TODO - mostrar descrição do registro selecionado para exclusão

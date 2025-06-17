@@ -4,6 +4,7 @@ import { getToken, removeToken, getCookie, getIssuer } from './authService'
 import router from '@/router/router'
 ;('@/router')
 import { useGlobalError } from '@/composables/useGlobalError'
+import { useGlobalLoading } from '@/stores/loading';
 
 // console.log('xxx' + getIssuer());
 const { showError } = useGlobalError() // fora do interceptor
@@ -22,8 +23,11 @@ const api = axios.create({
   withCredentials: false, // Desative CSRF quando usar JWT
 })
 
+const { startLoading, stopLoading } = useGlobalLoading();
+
 // Adiciona o token JWT a cada request
 api.interceptors.request.use((config) => {
+  startLoading();
   const token = getToken()
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
@@ -31,8 +35,12 @@ api.interceptors.request.use((config) => {
 
 // Se a resposta for 401, redireciona para login
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    stopLoading();
+    return response
+  },
   (error) => {
+    stopLoading();
     // if (error.response?.status === 401) {
     if (error.response && error.response.status === 401) {      
       // console.log('Token não fornecido ou malformado > Go to Page Login"')

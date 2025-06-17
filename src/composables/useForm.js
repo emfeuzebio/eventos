@@ -10,6 +10,9 @@ export function useForm({
    onSaved,
    afterDelete,
 }) {
+
+   // console.log("useForm:" + fields)
+
    const form = ref({ ...fields });
    const isEditing = ref(false);
 
@@ -22,15 +25,15 @@ export function useForm({
    const selectedToDelete = ref({});
    const deleteModalVisible = ref(false);
 
-   async function load(id) {
+   async function load(id=0) {
       try {
          loading.value = true;
          const res = await api.get(`${endpoint}/${id}`);
-         form.value = { ...fields, ...res.data };
-         isEditing.value = true;
-         formError.value = '';
-         clearFieldErrors();
-         editModalVisible.value = true;
+         form.value = { ...fields, ...res.data };  // carrega os dados do response para o form Modal
+         isEditing.value = id ?? false;            // controle se é edição ou novo registro
+         formError.value = '';                     // limpa o form errors
+         clearFieldErrors();                       // limpa o filds errors
+         editModalVisible.value = true;            // mostra o modal
       } catch (err) {
          formError.value =
             err.response?.data?.message || 'Erro ao carregar dados';
@@ -58,14 +61,16 @@ export function useForm({
    }
 
    async function onInsertNewClicked() {
-      const ok = await checkAuthBeforeSensitiveAction();
-      if (!ok) return;
+      // Antes usada isso
+      // const ok = await checkAuthBeforeSensitiveAction();
+      // if (!ok) return;
 
+      clearFieldData();
+      await load();     // laod form dados para novo registro
       insertNewModal(); // agora você pode abrir o modal com segurança
    }
 
    function insertNewModal() {
-      clearFieldData();
       editModalVisible.value = true;
    }
 

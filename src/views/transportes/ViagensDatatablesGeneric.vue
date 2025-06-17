@@ -63,6 +63,10 @@ const defaultValues = {
    rota_id: '',
    data_hora: '',
    veiculo_id: '',
+   eventos: [],
+   rotas: [],
+   veiculos: [],            
+
 };
 </script>
 
@@ -82,43 +86,63 @@ const defaultValues = {
       :canPrint="canPrint"
    >
       <template #form="{ form, errors }">
-         <CFormSelect
-            v-model="form.value.evento_id"
-            :options="eventos.map((ev) => ({ value: ev.id, label: ev.nome }))"
-            label="Evento"
-            :disabled="eventos.length === 0"
-         />
-         <div class="form-error" v-if="errors.value.evento_id">
-            {{ errors.value.evento_id[0] }}
+
+         {{ form.value }}
+         <!-- <pre>
+         {{ form.value }}
+         </pre> -->
+         
+         <div id="formModal" v-if="form.value">
+         
+            <CFormSelect
+               v-model="form.value.evento_id"
+               :options="eventos.map((ev) => ({ value: ev.id, label: ev.nome }))"
+               label="Evento"
+               :disabled="eventos.length === 0"
+            />
+            <div class="form-error" v-if="errors.value.evento_id">
+               {{ errors.value.evento_id[0] }}
+            </div>
+
+            <CFormSelect
+               v-model="form.value.rota_id"
+               :options="[
+                  { value: '', label: 'Selecione' },
+                  ...(form.value.rotas || []).map((ev) => ({ value: ev.id, label: ev.nome }))
+               ]"
+               label="Rota"
+               :disabled="form.value.rotas.length === 0"
+            />
+            <div class="form-error" v-if="errors.value.rota_id">
+               {{ errors.value.rota_id[0] }}
+            </div>
+
+            <CFormInput
+               v-model="form.value.data_hora"
+               type="datetime-local"
+               label="Data e Hora"
+            />
+            <div class="form-error" v-if="errors.value.data_hora">
+               {{ errors.value.data_hora[0] }}
+            </div>
+
+            <CFormSelect
+               v-model="form.value.veiculo_id"
+               :options="[
+                  { value: '', label: 'Selecione' },
+                  ...(form.value.veiculos || []).map((ev) => ({ value: ev.id, label: ev.descricao }))
+               ]"
+               label="Veículo"
+               :disabled="form.value.veiculos.length === 0"
+            />
+            <div class="form-error" v-if="errors.value.veiculo_id">
+               {{ errors.value.veiculo_id[0] }}
+            </div>
+            <!-- {{ form.value }} -->
+            <!-- {{ form.value.rotas }} -->
+              
          </div>
 
-         <CFormInput
-            v-model="form.value.rota_id"
-            label="Rota ID"
-            :class="{ 'is-invalid': errors.rota_id }"
-         />
-         <div class="form-error" v-if="errors.value.rota_id">
-            {{ errors.value.rota_id[0] }}
-         </div>
-
-         <CFormInput
-            v-model="form.value.data_hora"
-            type="datetime-local"
-            label="Data e Hora"
-            :class="{ 'is-invalid': errors.data_hora }"
-         />
-         <div class="form-error" v-if="errors.value.data_hora">
-            {{ errors.value.data_hora[0] }}
-         </div>
-
-         <CFormInput
-            v-model="form.value.veiculo_id"
-            label="Veículo ID"
-            :class="{ 'is-invalid': errors.rota_id }"
-         />
-         <div class="form-error" v-if="errors.value.rota_id">
-            {{ errors.value.rota_id[0] }}
-         </div>
       </template>
    </GenericCrud>
 </template>
