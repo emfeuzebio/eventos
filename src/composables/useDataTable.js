@@ -35,7 +35,7 @@ export function useDataTable({
          },
          columns,
          responsive: true,
-         processing: true,
+         processing: false,
          rowId: 'id',
          // dataSrc: '',
          dataSrc: function (response) {

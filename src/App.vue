@@ -4,11 +4,13 @@ import { useColorModes } from '@coreui/vue'
 
 import { useThemeStore } from '@/stores/theme.js'
 import GlobalErrorModal from '@/components/GlobalErrorModal.vue'
+import GlobalToast from '@/components/GlobalToast.vue'
 
 import { useGlobalLoading } from '@/stores/loading';
 import { CSpinner } from '@coreui/vue';
 
 const { globalLoading } = useGlobalLoading();
+// const { toasts, removeToast } = useToast()
 
 const { isColorModeSet, setColorMode } = useColorModes(
   'coreui-free-vue-admin-template-theme',
@@ -42,6 +44,7 @@ onBeforeMount(() => {
   </div>
   <router-view />
   <GlobalErrorModal />
+  <GlobalToast />
 </template>
 
 <style scoped>

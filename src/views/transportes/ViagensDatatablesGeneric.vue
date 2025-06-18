@@ -1,11 +1,13 @@
 <script setup>
+import { computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { formatToBrDateTime } from '@/utils/dateFormat';
+// import { useToast } from '@/composables/useToast'
 import 'datatables.net-dt';
 
 import { useEventos } from '@/composables/useEventos';
-const { eventos, loading, error } = useEventos();
+const { fetchEventos, fetchRotas, fetchVeiculos, eventos, rotas, veiculos, error } = useEventos();
 
 // define a Entidade Principal da View
 const entity = 'viagem';
@@ -13,6 +15,7 @@ const entity = 'viagem';
 // recuperas as Autorizações (abilities) do JWT
 const { can } = useAbilities();
 const { abilities } = useAbilities();
+// const { showToast } = useToast()
 
 // Permissões específicas para a entidade "veiculo"
 const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
@@ -33,10 +36,10 @@ console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
 console.log('canDelete:', canDelete); // Isso deve ser true ou false
 console.log('canPrint:', canPrint); // Isso deve ser true ou false
 
-// define parâmetros das tabela de dados
+// DATATABLES - define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Nome da Rota', data: 'rota.nome' },
+   { title: 'Nome da Rota', data: 'rota.nome', class: 'fw-bold' },
    {
       title: 'Data da Viagem',
       data: 'data_hora',
@@ -57,7 +60,7 @@ const columns = [
    },
 ];
 
-// define os valores padrão dos campos do formulário
+// FORM - define os valores padrão dos campos do formulário de dados da entidade
 const defaultValues = {
    evento_id: '1',
    rota_id: '',
@@ -68,27 +71,58 @@ const defaultValues = {
    veiculos: [],
 };
 
-const filters = [
+// FILTROS - carrega da API listas para popular os filtros
+fetchRotas();
+fetchVeiculos();
+fetchEventos();
+
+// Sem filtros
+// const filters = [];
+
+const filters = computed(() => [
    {
-      label: 'Rota',
-      field: 'rota_id',
-      type: 'select',
-      options: [
-         { value: 1, label: 'Chegada Rodoviária > FEB' },
-         { value: 2, label: 'Chegada: Aeroporto JK > FEB' },
-         { value: 9, label: 'Chegada Rodoviária > Hotel Plaza' },
-      ],
-   },
-   {
-      label: 'Veiculo',
-      field: 'veiculo_id',
-      type: 'select',
-      options: [
-         { value: 1, label: 'Veiculo 1' },
-         { value: 2, label: 'Veiculo 2' },
-      ],
-   },
-];
+    label: 'Evento',
+    field: 'evento_id',
+    type: 'select',
+    options: eventos.value.map((evento) => ({
+      value: evento.id,
+      label: evento.sigla,
+    })),
+  },
+  {
+    label: 'Rota',
+    field: 'rota_id',
+    type: 'select',
+    options: rotas.value.map((rota) => ({
+      value: rota.id,
+      label: rota.nome,
+    })),
+  },
+  {
+    label: 'Veículo',
+    field: 'veiculo_id',
+    type: 'select',
+    options: veiculos.value.map((veiculo) => ({
+      value: veiculo.id,
+      label: veiculo.descricao,
+    })),
+  },
+])
+
+// Filtros da Página com valores fixos
+// const filters = [
+//    {
+//       label: 'Rota',
+//       field: 'rota_id',
+//       type: 'select',
+//       options: [
+//          { value: 1, label: 'Chegada Rodoviária > FEB' },
+//          { value: 2, label: 'Chegada: Aeroporto JK > FEB' },
+//          { value: 9, label: 'Chegada Rodoviária > Hotel Plaza' },
+//       ],
+//    },
+// ];
+
 </script>
 
 <template>
@@ -107,19 +141,33 @@ const filters = [
       :canDelete="canDelete"
       :canPrint="canPrint"
    >
-      <!-- Form Dados do Edit/new MOdal -->
+      <!-- Form Dados do Edit/New MOdal -->
       <template #form="{ form, errors }">
+
          <!-- {{ form.value }} -->
          <!-- <pre> {{ form.value }} </pre> -->
 
          <div id="formModal" v-if="form.value">
             <label class="form-label fw-bold">Evento</label>
-            <CFormSelect
+
+            <!-- <CFormSelect
                v-model="form.value.evento_id"
                :options="
                   eventos.map((ev) => ({ value: ev.id, label: ev.nome }))
                "
                :disabled="eventos.length === 0"
+            /> -->
+
+            <CFormSelect
+               v-model="form.value.evento_id"
+               :options="[
+                  { value: '', label: 'Selecione' },
+                  ...(form.value.eventos || []).map((ev) => ({
+                     value: ev.id,
+                     label: ev.nome,
+                  })),
+               ]"
+               :disabled="form.value.eventos.length === 0"
             />
             <div class="form-error" v-if="errors.value.evento_id">
                {{ errors.value.evento_id[0] }}
@@ -168,3 +216,4 @@ const filters = [
       </template>
    </GenericCrud>
 </template>
+

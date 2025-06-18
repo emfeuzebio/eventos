@@ -8,6 +8,7 @@ import { useGlobalLoading } from '@/stores/loading';
 
 // console.log('xxx' + getIssuer());
 const { showError } = useGlobalError() // fora do interceptor
+const apiURL = import.meta.env.VITE_API_BASE_URL  // https://apieventos.fazcomphp.com.br/api/
 
 const api = axios.create({
   // baseURL: import.meta.env.VITE_API_BASE_URL || 'https://sua-api.com/api',
@@ -18,8 +19,8 @@ const api = axios.create({
 
   // TODO o backend está colocando no Issuer a URL dp site, mas deve colocar a URL da API
   // como abaixo. Estou forçando abaixo, mas o backend deve corrigir isso.
-  baseURL: 'https://apieventos.fazcomphp.com.br/api/',
-  timeout: 10000, // aguarda a resposta por 10s
+  baseURL: apiURL,
+  timeout: 10000,         // aguarda a resposta por 10s
   withCredentials: false, // Desative CSRF quando usar JWT
 })
 
@@ -50,7 +51,7 @@ api.interceptors.response.use(
       showError(error.response?.data?.error || '419 - Erro inesperado.')
     } // Não sendo erros de campos do formulário (422), exibe o erro
     else if (error.response?.status != 422) {
-      showError(error.response?.data?.error || 'Erro inesperado.')
+      showError(error.response?.data?.error || '419 - Erro inesperado.')
     }
     // demais erros são capturados noutro local
 

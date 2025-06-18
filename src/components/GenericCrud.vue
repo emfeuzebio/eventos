@@ -5,34 +5,23 @@
             <strong>{{ title }}</strong>
             <small v-if="description">- {{ description }}</small>
          </CCardHeader>
+         
          <CCardBody>
-            <div class="row mb-1 mb-0">
-               <!-- Alerta de Confirmações -->
-               <div class="col-12 col-md-8 text-start">
-                  <div
-                     v-if="alert.message"
-                     :class="`alert alert-${alert.type || 'info'}`"
-                     class="alert alert-dismissible fade show py-1 px-2 mb-0"
-                     role="alert"
-                  >
-                     {{ alert.message }}
-                     <button
-                        type="button"
-                        class="btn btn-sm btn-close py-2"
-                        @click="closeAlert"
-                        aria-label="Fechar"
-                     ></button>
-                  </div>
-               </div>
 
-               <div class="d-flex flex-wrap gap-2 mb-3">
+            <!-- Linha dos filtros, mensagens e botões -->
+            <div class="row align-items-center">
+
+               <!-- Coluna 1: Filtros -->
+               <div class="col-md-8 d-flex flex-wrap align-items-center gap-2">
+                  
+                  <div class="d-flex flex-wrap gap-21 mb-1">
                   <div
                      v-for="filter in props.filters"
                      :key="filter.field"
                      class="me-2"
                   >
-                     <label class="form-label fw-bold"
-                        >{{ filter.label }}:</label
+                     Filtrar por <label class="form-label fw-bold"
+                        > {{ filter.label }}</label
                      >
                      <!-- {{ filtros }} -->
                      <!-- {{ [filter.field] }} -->
@@ -64,31 +53,47 @@
 
                      <!-- Você pode expandir aqui para tipos como date, checkbox etc -->
                   </div>
+               </div>                  
                </div>
 
-               <!-- Botões -->
-               <div class="col-12 col-md-8 pb-1 text-end">
+               <!-- Coluna 2: Alerta -->
+               <!-- <div class="col-md-4 text-center">
+                  <div
+                     v-if="alert.message"
+                     :class="`alert alert-${alert.type || 'info'} alert-dismissible fade show py-1 px-2 mb-0`" role="alert"
+                  >
+                     {{ alert.message }}
+                     <button
+                     type="button"
+                     class="btn btn-sm btn-close"
+                     @click="closeAlert"
+                     aria-label="Fechar"
+                     ></button>
+                  </div>
+               </div> -->
+
+               <!-- Coluna 3: Botões -->
+               <div class="col-md-4 text-end">
                   <CButton
                      class="btn btn-sm btn-outline-info me-1"
                      v-if="canPrint"
                      @click="btnImprimir"
-                     >Imprimir</CButton
-                  >
+                  >Imprimir</CButton>
                   <CButton
                      class="btn btn-sm btn-outline-success me-1"
                      v-if="canInsert"
                      @click="form.insertNewModal"
-                     >Inserir Novo</CButton
-                  >
+                  >Inserir Novo</CButton>
                   <CButton
-                     class="btn btn-sm btn-outline-secondary me-1"
+                     class="btn btn-sm btn-outline-secondary"
                      @click="refreshTable"
-                     >Recarregar</CButton
-                  >
+                  >Recarregar
+                  </CButton>
                </div>
+
             </div>
 
-            <!-- Tabela de dados -->
+            <!-- linha da Tabela de dados -->
             <div class="table-responsive col-md-12">
                <table
                   :id="tableId"
@@ -169,6 +174,9 @@
 import { onMounted, ref, computed } from 'vue';
 import { useDataTable } from '@/composables/useDataTable';
 import { useForm } from '@/composables/useForm';
+import { useToast } from '@/composables/useToast'
+
+const { showToast } = useToast()
 
 // Props configuráveis
 const props = defineProps({
@@ -178,13 +186,13 @@ const props = defineProps({
    columns: Array,
    defaultValues: Object,
    abilities: Array,
-   filters: Array,
-   default: () => [],
+   filters: Array, default: () => [],
    canInsert: Boolean,
    canUpdate: Boolean,
    canDelete: Boolean,
    canPrint: Boolean,
 });
+
 
 // controe os filtros
 const filtros = ref({});
@@ -209,7 +217,12 @@ function closeAlert() {
 }
 
 function btnImprimir() {
-   showAlert('danger', 'Imprimir não implementado.');
+   // showAlert('danger', 'Imprimir não implementado.');
+   showToast({
+         title: 'Erro',
+         message: "Imprimir não implementado!",
+         color: 'danger',
+      })
 }
 
 // Tabela de Dados
@@ -250,11 +263,21 @@ const form = useForm({
    defaultValues: props.defaultValues ?? {},
    onSaved: () => {
       refreshTable();
-      showAlert('success', 'Registro salvo com sucesso.');
+      // showAlert('success', 'Registro salvo com sucesso.');
+      showToast({
+         title: 'Sucesso',
+         message: 'Dados salvos com sucesso!',
+         color: 'success',
+      })
    },
    afterDelete: () => {
       refreshTable();
-      showAlert('success', 'Registro excluído com sucesso.');
+      // showAlert('success', 'Registro excluído com sucesso.');
+      showToast({
+         title: 'Sucesso',
+         message: 'Registro excluído com sucesso!',
+         color: 'success',
+      })
    },
 });
 
@@ -271,3 +294,27 @@ const descricaoParaExcluir = computed(() => {
 // Início
 onMounted(init);
 </script>
+
+<style>
+@import 'datatables.net-dt/css/dataTables.dataTables.min.css';
+
+.btn-xs {
+   padding: 0.15rem 0.4rem;
+   font-size: 0.75rem;
+   line-height: 1;
+   border-radius: 0.2rem;
+}
+
+.form-error {
+   color: #dc3545;
+   font-size: 0.875rem;
+   margin-top: 0.25rem;
+}
+
+.dataTable tbody td {
+   font-size: 15px;
+   /* font-weight: bold; */
+   /* font-size: medium; */
+}
+</style>
+

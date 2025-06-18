@@ -540,19 +540,3 @@ export default {
 };
 </script>
 
-<style>
-@import 'datatables.net-dt/css/dataTables.dataTables.min.css';
-
-.btn-xs {
-   padding: 0.15rem 0.4rem;
-   font-size: 0.75rem;
-   line-height: 1;
-   border-radius: 0.2rem;
-}
-
-.form-error {
-   color: #dc3545;
-   font-size: 0.875rem;
-   margin-top: 0.25rem;
-}
-</style>
