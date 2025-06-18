@@ -34,7 +34,6 @@
                      <label class="form-label fw-bold"
                         >{{ filter.label }}:</label
                      >
-
                      <!-- {{ filtros }} -->
                      <!-- {{ [filter.field] }} -->
                      <!-- {{ filters[0].options }} -->
