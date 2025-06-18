@@ -1,7 +1,6 @@
 // src/composables/useForm.js
 import { ref } from 'vue';
 import api from '@/services/api';
-import { checkAuthBeforeSensitiveAction } from '@/composables/useAuthGuard';
 
 export function useForm({
    endpoint,
@@ -60,18 +59,10 @@ export function useForm({
       clearFieldErrors();
    }
 
-   async function onInsertNewClicked() {
-      // Antes usada isso
-      // const ok = await checkAuthBeforeSensitiveAction();
-      // if (!ok) return;
-
-      clearFieldData();
-      await load();     // laod form dados para novo registro
-      insertNewModal(); // agora você pode abrir o modal com segurança
-   }
-
-   function insertNewModal() {
-      editModalVisible.value = true;
+   async function insertNewModal() {
+      clearFieldData(); // limpa dos campos
+      await load();     // carrega os dados necessárioas ao form para o novo registro (listas)
+      // editModalVisible.value = true;
    }
 
    function closeModal() {
@@ -140,7 +131,6 @@ export function useForm({
       load,
       confirmSave,
       insertNewModal,
-      onInsertNewClicked,
       closeModal,
       confirmDeleteModal,
       cancelDelete,

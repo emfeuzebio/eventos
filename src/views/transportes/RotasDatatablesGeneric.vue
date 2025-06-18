@@ -61,6 +61,8 @@ const defaultValues = {
    destino: 'Nome do Ponto de destino',
    ativo: 'SIM',
 };
+
+const filters = [{}];
 </script>
 
 <template>
@@ -68,6 +70,7 @@ const defaultValues = {
       title="Lista de Rotas de Viagens "
       description="Gerenciamento de Rotas de Viagens"
       endpoint="rota"
+      :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
       :abilities="abilities"

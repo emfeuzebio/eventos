@@ -25,8 +25,50 @@
                   </div>
                </div>
 
+               <div class="d-flex flex-wrap gap-2 mb-3">
+                  <div
+                     v-for="filter in props.filters"
+                     :key="filter.field"
+                     class="me-2"
+                  >
+                     <label class="form-label fw-bold"
+                        >{{ filter.label }}:</label
+                     >
+
+                     <!-- {{ filtros }} -->
+                     <!-- {{ [filter.field] }} -->
+                     <!-- {{ filters[0].options }} -->
+
+                     <select
+                        v-if="filter.type === 'select'"
+                        v-model="filtros[filter.field]"
+                        class="form-select form-select-sm"
+                        @change="refreshTable"
+                     >
+                        <option value="">Todos</option>
+                        <option
+                           v-for="opt in filter.options"
+                           :key="opt.value"
+                           :value="opt.value"
+                        >
+                           {{ opt.label }}
+                        </option>
+                     </select>
+
+                     <CFormInput
+                        v-else-if="filter.type === 'text'"
+                        v-model="filtros[filter.field]"
+                        type="text"
+                        class="form-control-sm"
+                        @change="refreshTable"
+                     />
+
+                     <!-- Você pode expandir aqui para tipos como date, checkbox etc -->
+                  </div>
+               </div>
+
                <!-- Botões -->
-               <div class="col-12 col-md-4 pb-1 text-end">
+               <div class="col-12 col-md-8 pb-1 text-end">
                   <CButton
                      class="btn btn-sm btn-outline-info me-1"
                      v-if="canPrint"
@@ -36,7 +78,7 @@
                   <CButton
                      class="btn btn-sm btn-outline-success me-1"
                      v-if="canInsert"
-                     @click="form.onInsertNewClicked"
+                     @click="form.insertNewModal"
                      >Inserir Novo</CButton
                   >
                   <CButton
@@ -65,7 +107,9 @@
          keyboard="true"
       >
          <CModalHeader>
-            <CModalTitle>{{ form.isEditing ? 'Editar' : 'Novo' }}</CModalTitle>
+            <CModalTitle>{{
+               form.isEditing.value ? 'Editar ' : 'Inserir ' + endpoint
+            }}</CModalTitle>
          </CModalHeader>
          <CModalBody>
             <CForm>
@@ -80,7 +124,7 @@
                >Cancelar</CButton
             >
             <CButton color="primary" size="sm" @click="form.confirmSave">{{
-               form.isEditing ? 'Salvar' : 'Criar'
+               form.isEditing.value ? 'Salvar' : 'Criar'
             }}</CButton>
          </CModalFooter>
       </CModal>
@@ -135,11 +179,22 @@ const props = defineProps({
    columns: Array,
    defaultValues: Object,
    abilities: Array,
+   filters: Array,
+   default: () => [],
    canInsert: Boolean,
    canUpdate: Boolean,
    canDelete: Boolean,
    canPrint: Boolean,
 });
+
+// controe os filtros
+const filtros = ref({});
+// console.log(props.filters);
+
+props.filters.forEach((filtro) => {
+   filtros.value[filtro.field] = null; // inicia vazio
+});
+// console.log(filtros);
 
 // Estados e ações
 const alert = ref({ type: '', message: '' });
@@ -162,6 +217,7 @@ function btnImprimir() {
 const { init, refreshTable } = useDataTable({
    tableId,
    endpoint: props.endpoint,
+   externalFilters: filtros,
    columns: [
       ...props.columns,
       {
