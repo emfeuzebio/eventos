@@ -3,7 +3,7 @@ import $ from 'jquery';
 import 'datatables.net-dt';
 import api from '@/services/api'; 
 
-export function useDataTable({
+export function useDataTable({ 
    tableId,
    endpoint,
    columns,
