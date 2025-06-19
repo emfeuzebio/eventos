@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import $ from 'jquery';
 import 'datatables.net-dt';
-import api from '@/services/api';
+import api from '@/services/api'; 
 
 export function useDataTable({
    tableId,
