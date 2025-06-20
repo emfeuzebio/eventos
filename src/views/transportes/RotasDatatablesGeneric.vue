@@ -1,10 +1,12 @@
 <script setup>
+import { computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import 'datatables.net-dt';
 
 import { useEventos } from '@/composables/useEventos';
-const { eventos, loading, error } = useEventos();
+const { eventos, fetchEventos, fetchRotas, rotas, loading, error } =
+   useEventos();
 
 // define a Entidade Principal da View
 const entity = 'rota';
@@ -37,13 +39,19 @@ const columns = [
    { title: 'ID', data: 'id' },
    { title: 'Nome da Rota', data: 'nome' },
    { title: 'Tipo', data: 'tipo' },
+   // {
+   //    title: 'Origem',
+   //    data: 'origem',
+   //    render: (data) => `${data} `,
+   //    className: 'text-left',
+   // },
+   // { title: 'Destino', data: 'destino' },
    {
-      title: 'Origem',
-      data: 'origem',
-      render: (data) => `${data} `,
-      className: 'text-left',
+      title: 'Qtd Viagens',
+      data: null,
+      render: (data) => `?`,
+      className: 'text-center',
    },
-   { title: 'Destino', data: 'destino' },
    {
       title: 'Ativo',
       data: 'ativo',
@@ -62,10 +70,40 @@ const defaultValues = {
    ativo: 'SIM',
 };
 
-const filters = [{}];
+// carrega listas de estidades da API para popular listas: <selects> os filtros
+fetchEventos();
+// fetchRotas();
+
+// filtro da página - usar quando não há filtros
+// const filters = [{}]; // nessse caso sem filtros
+
+// Filtros da Página com valores fixos - filtro reativo aos dados carregados
+const filters = computed(() => [
+   {
+      label: 'Evento',
+      field: 'evento_id',
+      type: 'select',
+      options: eventos.value.map((evento) => ({
+         value: evento.id,
+         label: evento.sigla,
+      })),
+   },
+   {
+      label: 'Tipo de Rota',
+      field: 'tipo',
+      type: 'select',
+      options: [
+         { value: 'Chegada', label: 'Chegada' },
+         { value: 'Partida', label: 'Partida' },
+      ],
+   },
+]);
 </script>
 
 <template>
+   <!-- {{ rotas }} -->
+   <!-- {{ eventos }} -->
+
    <GenericCrud
       title="Lista de Rotas de Viagens "
       description="Gerenciamento de Rotas de Viagens"
@@ -82,59 +120,70 @@ const filters = [{}];
       :canPrint="canPrint"
    >
       <template #form="{ form, errors }">
+         <!-- {{ eventos }} -->
+         <!-- {{ rotas }} -->
+         {{ form.value }}
+
+         <label class="form-label fw-bold">Evento</label>
+
          <CFormSelect
             v-model="form.value.evento_id"
-            :options="eventos.map((ev) => ({ value: ev.id, label: ev.nome }))"
-            label="Evento"
-            :disabled="eventos.length === 0"
+            :options="[
+               { value: '', label: 'Selecione' },
+               ...eventos.map((ev) => ({ value: ev.id, label: ev.nome })),
+            ]"
          />
          <div class="form-error" v-if="errors.value.evento_id">
             {{ errors.value.evento_id[0] }}
          </div>
 
+         <label class="form-label fw-bold">Nome da Rota</label>
          <CFormInput
             v-model="form.value.nome"
-            label="Nome da Rota"
             :class="{ 'is-invalid': errors.nome }"
          />
          <div class="form-error" v-if="errors.value.nome">
             {{ errors.value.nome[0] }}
          </div>
 
-         <CFormInput
+         <label class="form-label fw-bold">Tipo</label>
+         <CFormSelect
             v-model="form.value.tipo"
-            label="Tipo"
-            :class="{ 'is-invalid': errors.tipo }"
+            :options="[
+               { value: '', label: 'Selecione' },
+               { value: 'Chegada', label: 'Chegada' },
+               { value: 'Partida', label: 'Partida' },
+            ]"
          />
          <div class="form-error" v-if="errors.value.tipo">
             {{ errors.value.tipo[0] }}
          </div>
 
+         <label class="form-label fw-bold">Local de Origem</label>
          <CFormInput
             v-model="form.value.origem"
-            label="Local de Origem"
             :class="{ 'is-invalid': errors.origem }"
          />
          <div class="form-error" v-if="errors.value.origem">
             {{ errors.value.origem[0] }}
          </div>
 
+         <label class="form-label fw-bold">Local de Destino</label>
          <CFormInput
             v-model="form.value.destino"
-            label="Local de Destino"
             :class="{ 'is-invalid': errors.destino }"
          />
          <div class="form-error" v-if="errors.value.destino">
             {{ errors.value.destino[0] }}
          </div>
 
+         <label class="form-label fw-bold">Ativo</label>
          <CFormSelect
             v-model="form.value.ativo"
             :options="[
                { value: 'SIM', label: 'SIM' },
                { value: 'NÃO', label: 'NÃO' },
             ]"
-            label="Ativo"
          />
          <div class="form-error" v-if="errors.value.ativo">
             {{ errors.value.ativo[0] }}

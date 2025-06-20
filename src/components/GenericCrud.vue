@@ -5,55 +5,53 @@
             <strong>{{ title }}</strong>
             <small v-if="description">- {{ description }}</small>
          </CCardHeader>
-         
-         <CCardBody>
 
+         <CCardBody>
             <!-- Linha dos filtros, mensagens e botões -->
             <div class="row align-items-center">
-
                <!-- Coluna 1: Filtros -->
                <div class="col-md-8 d-flex flex-wrap align-items-center gap-2">
-                  
                   <div class="d-flex flex-wrap gap-21 mb-1">
-                  <div
-                     v-for="filter in props.filters"
-                     :key="filter.field"
-                     class="me-2"
-                  >
-                     Filtrar por <label class="form-label fw-bold"
-                        > {{ filter.label }}</label
+                     <div
+                        v-for="filter in props.filters"
+                        :key="filter.field"
+                        class="me-2"
                      >
-                     <!-- {{ filtros }} -->
-                     <!-- {{ [filter.field] }} -->
-                     <!-- {{ filters[0].options }} -->
-
-                     <select
-                        v-if="filter.type === 'select'"
-                        v-model="filtros[filter.field]"
-                        class="form-select form-select-sm"
-                        @change="refreshTable"
-                     >
-                        <option value="">Todos</option>
-                        <option
-                           v-for="opt in filter.options"
-                           :key="opt.value"
-                           :value="opt.value"
+                        Filtrar por:
+                        <label class="form-label fw-bold">
+                           {{ filter.label }}</label
                         >
-                           {{ opt.label }}
-                        </option>
-                     </select>
+                        <!-- {{ filtros }} -->
+                        <!-- {{ [filter.field] }} -->
+                        <!-- {{ filters[0].options }} -->
 
-                     <CFormInput
-                        v-else-if="filter.type === 'text'"
-                        v-model="filtros[filter.field]"
-                        type="text"
-                        class="form-control-sm"
-                        @change="refreshTable"
-                     />
+                        <select
+                           v-if="filter.type === 'select'"
+                           v-model="filtros[filter.field]"
+                           class="form-select form-select-sm"
+                           @change="refreshTable"
+                        >
+                           <option value="">Todos</option>
+                           <option
+                              v-for="opt in filter.options"
+                              :key="opt.value"
+                              :value="opt.value"
+                           >
+                              {{ opt.label }}
+                           </option>
+                        </select>
 
-                     <!-- Você pode expandir aqui para tipos como date, checkbox etc -->
+                        <CFormInput
+                           v-else-if="filter.type === 'text'"
+                           v-model="filtros[filter.field]"
+                           type="text"
+                           class="form-control-sm"
+                           @change="refreshTable"
+                        />
+
+                        <!-- Você pode expandir aqui para tipos como date, checkbox etc -->
+                     </div>
                   </div>
-               </div>                  
                </div>
 
                <!-- Coluna 2: Alerta -->
@@ -78,19 +76,20 @@
                      class="btn btn-sm btn-outline-info me-1"
                      v-if="canPrint"
                      @click="btnImprimir"
-                  >Imprimir</CButton>
+                     >Imprimir</CButton
+                  >
                   <CButton
                      class="btn btn-sm btn-outline-success me-1"
                      v-if="canInsert"
                      @click="form.insertNewModal"
-                  >Inserir Novo</CButton>
+                     >Inserir Novo</CButton
+                  >
                   <CButton
                      class="btn btn-sm btn-outline-secondary"
                      @click="refreshTable"
-                  >Recarregar
+                     >Recarregar
                   </CButton>
                </div>
-
             </div>
 
             <!-- linha da Tabela de dados -->
@@ -174,9 +173,9 @@
 import { onMounted, ref, computed } from 'vue';
 import { useDataTable } from '@/composables/useDataTable';
 import { useForm } from '@/composables/useForm';
-import { useToast } from '@/composables/useToast'
+import { useToast } from '@/composables/useToast';
 
-const { showToast } = useToast()
+const { showToast } = useToast();
 
 // Props configuráveis
 const props = defineProps({
@@ -186,13 +185,13 @@ const props = defineProps({
    columns: Array,
    defaultValues: Object,
    abilities: Array,
-   filters: Array, default: () => [],
+   filters: Array,
+   default: () => [],
    canInsert: Boolean,
    canUpdate: Boolean,
    canDelete: Boolean,
    canPrint: Boolean,
 });
-
 
 // controe os filtros
 const filtros = ref({});
@@ -219,10 +218,10 @@ function closeAlert() {
 function btnImprimir() {
    // showAlert('danger', 'Imprimir não implementado.');
    showToast({
-         title: 'Erro',
-         message: "Imprimir não implementado!",
-         color: 'danger',
-      })
+      title: 'Erro',
+      message: 'Imprimir não implementado!',
+      color: 'danger',
+   });
 }
 
 // Tabela de Dados
@@ -268,7 +267,7 @@ const form = useForm({
          title: 'Sucesso',
          message: 'Dados salvos com sucesso!',
          color: 'success',
-      })
+      });
    },
    afterDelete: () => {
       refreshTable();
@@ -277,7 +276,7 @@ const form = useForm({
          title: 'Sucesso',
          message: 'Registro excluído com sucesso!',
          color: 'success',
-      })
+      });
    },
 });
 
@@ -317,4 +316,3 @@ onMounted(init);
    /* font-size: medium; */
 }
 </style>
-

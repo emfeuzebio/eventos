@@ -9,9 +9,7 @@ export function useForm({
    onSaved,
    afterDelete,
 }) {
-
    // console.log("useForm:" + fields)
-
    const form = ref({ ...fields });
    const isEditing = ref(false);
 
@@ -24,15 +22,15 @@ export function useForm({
    const selectedToDelete = ref({});
    const deleteModalVisible = ref(false);
 
-   async function load(id=0) {
+   async function load(id = 0) {
       try {
          loading.value = true;
          const res = await api.get(`${endpoint}/${id}`);
-         form.value = { ...fields, ...res.data };  // carrega os dados do response para o form Modal
-         isEditing.value = id ?? false;            // controle se é edição ou novo registro
-         formError.value = '';                     // limpa o form errors
-         clearFieldErrors();                       // limpa o filds errors
-         editModalVisible.value = true;            // mostra o modal
+         form.value = { ...fields, ...res.data }; // carrega os dados do response para o form Modal
+         isEditing.value = id ?? false; // controle se é edição ou novo registro
+         formError.value = ''; // limpa o form errors
+         clearFieldErrors(); // limpa o filds errors
+         editModalVisible.value = true; // mostra o modal
       } catch (err) {
          formError.value =
             err.response?.data?.message || 'Erro ao carregar dados';
@@ -61,13 +59,13 @@ export function useForm({
 
    async function insertNewModal() {
       clearFieldData(); // limpa dos campos
-      await load();     // carrega os dados necessárioas ao form para o novo registro (listas)
+      await load(); // carrega os dados necessárioas ao form para o novo registro (listas)
       // editModalVisible.value = true;
    }
 
    function closeModal() {
       editModalVisible.value = false;
-      clearFieldData();  
+      clearFieldData();
    }
 
    function confirmDeleteModal(rowData) {
@@ -102,9 +100,9 @@ export function useForm({
          clearFieldErrors();
 
          if (isEditing.value) {
-            await api.put(`${endpoint}/${form.value.id}`, form.value);
+            await api.put(`${endpoint}/${form.value.id}`, form.value);  // PUT update
          } else {
-            await api.post(endpoint, form.value);
+            await api.post(endpoint, form.value);                       // POST insert 
          }
 
          editModalVisible.value = false;
@@ -112,7 +110,7 @@ export function useForm({
       } catch (error) {
          if (error.response?.status === 422) {
             fieldErrors.value = error.response.data.errors || {};
-            console.log(fieldErrors.value);
+            // console.log(fieldErrors.value);
          }
       } finally {
          loading.value = false;

@@ -7,7 +7,15 @@ import { formatToBrDateTime } from '@/utils/dateFormat';
 import 'datatables.net-dt';
 
 import { useEventos } from '@/composables/useEventos';
-const { fetchEventos, fetchRotas, fetchVeiculos, eventos, rotas, veiculos, error } = useEventos();
+const {
+   fetchEventos,
+   fetchRotas,
+   fetchVeiculos,
+   eventos,
+   rotas,
+   veiculos,
+   error,
+} = useEventos();
 
 // define a Entidade Principal da View
 const entity = 'viagem';
@@ -71,43 +79,43 @@ const defaultValues = {
    veiculos: [],
 };
 
-// FILTROS - carrega da API listas para popular os filtros
+// carrega listas de estidades da API para popular listas: <selects> os filtros
 fetchRotas();
 fetchVeiculos();
 fetchEventos();
 
-// Sem filtros
-// const filters = [];
+// filtro da página - usar quando não há filtros
+// const filters = [{}]; // nessse caso sem filtros
 
 const filters = computed(() => [
    {
-    label: 'Evento',
-    field: 'evento_id',
-    type: 'select',
-    options: eventos.value.map((evento) => ({
-      value: evento.id,
-      label: evento.sigla,
-    })),
-  },
-  {
-    label: 'Rota',
-    field: 'rota_id',
-    type: 'select',
-    options: rotas.value.map((rota) => ({
-      value: rota.id,
-      label: rota.nome,
-    })),
-  },
-  {
-    label: 'Veículo',
-    field: 'veiculo_id',
-    type: 'select',
-    options: veiculos.value.map((veiculo) => ({
-      value: veiculo.id,
-      label: veiculo.descricao,
-    })),
-  },
-])
+      label: 'Evento',
+      field: 'evento_id',
+      type: 'select',
+      options: eventos.value.map((evento) => ({
+         value: evento.id,
+         label: evento.sigla,
+      })),
+   },
+   {
+      label: 'Rota',
+      field: 'rota_id',
+      type: 'select',
+      options: rotas.value.map((rota) => ({
+         value: rota.id,
+         label: rota.nome,
+      })),
+   },
+   {
+      label: 'Veículo',
+      field: 'veiculo_id',
+      type: 'select',
+      options: veiculos.value.map((veiculo) => ({
+         value: veiculo.id,
+         label: veiculo.descricao,
+      })),
+   },
+]);
 
 // Filtros da Página com valores fixos
 // const filters = [
@@ -122,7 +130,6 @@ const filters = computed(() => [
 //       ],
 //    },
 // ];
-
 </script>
 
 <template>
@@ -143,7 +150,6 @@ const filters = computed(() => [
    >
       <!-- Form Dados do Edit/New MOdal -->
       <template #form="{ form, errors }">
-
          <!-- {{ form.value }} -->
          <!-- <pre> {{ form.value }} </pre> -->
 
@@ -216,4 +222,3 @@ const filters = computed(() => [
       </template>
    </GenericCrud>
 </template>
-
