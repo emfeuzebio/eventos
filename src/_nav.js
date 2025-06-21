@@ -347,6 +347,16 @@ export default [
         name: 'Viagens Generic DTables',
         to: '/transportes/viagens',
       },
+      {
+        component: 'CNavItem',
+        name: 'Gestão Chegadas',
+        to: '/transportes/chegadas',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Entidades Espíritas',
+        to: '/cadastros/entidades',
+      },
     ],
   },
 

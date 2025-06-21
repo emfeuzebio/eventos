@@ -75,7 +75,7 @@ export function useDataTable({
       table.on('click', '.btnDelete', (e) => {
          const id = $(e.currentTarget).data('id');
          const rowData = dataTable.value.row(`#${id}`).data();
-         console.log('Linha selecionada para exclusão:', rowData);
+         // console.log('Linha selecionada para exclusão:', rowData);
          if (onClickDelete) onClickDelete(rowData);
       });
 

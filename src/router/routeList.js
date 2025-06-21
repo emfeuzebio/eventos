@@ -270,6 +270,18 @@ const routes = [
               component: () => import('@/views/transportes/ViagensDatatablesGeneric.vue'),
               meta: { requiresAuth: true }, // Protege esta rota
             },
+            {
+              path: '/transportes/chegadas',
+              name: 'Chegadas',
+              component: () => import('@/views/transportes/GestaoChegadasDatatablesComposition.vue'),
+              // meta: { requiresAuth: true }, // Protege esta rota
+            },
+            {
+              path: '/cadastros/entidades',
+              name: 'Entidades',
+              component: () => import('@/views/transportes/EntidadesDatatablesGeneric.vue'),
+              // meta: { requiresAuth: true }, // Protege esta rota
+            },
           ],
         },
   
