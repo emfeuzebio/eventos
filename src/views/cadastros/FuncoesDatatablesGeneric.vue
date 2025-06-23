@@ -6,18 +6,14 @@ import 'datatables.net-dt';
 
 import { useEventos } from '@/composables/useEventos';
 const {
-   eventos,
-   fetchEventos,
-   fetchRotas,
    fetchEstados,
    estados,
-   rotas,
    loading,
    error,
 } = useEventos();
 
 // define a Entidade Principal da View
-const entity = 'funcaos';
+const entity = 'funcao';
 
 // recuperas as Autorizações (abilities) do JWT
 const { can } = useAbilities();
@@ -31,24 +27,24 @@ const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização
 const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
 
 var canPrint = can(`${entity}.print`);
-var canPrint = true;
+var canPrint = false;
 
 // DEBUG de todas abilities do User Logado
-console.log('Abilities carregadas:', abilities.value);
-console.log('canList:', canList); // Isso deve ser true ou false
-console.log('canShow:', canShow); // Isso deve ser true ou false
-console.log('canInsert:', canInsert); // Isso deve ser true ou false
-console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
-console.log('canDelete:', canDelete); // Isso deve ser true ou false
-console.log('canPrint:', canPrint); // Isso deve ser true ou false
+// console.log('Abilities carregadas:', abilities.value);
+// console.log('canList:', canList); // Isso deve ser true ou false
+// console.log('canShow:', canShow); // Isso deve ser true ou false
+// console.log('canInsert:', canInsert); // Isso deve ser true ou false
+// console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
+// console.log('canDelete:', canDelete); // Isso deve ser true ou false
+// console.log('canPrint:', canPrint); // Isso deve ser true ou false
 
 // define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Descrição', data: 'descricao', class: 'fw-bold', width: '460px' },
-   { title: 'Sigla', data: 'sigla', width: '100px' },
-   { title: 'Qtd', data: 'qtd', class: 'dt-center small', },
-   { title: 'Exclusivo FEB', data: 'exclusivo_feb', class: 'dt-center small', },
+   { title: 'Nome da Função', data: 'descricao', class: 'fw-bold' },
+   { title: 'Sigla', data: 'sigla', width: '160px' },
+   { title: 'Qtd Máx', data: 'qtd', width: '100px', className: 'text-center', },
+   { title: 'Exclusivo FEB', data: 'exclusivo_feb', class: 'dt-center small', width: '130px' },
    {
       title: 'Ativo',
       data: 'ativo',
@@ -60,33 +56,19 @@ const columns = [
          }">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
       },
    },
-   // { title: 'Destino', data: 'destino' },
-   // {
-   //    title: 'Qtd Viagens',
-   //    data: null,
-   //    render: (data) => `?`,
-   //    className: 'text-center',
-   // },
-   // {
-   //    title: 'Ativo',
-   //    data: 'ativo',
-   //    render: (data) => (data === 'SIM' ? 'SIM' : 'NÃO'),
-   //    className: 'text-center',
-   // },
 ];
 
 // define os valores padrão dos campos do formulário
 const defaultValues = {
-   evento_id: '1',
-   nome: 'Nome',
-   sigla: 'Sigla',
    descricao: 'Descrição',
+   sigla: 'Sigla',
+   qtd: '1',
+   exclusivo_feb: 'NÃO',
    ativo: 'SIM',
 };
 
 // carrega listas de estidades da API para popular listas: <selects> os filtros
-// fetchEventos();
-fetchEstados();
+// fetchEstados();
 
 // filtro da página - usar quando não há filtros
 const filters = [{}]; // nessse caso sem filtros
@@ -94,13 +76,12 @@ const filters = [{}]; // nessse caso sem filtros
 </script>
 
 <template>
-   <!-- {{ rotas }} -->
    <!-- {{ eventos }} -->
 
    <GenericCrud
-      title="Lista de Funções "
-      description="Gerenciamento das Funções/Papéis da Pessoas inscritas no Evento"
-      endpoint="funcaos"
+      title="Cadastro de Funções "
+      description="Gerenciamento das Funções/Papéis de Pessoas inscritas em um Evento"
+      endpoint="funcao"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
@@ -116,13 +97,13 @@ const filters = [{}]; // nessse caso sem filtros
          <!-- {{ form.value.estados }} -->
          <!-- {{ estados }} -->
 
-         <label class="form-label fw-bold">Nome</label>
+         <label class="form-label fw-bold">Nome da Função</label>
          <CFormInput
-            v-model="form.value.nome"
-            :class="{ 'is-invalid': errors.nome }"
+            v-model="form.value.descricao"
+            :class="{ 'is-invalid': errors.descricao }"
          />
-         <div class="form-error" v-if="errors.value.nome">
-            {{ errors.value.nome[0] }}
+         <div class="form-error" v-if="errors.value.descricao">
+            {{ errors.value.descricao[0] }}
          </div>
 
          <label class="form-label fw-bold">Sigla</label>
@@ -134,13 +115,25 @@ const filters = [{}]; // nessse caso sem filtros
             {{ errors.value.sigla[0] }}
          </div>
 
-         <label class="form-label fw-bold">Descrição</label>
+         <label class="form-label fw-bold">Quantidade Máxima por Evento</label>
          <CFormInput
-            v-model="form.value.descricao"
-            :class="{ 'is-invalid': errors.descricao }"
+            v-model="form.value.qtd"
+            :class="{ 'is-invalid': errors.qtd }"
          />
-         <div class="form-error" v-if="errors.value.descricao">
-            {{ errors.value.descricao[0] }}
+         <div class="form-error" v-if="errors.value.qtd">
+            {{ errors.value.qtd[0] }}
+         </div>
+
+         <label class="form-label fw-bold">Exclusivo da FEB</label>
+         <CFormSelect
+            v-model="form.value.exclusivo_feb"
+            :options="[
+               { value: 'SIM', label: 'SIM' },
+               { value: 'NÃO', label: 'NÃO' },
+            ]"
+         />
+         <div class="form-error" v-if="errors.value.exclusivo_feb">
+            {{ errors.value.exclusivo_feb[0] }}
          </div>
 
          <label class="form-label fw-bold">Ativo</label>

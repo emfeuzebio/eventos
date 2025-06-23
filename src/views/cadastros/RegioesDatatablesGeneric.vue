@@ -36,8 +36,8 @@ var canPrint = false;
 // define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Sigla', data: 'sigla' },
    { title: 'Nome da Região', data: 'descricao', class: 'fw-bold' },
+   { title: 'Sigla', data: 'sigla' },
 ];
 
 // define os valores padrão dos campos do formulário

@@ -36,8 +36,8 @@ console.log('canPrint:', canPrint); // Isso deve ser true ou false
 // define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Sigla', data: 'sigla' },
    { title: 'Nome do Estado', data: 'descricao', class: 'fw-bold' },
+   { title: 'Sigla', data: 'sigla' },
    {
       title: 'Região',
       data: 'regiao.descricao',
@@ -97,21 +97,6 @@ const filters = [{}]; // nessse caso sem filtros
          <!-- {{ form.value.estados }} -->
          <!-- {{ estados }} -->
 
-         <label class="form-label fw-bold">Região do País</label>
-         <CFormSelect
-            v-model="form.value.regiao_id"
-            :options="[
-               { value: '', label: 'Selecione' },
-               ...regioes.map((regiao) => ({
-                  value: regiao.id,
-                  label: regiao.descricao,
-               })),
-            ]"
-         />
-         <div class="form-error" v-if="errors.value.regiao_id">
-            {{ errors.value.regiao_id[0] }}
-         </div>
-
          <label class="form-label fw-bold">Nome do Estado da Federação</label>
          <CFormInput
             v-model="form.value.descricao"
@@ -129,6 +114,22 @@ const filters = [{}]; // nessse caso sem filtros
          <div class="form-error" v-if="errors.value.sigla">
             {{ errors.value.sigla[0] }}
          </div>
+
+         <label class="form-label fw-bold">Região do País</label>
+         <CFormSelect
+            v-model="form.value.regiao_id"
+            :options="[
+               { value: '', label: 'Selecione' },
+               ...regioes.map((regiao) => ({
+                  value: regiao.id,
+                  label: regiao.descricao,
+               })),
+            ]"
+         />
+         <div class="form-error" v-if="errors.value.regiao_id">
+            {{ errors.value.regiao_id[0] }}
+         </div>
+
       </template>
    </GenericCrud>
 </template>
