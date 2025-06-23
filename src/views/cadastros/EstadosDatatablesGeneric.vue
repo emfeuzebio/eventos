@@ -40,11 +40,11 @@ const columns = [
    { title: 'Nome do Estado', data: 'descricao', class: 'fw-bold' },
    {
       title: 'Região',
-      data: null,
-      render(data, type, row) {
-         return '';
-      },
+      data: 'regiao.descricao',
+      render: (data) => `${data} `,
+      className: 'text-left',
    },
+
 ];
 
 // define os valores padrão dos campos do formulário
@@ -99,7 +99,7 @@ const filters = [{}]; // nessse caso sem filtros
 
          <label class="form-label fw-bold">Região do País</label>
          <CFormSelect
-            v-model="form.value.estado_id"
+            v-model="form.value.regiao_id"
             :options="[
                { value: '', label: 'Selecione' },
                ...estados.map((estado) => ({
@@ -108,8 +108,8 @@ const filters = [{}]; // nessse caso sem filtros
                })),
             ]"
          />
-         <div class="form-error" v-if="errors.value.estado_id">
-            {{ errors.value.estado_id[0] }}
+         <div class="form-error" v-if="errors.value.regiao_id">
+            {{ errors.value.regiao_id[0] }}
          </div>
 
          <label class="form-label fw-bold">Nome do Estado da Federação</label>

@@ -7,6 +7,7 @@ export function useEventos(ativo = true) {
    const rotas = ref([]);
    const veiculos = ref([]);
    const estados = ref([]);
+   const regioes = ref([]);
    const error = ref(null);
 
    const fetchEventos = async () => {
@@ -49,7 +50,16 @@ export function useEventos(ativo = true) {
    const fetchEstados = async () => {
       try {
          error.value = null;
-         estados.value = (await api.get('/estado')).data;
+         estados.value = (await api.get('/regiao')).data;
+      } catch (err) {
+         error.value = err;
+      }
+   };
+
+   const fetchRegioes = async () => {
+      try {
+         error.value = null;
+         regioes.value = (await api.get('/estado')).data;
       } catch (err) {
          error.value = err;
       }
@@ -62,10 +72,12 @@ export function useEventos(ativo = true) {
       veiculos,
       rotas,
       estados,
+      regioes,
       fetchEventos, // caso queira recarregar manualmente
       fetchVeiculos, // caso queira recarregar manualmente
       fetchRotas, // caso queira recarregar manualmente
       fetchEstados, // caso queira recarregar manualmente
+      fetchRegioes, // caso queira recarregar manualmente
       error,
    };
 }
