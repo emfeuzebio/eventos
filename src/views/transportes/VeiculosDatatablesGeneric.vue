@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import 'datatables.net-dt';
@@ -32,7 +33,7 @@ console.log('canPrint:', canPrint); // Isso deve ser true ou false
 // define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Descrição do Veículo', data: 'descricao' },
+   { title: 'Descrição do Veículo', data: 'descricao', class: 'fw-bold' },
    { title: 'Tipo', data: 'tipo' },
    {
       title: 'Capacidade',
@@ -44,8 +45,12 @@ const columns = [
    {
       title: 'Ativo',
       data: 'ativo',
-      render: (data) => (data === 'Y' ? 'SIM' : 'NÃO'),
-      className: 'text-center',
+      class: 'dt-center small',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.ativo === 'Y' ? 'text-primary' : 'text-danger'
+         }">${row.ativo === 'Y' ? 'SIM' : 'NÃO'}</span>`;
+      },
    },
 ];
 
@@ -59,13 +64,39 @@ const defaultValues = {
    telefone: '(61) 90000-0000',
    ativo: 'Y',
 };
+
+// filtro da página - usar quando não há filtros
+// const filters = [{}]; // nessse caso sem filtros
+
+// monta lista de tipos de veículos para o filtro
+const tipoVeiculo = [
+   { value: '', label: 'Selecione o tipo' },
+   { value: 'Automóvel', label: 'Automóvel' },
+   { value: 'Van', label: 'Van' },
+   { value: 'Micrônibus', label: 'Micrônibus' },
+   { value: 'Ônibus', label: 'Ônibus' },
+];
+
+// Filtros da Página com valores fixos - filtro reativo aos dados carregados
+const filters = computed(() => [
+   {
+      label: 'Tipo de Veículo',
+      field: 'tipo',
+      type: 'select',
+      options: tipoVeiculo.map((tipo) => ({
+         value: tipo.value,
+         label: tipo.label,
+      })),
+   },
+]);
 </script>
 
 <template>
    <GenericCrud
-      title="Lista de Veículos"
+      title="Cadastro de Veículos"
       description="Gerenciamento da frota de Veículos"
       endpoint="veiculo"
+      :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
       :abilities="abilities"

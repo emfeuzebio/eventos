@@ -352,10 +352,30 @@ export default [
         name: 'Gestão Chegadas',
         to: '/transportes/chegadas',
       },
+    ],
+  },
+
+  // Cadastros
+  {
+    component: 'CNavGroup',
+    name: 'Cadastros',
+    to: '/cadastros',
+    icon: 'cil-envelope-open',
+    items: [
       {
         component: 'CNavItem',
         name: 'Entidades Espíritas',
         to: '/cadastros/entidades',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Estados da Federação',
+        to: '/cadastros/estados',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Regiões do País',
+        to: '/cadastros/regioes',
       },
     ],
   },

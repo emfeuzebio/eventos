@@ -5,19 +5,10 @@ import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import 'datatables.net-dt';
 
 import { useEventos } from '@/composables/useEventos';
-const {
-   eventos,
-   fetchEventos,
-   fetchRotas,
-   fetchEstados,
-   estados,
-   rotas,
-   loading,
-   error,
-} = useEventos();
+const { fetchEstados, estados } = useEventos();
 
 // define a Entidade Principal da View
-const entity = 'entidade';
+const entity = 'estado';
 
 // recuperas as Autorizações (abilities) do JWT
 const { can } = useAbilities();
@@ -31,7 +22,7 @@ const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização
 const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
 
 var canPrint = can(`${entity}.print`);
-var canPrint = true;
+var canPrint = false;
 
 // DEBUG de todas abilities do User Logado
 console.log('Abilities carregadas:', abilities.value);
@@ -45,58 +36,42 @@ console.log('canPrint:', canPrint); // Isso deve ser true ou false
 // define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Nome', data: 'nome' },
    { title: 'Sigla', data: 'sigla' },
-   { title: 'Descrição', data: 'descricao' },
-   // {
-   //    title: 'Origem',
-   //    data: 'origem',
-   //    render: (data) => `${data} `,
-   //    className: 'text-left',
-   // },
-   // { title: 'Destino', data: 'destino' },
-   // {
-   //    title: 'Qtd Viagens',
-   //    data: null,
-   //    render: (data) => `?`,
-   //    className: 'text-center',
-   // },
-   // {
-   //    title: 'Ativo',
-   //    data: 'ativo',
-   //    render: (data) => (data === 'SIM' ? 'SIM' : 'NÃO'),
-   //    className: 'text-center',
-   // },
+   { title: 'Nome do Estado', data: 'descricao', class: 'fw-bold' },
+   {
+      title: 'Região',
+      data: null,
+      render(data, type, row) {
+         return '';
+      },
+   },
 ];
 
 // define os valores padrão dos campos do formulário
 const defaultValues = {
-   evento_id: '1',
-   nome: 'Nome',
+   regiao_id: null,
    sigla: 'Sigla',
    descricao: 'Descrição',
-   ativo: 'SIM',
 };
 
 // carrega listas de estidades da API para popular listas: <selects> os filtros
-// fetchEventos();
 fetchEstados();
 
 // filtro da página - usar quando não há filtros
-// const filters = [{}]; // nessse caso sem filtros
+const filters = [{}]; // nessse caso sem filtros
 
 // Filtros da Página com valores fixos - filtro reativo aos dados carregados
-const filters = computed(() => [
-   {
-      label: 'Estado',
-      field: 'estado_id',
-      type: 'select',
-      options: estados.value.map((estado) => ({
-         value: estado.id,
-         label: estado.descricao,
-      })),
-   },
-]);
+// const filters = computed(() => [
+//    {
+//       label: 'Estado',
+//       field: 'estado_id',
+//       type: 'select',
+//       options: estados.value.map((estado) => ({
+//          value: estado.id,
+//          label: estado.descricao,
+//       })),
+//    },
+// ]);
 </script>
 
 <template>
@@ -104,9 +79,9 @@ const filters = computed(() => [
    <!-- {{ eventos }} -->
 
    <GenericCrud
-      title="Lista de Entidades "
-      description="Gerenciamento de Entidades Espíritas"
-      endpoint="entidade"
+      title="Cadastro de Estados "
+      description="Gerenciamento do cadastro de Estados da Federação"
+      endpoint="estado"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
@@ -121,11 +96,8 @@ const filters = computed(() => [
       <template #form="{ form, errors }">
          <!-- {{ form.value.estados }} -->
          <!-- {{ estados }} -->
-         <!-- {{ eventos }} -->
-         <!-- {{ rotas }} -->
-         <!-- {{ form.value }} -->
 
-         <label class="form-label fw-bold">Estado da Federação</label>
+         <label class="form-label fw-bold">Região do País</label>
          <CFormSelect
             v-model="form.value.estado_id"
             :options="[
@@ -140,13 +112,13 @@ const filters = computed(() => [
             {{ errors.value.estado_id[0] }}
          </div>
 
-         <label class="form-label fw-bold">Nome</label>
+         <label class="form-label fw-bold">Nome do Estado da Federação</label>
          <CFormInput
-            v-model="form.value.nome"
-            :class="{ 'is-invalid': errors.nome }"
+            v-model="form.value.descricao"
+            :class="{ 'is-invalid': errors.descricao }"
          />
-         <div class="form-error" v-if="errors.value.nome">
-            {{ errors.value.nome[0] }}
+         <div class="form-error" v-if="errors.value.descricao">
+            {{ errors.value.descricao[0] }}
          </div>
 
          <label class="form-label fw-bold">Sigla</label>
@@ -156,27 +128,6 @@ const filters = computed(() => [
          />
          <div class="form-error" v-if="errors.value.sigla">
             {{ errors.value.sigla[0] }}
-         </div>
-
-         <label class="form-label fw-bold">Descrição</label>
-         <CFormInput
-            v-model="form.value.descricao"
-            :class="{ 'is-invalid': errors.descricao }"
-         />
-         <div class="form-error" v-if="errors.value.descricao">
-            {{ errors.value.descricao[0] }}
-         </div>
-
-         <label class="form-label fw-bold">Ativo</label>
-         <CFormSelect
-            v-model="form.value.ativo"
-            :options="[
-               { value: 'SIM', label: 'SIM' },
-               { value: 'NÃO', label: 'NÃO' },
-            ]"
-         />
-         <div class="form-error" v-if="errors.value.ativo">
-            {{ errors.value.ativo[0] }}
          </div>
       </template>
    </GenericCrud>

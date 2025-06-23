@@ -206,14 +206,14 @@ props.filters.forEach((filtro) => {
 const alert = ref({ type: '', message: '' });
 const tableId = `datatable-${props.endpoint}`;
 
-function showAlert(type, message) {
-   alert.value = { type, message };
-   setTimeout(() => (alert.value.message = ''), 5000);
-}
+// function showAlert(type, message) {
+//    alert.value = { type, message };
+//    setTimeout(() => (alert.value.message = ''), 5000);
+// }
 
-function closeAlert() {
-   alert.value.message = '';
-}
+// function closeAlert() {
+//    alert.value.message = '';
+// }
 
 function btnImprimir() {
    // showAlert('danger', 'Imprimir não implementado.');
@@ -229,6 +229,7 @@ const { init, refreshTable } = useDataTable({
    tableId,
    endpoint: props.endpoint,
    externalFilters: filtros,
+   autoWidth: false, // desativa o ajuste automático para que a largura definida funcione
    columns: [
       ...props.columns,
       {

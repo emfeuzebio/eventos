@@ -276,15 +276,44 @@ const routes = [
               component: () => import('@/views/transportes/GestaoChegadasDatatablesComposition.vue'),
               // meta: { requiresAuth: true }, // Protege esta rota
             },
+          ],
+        },
+
+        // Cadastros
+        {
+          path: '/cadastros',
+          name: 'Cadastros',
+          component: {
+            render() {
+              return h(resolveComponent('router-view'))
+            },
+          },
+          redirect: '/transportes/veiculos',
+          children: [
             {
               path: '/cadastros/entidades',
               name: 'Entidades',
-              component: () => import('@/views/transportes/EntidadesDatatablesGeneric.vue'),
+              component: () => import('@/views/cadastros/EntidadesDatatablesGeneric.vue'),
+              // meta: { requiresAuth: true }, // Protege esta rota
+            },
+            {
+              path: '/cadastros/estados',
+              name: 'Estados',
+              component: () => import('@/views/cadastros/EstadosDatatablesGeneric.vue'),
+              // component: () => import('@/views/pages/Page404.vue'),
+              // meta: { requiresAuth: true }, // Protege esta rota
+            },
+            {
+              path: '/cadastros/regioes',
+              name: 'Regiões',
+              component: () => import('@/views/cadastros/RegioesDatatablesGeneric.vue'),
+              // component: () => import('@/views/pages/Page404.vue'),
               // meta: { requiresAuth: true }, // Protege esta rota
             },
           ],
         },
-  
+
+        // Notifications
         {
           path: '/notifications',
           name: 'Notifications',
