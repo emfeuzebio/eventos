@@ -43,9 +43,10 @@ export function useDataTable({
          }, // Ajuste para o formato esperado pelo DataTables
          language: { url: '/assets/DataTables.pt_BR.json' },
          lengthMenu: [
-            [5, 10, 25, -1],
-            [5, 10, 25, 'Todos'],
+            [5, 10, 25, 50, 100, -1],
+            [5, 10, 25, 50, 100, 'Todos'],
          ],
+         pageLength: 10, 
          drawCallback() {
             bindTableEvents();
          },
