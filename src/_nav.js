@@ -369,6 +369,11 @@ export default [
       },
       {
         component: 'CNavItem',
+        name: 'Funções/Papéis',
+        to: '/cadastros/funcoes',
+      },
+      {
+        component: 'CNavItem',
         name: 'Estados da Federação',
         to: '/cadastros/estados',
       },

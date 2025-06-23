@@ -14,6 +14,12 @@ import DocsComponents from '@/components/DocsComponents'
 import DocsExample from '@/components/DocsExample'
 import DocsIcons from '@/components/DocsIcons'
 
+// Para tootil tips não funcionou
+// import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+
+import FloatingVue from 'floating-vue';
+import 'floating-vue/dist/style.css';
+
 import en from './locales/en.json'
 import pt from './locales/pt.json'
 
@@ -32,13 +38,13 @@ const i18n = createI18n({
     }
 })
 
-// app.use(createPinia())
-app.use(pinia)
-app.use(router)
+app.use(pinia)                  // Pinia para gerenciamento de estado
+app.use(router)                 // Vue Router para navegação
+app.use(FloatingVue);           // Para tooltips e popovers
 
-app.use(i18n)
-app.use(CoreuiVue)
-app.provide('icons', icons)
+app.use(i18n)                   // Vue I18n para internacionalização
+app.use(CoreuiVue)              // CoreUI Vue para componentes UI
+app.provide('icons', icons)     // Fornece os ícones para os componentes
 app.component('CIcon', CIcon)
 app.component('DocsComponents', DocsComponents)
 app.component('DocsExample', DocsExample)

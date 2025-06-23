@@ -297,6 +297,12 @@ const routes = [
               // meta: { requiresAuth: true }, // Protege esta rota
             },
             {
+              path: '/cadastros/funcoes',
+              name: 'Funções',
+              component: () => import('@/views/cadastros/FuncoesDatatablesGeneric.vue'),
+              // meta: { requiresAuth: true }, // Protege esta rota
+            },
+            {
               path: '/cadastros/estados',
               name: 'Estados',
               component: () => import('@/views/cadastros/EstadosDatatablesGeneric.vue'),

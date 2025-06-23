@@ -59,7 +59,7 @@ export function useEventos(ativo = true) {
    const fetchRegioes = async () => {
       try {
          error.value = null;
-         regioes.value = (await api.get('/estado')).data;
+         regioes.value = (await api.get('/regiao')).data;
       } catch (err) {
          error.value = err;
       }

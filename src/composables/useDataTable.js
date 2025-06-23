@@ -2,6 +2,8 @@ import { ref } from 'vue';
 import $ from 'jquery';
 import 'datatables.net-dt';
 import api from '@/services/api'; 
+import { createTooltip } from 'floating-vue'
+
 
 export function useDataTable({ 
    tableId,
@@ -49,6 +51,26 @@ export function useDataTable({
          pageLength: 10, 
          drawCallback() {
             bindTableEvents();
+            // const elements = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            // elements.forEach((el) => {
+            //   bootstrap.Tooltip.getInstance(el)?.dispose(); // remove se já existe
+            //   new bootstrap.Tooltip(el); // recria
+            // });            
+            // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            // tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+
+            const tooltipEls = document.querySelectorAll('[data-v-tooltip]');
+    
+            tooltipEls.forEach(el => {
+              // Evita reaplicar
+              if (!el._tooltipInstance) {
+                const content = el.getAttribute('data-v-tooltip')
+                el._tooltipInstance = createTooltip(el, {
+                  content,
+                  placement: 'top',
+                })
+              }
+            });            
          },
       });
    }

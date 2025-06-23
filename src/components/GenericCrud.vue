@@ -241,10 +241,10 @@ const { init, refreshTable } = useDataTable({
          render(data, type, row) {
             return (
                `
-          <button class="btnEdit   btn btn-xs btn-outline-primary me-1" data-id="${row.id}"` +
+          <button class="btnEdit btn btn-xs btn-outline-primary me-1" data-id="${row.id}" data-v-tooltip="Editar o registro atual" ` +
                (props.canUpdate ? '' : 'disabled') +
                ` >Editar</button>
-          <button class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}"` +
+          <button class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" data-v-tooltip="Excluir o registro atual"` +
                (props.canDelete ? '' : 'disabled') +
                ` >Excluir</button>
         `
