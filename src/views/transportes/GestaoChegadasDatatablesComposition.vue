@@ -89,7 +89,7 @@ import { can } from '@/services/AuthorizationsService';
 
 // Components externos (você pode separá-los em arquivos ou mantê-los inline)
 // import EditModal from './EditModal.vue';
-import ConfirmDeleteModal from './ConfirmDeleteModal.vue';
+// import ConfirmDeleteModal from './ConfirmDeleteModal.vue';
 
 // Permissões
 const canList = ref(can('veiculo.index'));
