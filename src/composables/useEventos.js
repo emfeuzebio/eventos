@@ -8,6 +8,8 @@ export function useEventos(ativo = true) {
    const veiculos = ref([]);
    const estados = ref([]);
    const regioes = ref([]);
+   const viagens = ref([]);
+   const viagensDaRota = ref([]);
    const error = ref(null);
 
    const fetchEventos = async () => {
@@ -17,6 +19,24 @@ export function useEventos(ativo = true) {
             params: ativo ? { ativo: 'SIM' } : {},
          });
          eventos.value = res.data;
+      } catch (err) {
+         error.value = err;
+      }
+   };
+
+   const fetchRegioes = async () => {
+      try {
+         error.value = null;
+         regioes.value = (await api.get('/regiao')).data;
+      } catch (err) {
+         error.value = err;
+      }
+   };
+
+   const fetchEstados = async () => {
+      try {
+         error.value = null;
+         estados.value = (await api.get('/estado')).data;
       } catch (err) {
          error.value = err;
       }
@@ -47,23 +67,57 @@ export function useEventos(ativo = true) {
       }
    };
 
-   const fetchEstados = async () => {
+   const fetchViagens = async () => {
       try {
          error.value = null;
-         estados.value = (await api.get('/estado')).data;
+         viagens.value = (await api.get('/viagem')).data;
       } catch (err) {
          error.value = err;
       }
    };
 
-   const fetchRegioes = async () => {
+   const fetchViagensDaRota = async (rotaId) => {
+      console.log('fetchViagensDaRota:', rotaId);
+      
       try {
          error.value = null;
-         regioes.value = (await api.get('/regiao')).data;
+         viagensDaRota.value = (await api.get('/viagem'), { params: { rotaId: rotaId } }).data;
       } catch (err) {
          error.value = err;
       }
+    }   
+
+   const salvarViagem = async (id, dados) => {
+      try {
+         // console.log('salvarViagem:', id, dados);
+         error.value = null;
+         await api.put(`/inscricao/${id}/marcarChegada`, dados);
+         return true;
+      } catch (err) {
+         error.value = err;
+         return false;
+      }
    };
+
+
+   /*
+
+      2. Backend Laravel (exemplo) 
+      
+      // InscricaoController.php
+      public function atualizaTraslado(Request $request, $id)
+      {
+         $inscricao = Inscricao::findOrFail($id);
+         $request->validate([
+            'chegada_traslado' => ['required', 'in:SIM,NÃO'],
+         ]);
+         $inscricao->chegada_traslado = $request->chegada_traslado;
+         $inscricao->save();
+
+         return response()->json(['success' => true]);
+      }
+
+   */
 
    // onMounted(fetchEventos)
 
@@ -73,11 +127,18 @@ export function useEventos(ativo = true) {
       rotas,
       estados,
       regioes,
-      fetchEventos, // caso queira recarregar manualmente
+      viagens,
+      viagensDaRota,
+      
+      fetchEventos,  // caso queira recarregar manualmente
       fetchVeiculos, // caso queira recarregar manualmente
-      fetchRotas, // caso queira recarregar manualmente
-      fetchEstados, // caso queira recarregar manualmente
-      fetchRegioes, // caso queira recarregar manualmente
+      fetchRotas,    // caso queira recarregar manualmente
+      fetchEstados,  // caso queira recarregar manualmente
+      fetchRegioes,  // caso queira recarregar manualmente
+      fetchViagens,  // caso queira recarregar manualmente
+      fetchViagensDaRota,  // caso queira recarregar manualmente
+
+      salvarViagem, // 
       error,
    };
 }

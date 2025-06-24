@@ -49,7 +49,11 @@ api.interceptors.response.use(
       router.push('/pages/login')
     } else if (error.response?.status == 419) {
       showError(error.response?.data?.error || '419 - Erro inesperado.')
-    } // Não sendo erros de campos do formulário (422), exibe o erro
+    } 
+    else if (error.response?.status == 404) {
+      showError(error.response?.data?.message || '404 - Erro inesperado.')
+    }
+    // Não sendo erros de campos do formulário (422), exibe o erro
     else if (error.response?.status != 422) {
       showError(error.response?.data?.error || '419 - Erro inesperado.')
     }

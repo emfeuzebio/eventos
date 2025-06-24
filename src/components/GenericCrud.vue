@@ -175,6 +175,9 @@ import { useDataTable } from '@/composables/useDataTable';
 import { useForm } from '@/composables/useForm';
 import { useToast } from '@/composables/useToast';
 
+import { useEventos } from '@/composables/useEventos';
+const { fetchRegioes, regioes } = useEventos();
+
 const { showToast } = useToast();
 
 // Props configuráveis
@@ -253,6 +256,8 @@ const { init, refreshTable } = useDataTable({
       },
    ],
 
+   // onClickSelectViagem: () => fetchRegioes(),
+   onClickSelectViagem: () => abrirModal(),
    onClickEdit: (id) => form.load(id),
    onClickDelete: (rowData) => form.confirmDeleteModal(rowData),
 });

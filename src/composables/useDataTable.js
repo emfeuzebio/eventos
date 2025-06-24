@@ -12,6 +12,7 @@ export function useDataTable({
    onClickEdit,
    onClickDelete,
    onClickShow,
+   onClickSelectViagem,
    externalFilters,
 }) {
    const dataTable = ref(null);
@@ -51,14 +52,8 @@ export function useDataTable({
          pageLength: 10, 
          drawCallback() {
             bindTableEvents();
-            // const elements = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            // elements.forEach((el) => {
-            //   bootstrap.Tooltip.getInstance(el)?.dispose(); // remove se já existe
-            //   new bootstrap.Tooltip(el); // recria
-            // });            
-            // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            // tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
 
+            // Reaplica tooltips após o DataTable ser renderizado
             const tooltipEls = document.querySelectorAll('[data-v-tooltip]');
     
             tooltipEls.forEach(el => {
@@ -106,6 +101,26 @@ export function useDataTable({
          const id = $(e.currentTarget).data('id');
          if (onClickShow) onClickShow(id);
       });
+
+
+      // Eventos adicionais para view especializada
+      // Por ora estão aqui, depois levar para view especializada
+         table.on('click', '.btnToggleChegadaTraslado', (e) => {
+            const inscricaoId = $(e.currentTarget).data('inscricao_id');
+            const ativo = e.target.checked ? 'SIM' : 'NÃO';
+            console.log(`btnToggleChegadaTraslado > Alterar inscricaoId ${inscricaoId} para ${ativo}`);         
+            // if (onClickEdit) onClickEdit(inscricaoId);
+            // abrirModal();
+         });
+      
+         table.on('click', '.btnSelecionarViagem', (e) => {
+            const inscricaoId = $(e.currentTarget).data('inscricao_id');
+            const viagemId = $(e.currentTarget).data('viagem_id');
+            const rotaId = $(e.currentTarget).data('rota_id');
+            console.log(`btnSelecionarViagem > InscricaoId ${inscricaoId}; ViagemId ${viagemId}; RotaId ${rotaId}`);
+            if (onClickSelectViagem) onClickSelectViagem(inscricaoId);
+         });      
+       
    }
 
    return {

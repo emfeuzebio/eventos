@@ -9,7 +9,7 @@ export function formatToBrDateTime(dateStr) {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-    second: '2-digit',
+    // second: '2-digit',
     hour12: false,
     timeZone: 'America/Sao_Paulo', // opcional: garante fuso correto
   }).format(date)
