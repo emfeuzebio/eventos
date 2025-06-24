@@ -88,7 +88,7 @@ import { useUserStore } from '@/stores/userStore';
 import { can } from '@/services/AuthorizationsService';
 
 // Components externos (você pode separá-los em arquivos ou mantê-los inline)
-import EditModal from './EditModal.vue';
+// import EditModal from './EditModal.vue';
 import ConfirmDeleteModal from './ConfirmDeleteModal.vue';
 
 // Permissões

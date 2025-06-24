@@ -382,6 +382,11 @@ export default [
         name: 'Regiões do País',
         to: '/cadastros/regioes',
       },
+      {
+        component: 'CNavItem',
+        name: 'Inscrições',
+        to: '/cadastros/inscricoes',
+      },
     ],
   },
 

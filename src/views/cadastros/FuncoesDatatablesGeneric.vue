@@ -5,12 +5,7 @@ import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import 'datatables.net-dt';
 
 import { useEventos } from '@/composables/useEventos';
-const {
-   fetchEstados,
-   estados,
-   loading,
-   error,
-} = useEventos();
+const { fetchEstados, estados, loading, error } = useEventos();
 
 // define a Entidade Principal da View
 const entity = 'funcao';
@@ -43,8 +38,13 @@ const columns = [
    { title: 'ID', data: 'id' },
    { title: 'Nome da Função', data: 'descricao', class: 'fw-bold' },
    { title: 'Sigla', data: 'sigla', width: '160px' },
-   { title: 'Qtd Máx', data: 'qtd', width: '100px', className: 'text-center', },
-   { title: 'Exclusivo FEB', data: 'exclusivo_feb', class: 'dt-center small', width: '130px' },
+   { title: 'Qtd Máx', data: 'qtd', width: '120px', className: 'text-center' },
+   {
+      title: 'Exclusivo FEB',
+      data: 'exclusivo_feb',
+      class: 'dt-center small',
+      width: '140px',
+   },
    {
       title: 'Ativo',
       data: 'ativo',
@@ -72,7 +72,6 @@ const defaultValues = {
 
 // filtro da página - usar quando não há filtros
 const filters = [{}]; // nessse caso sem filtros
-
 </script>
 
 <template>

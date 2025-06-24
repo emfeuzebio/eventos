@@ -288,7 +288,7 @@ const routes = [
               return h(resolveComponent('router-view'))
             },
           },
-          redirect: '/transportes/veiculos',
+          redirect: '/cadastros/entidades',
           children: [
             {
               path: '/cadastros/entidades',
@@ -306,13 +306,18 @@ const routes = [
               path: '/cadastros/estados',
               name: 'Estados',
               component: () => import('@/views/cadastros/EstadosDatatablesGeneric.vue'),
-              // component: () => import('@/views/pages/Page404.vue'),
               // meta: { requiresAuth: true }, // Protege esta rota
             },
             {
               path: '/cadastros/regioes',
               name: 'Regiões',
               component: () => import('@/views/cadastros/RegioesDatatablesGeneric.vue'),
+              // meta: { requiresAuth: true }, // Protege esta rota
+            },
+            {
+              path: '/cadastros/inscricoes',
+              name: 'Inscrições',
+              component: () => import('@/views/cadastros/InscricaosDatatablesGeneric.vue'),
               // component: () => import('@/views/pages/Page404.vue'),
               // meta: { requiresAuth: true }, // Protege esta rota
             },
