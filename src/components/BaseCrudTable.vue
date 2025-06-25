@@ -6,7 +6,6 @@
             <strong>{{ title }}</strong>
             <small v-if="description">- {{ description }}</small>
          </CCardHeader>
-
          <CCardBody>
             <!-- Linha dos filtros, mensagens e botões -->
             <div class="row align-items-center">
@@ -55,30 +54,13 @@
                   </div>
                </div>
 
-               <!-- Coluna 2: Alerta -->
-               <!-- <div class="col-md-4 text-center">
-                  <div
-                     v-if="alert.message"
-                     :class="`alert alert-${alert.type || 'info'} alert-dismissible fade show py-1 px-2 mb-0`" role="alert"
-                  >
-                     {{ alert.message }}
-                     <button
-                     type="button"
-                     class="btn btn-sm btn-close"
-                     @click="closeAlert"
-                     aria-label="Fechar"
-                     ></button>
-                  </div>
-               </div> -->
-
-               <!-- Coluna 3: Botões -->
+               <!-- Coluna 2: Botões à esquerda -->
                <div class="col-md-4 text-end">
-                  <CButton
+                  <!-- <CButton
                      class="btn btn-sm btn-outline-info me-1"
-                     v-if="canPrint"
                      @click="btnImprimir"
                      >Imprimir</CButton
-                  >
+                  > -->
                   <CButton
                      class="btn btn-sm btn-outline-success me-1"
                      v-if="canInsert"
@@ -106,15 +88,41 @@
             </div>
          </CCardBody>
       </CCard>
+
+      
    </CCol>
+
+   <!-- Modal Confirma Excluir -->
+   <CModal
+      :visible="showConfirmDelete"
+      @close="cancelDelete"
+      backdrop="static"
+      keyboard="false"
+      >
+      <CModalHeader>
+         <strong>Confirmar Exclusão</strong>
+      </CModalHeader>
+      <CModalBody>
+         Tem certeza que deseja excluir: 
+         <strong>{{ itemToDelete?.pessoa.nome_completo || 'este item' }}</strong> ?
+      </CModalBody>
+      <CModalFooter>
+         <CButton color="btn btn-sm btn-outline-secondary me-1" @click="cancelDelete">Cancelar</CButton>
+         <CButton color="btn btn-sm btn-outline-danger    me-1" @click="confirmDelete">Excluir</CButton>
+      </CModalFooter>
+   </CModal>
+
 </template>
 
 <script setup>
 import { onMounted, watch, ref, onUnmounted } from 'vue';
+import { CModal, CModalHeader, CModalBody, CModalFooter, CButton } from '@coreui/vue';
 import $ from 'jquery';
 import 'datatables.net-dt';
 // import 'datatables.net-bs5';
 import api from '@/services/api';
+import { useToast } from '@/composables/useToast';
+
 
 const props = defineProps({
    title: String,
@@ -134,14 +142,14 @@ const props = defineProps({
 
 // console.log('Props visíveis:', JSON.parse(JSON.stringify(props)));
 console.log('Props abilities:', JSON.parse(JSON.stringify(props.abilities)));
-// console.log('Props visíveis:', JSON.parse(JSON.stringify(props.columns)));
-
-console.log('Props filters:', JSON.parse(JSON.stringify(props.filters)));
+// console.log('Props filters:', JSON.parse(JSON.stringify(props.filters)));
 
 const emit = defineEmits(['edit', 'delete', 'custom']);
 
+const { showToast } = useToast();
+
 const table = ref(null);
-let dataTableInstance = null;
+let dataTableInstance = ref(null);
 
 const initTable = () => {
    dataTableInstance = $(table.value).DataTable({
@@ -151,11 +159,11 @@ const initTable = () => {
                // ...externalFilters.value,
             },
          })
-            .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
-            .catch((error) => {
-               console.error('Erro ao carregar dados:', error);
-               callback({ data: [] }); // evita que a tabela quebre
-            });
+         .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
+         .catch((error) => {
+            console.error('Erro ao carregar dados:', error);
+            callback({ data: [] }); // evita que a tabela quebre
+         });
       },
       responsive: true,
       processing: false,
@@ -195,7 +203,9 @@ const initTable = () => {
 
    $(table.value).on('click', '.btn-delete', function () {
       const row = dataTableInstance.row($(this).closest('tr')).data();
-      emit('delete', row);
+      console.log('Excluir', row);
+      openDeleteModal(row);
+      // emit('delete', row);
    });
 
    $(table.value).on('click', '[data-custom-action]', function (e) {
@@ -212,6 +222,48 @@ const initTable = () => {
    });
 };
 
+function refreshTable() {
+   if (!dataTableInstance) {      
+      console.warn('DataTable ainda não está inicializado.');
+      return;
+   }
+  dataTableInstance?.ajax?.reload(null, false)
+}
+
+function btnImprimir() {
+   showToast({title: 'Alerta', message: 'Imprimir não implementado ainda!', color: 'danger',});
+}
+
+const showConfirmDelete = ref(false);
+const itemToDelete = ref(null);
+
+function openDeleteModal(row) {
+  itemToDelete.value = row;
+  showConfirmDelete.value = true;
+}
+
+function cancelDelete() {
+  showConfirmDelete.value = false;
+  itemToDelete.value = null;
+}
+
+const confirmDelete = async () => {
+   // Usado quando emitia para página Pai o delete event
+   // emit('delete', itemToDelete.value);
+
+   try {
+      await api.delete(`${props.endpoint}/${itemToDelete.value.id}`);
+      showToast({title: 'Alerta', message: `Registro ${id} excluído com sucesso!`});
+      itemToDelete.value = null;
+      showConfirmDelete.value = false;
+      refreshTable();
+   } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+      // showToast({title: 'Erro', message: `Erro ao excluir o Registro ${id}! ` + error, color: 'danger',});
+   }
+};
+
+
 onMounted(() => {
    initTable();
 });
@@ -221,6 +273,13 @@ onUnmounted(() => {
       dataTableInstance.destroy();
    }
 });
+
+// Expõe a função para componentes pais
+defineExpose({
+  refreshTable,
+  btnImprimir,
+})
+
 </script>
 
 <style>

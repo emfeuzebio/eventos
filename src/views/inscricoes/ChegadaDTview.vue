@@ -1,6 +1,16 @@
 <!-- views/GenericCrudView.vue -->
 <template>
+
+   <CButton class="btn btn-sm btn-outline-warning me-1 mb-2"
+      @click="atualizarTabela">Recarregar da View Especializada
+   </CButton>
+
+   <CButton class="btn btn-sm btn-outline-info me-1 mb-2"
+      @click="btnImprimir">Imprimir
+   </CButton>
+
    <BaseCrudTable
+      ref="crudTableRef"
       title="Cadastro de Estados "
       description="Gerenciamento do cadastro de Estados da Federação"
       endpoint="inscricao"
@@ -13,29 +23,60 @@
       @custom="onCustomAction"
    />
 
-   <CModal :visible="showZapModal" @close="showZapModal = false">
+   <!-- Modal Selecionar viagem -->
+   <CModal :visible="showZapModal" @close="showZapModal = false" backdrop="static">
       <CModalHeader>
-         <strong>Enviar WhatsApp</strong>
+         <strong>Marcar Viagem </strong>
       </CModalHeader>
       <CModalBody>
-         <div class="mb-3">
-            <label class="form-label">Mensagem</label>
-            <textarea
-               v-model="zapMensagem"
-               class="form-control"
-               rows="4"
-            ></textarea>
-         </div>
+
+         <label class="form-label fw-bold mb-1 mt-0" >Dados da Chegada</label>
+         <CAlert color="primary" v-html="zapMensagem"></CAlert>
+
+         <label class="form-label fw-bold mb-1 mt-0">Selecione a Rota</label>
+         <CFormSelect
+            v-model="rotaSelecionada"
+            :options="[
+               { value: '', label: 'Selecione' },
+               ...rotas.map((rota) => ({
+                  value: rota.id,
+                  label: rota.nome,
+               })),
+            ]"
+            @change="fetchViagensPorRota(rotaSelecionada)"
+         />
+
+         <label class="form-label fw-bold mb-1 mt-2">Selecione a Viagem</label>
+         <CFormSelect
+            v-model="viagemSelecionada"
+            :options="[
+               { value: '', label: 'Selecione' },
+               ...viagensDaRota.map((viagem) => ({
+                  value: viagem.id,
+                  label:
+                     'Id: ' +
+                     viagem.id +
+                     ' - ' +
+                     formatToBrDateTime(`${viagem.data_hora}`) +
+                     ' - ' +
+                     viagem.veiculo.descricao,
+               })),
+            ]"
+         />
+
+         <label class="form-label fw-bold mb-1 mt-2">Dados do Traslado de Chegada escolhido</label>
+         <CAlert color="light" v-html="zapViagemEscolhida"></CAlert>
+
       </CModalBody>
       <CModalFooter>
-         <CButton color="secondary" @click="showZapModal = false"
+         <CButton color="btn btn-secondary btn-sm me-1" @click="showZapModal = false"
             >Cancelar</CButton
          >
-         <CButton color="primary" @click="enviarZap">Enviar</CButton>
+         <CButton color="btn btn-primary btn-sm me-1" @click="salvarViagemModal">Salvar</CButton>
       </CModalFooter>
    </CModal>
 
-   <!-- Confirma Excluir Modal  -->
+   <!-- Modal Confirma Excluir -->
    <CModal
       :visible="showDeleteModal"
       @close="showDeleteModal = false"
@@ -67,6 +108,7 @@
          >
       </CModalFooter>
    </CModal>
+
 </template>
 
 <script setup>
@@ -75,11 +117,19 @@ import { formatToBrDateTime } from '@/utils/dateFormat';
 import { useToast } from '@/composables/useToast';
 import { getAbilities } from '@/services/AuthorizationsService';
 import { ref } from 'vue';
+import api from '@/services/api';
 import { computed } from 'vue';
 import axios from 'axios';
-
+import { CModal, CModalHeader, CModalBody, CModalFooter, CButton, } from '@coreui/vue';
 import { useEventos } from '@/composables/useEventos';
-const { marcarTrasladoChegada } = useEventos();
+
+const crudTableRef = ref()
+
+const viagensDaRota = ref([]);
+
+const { showToast } = useToast();
+
+const { marcarTrasladoChegada, fetchRotas, rotas, salvarViagem } = useEventos();
 
 // recuperas as Autorizações (abilities) do JWT
 const abilities = getAbilities();
@@ -112,18 +162,6 @@ const filters = [{}]; // nessse caso sem filtros
 //       // })),
 //    },
 // ]);
-
-import {
-   CModal,
-   CModalHeader,
-   CModalBody,
-   CModalFooter,
-   CButton,
-} from '@coreui/vue';
-
-const { showToast } = useToast();
-
-// const ajaxUrl = 'inscricao';
 
 const columns = [
    { title: 'ID', data: 'id', width: '30px' },
@@ -174,14 +212,20 @@ const columns = [
 ];
 
 const extraColumnRender = (row) => {
+   // controle de acesso
+   const canMarcarcheg = abilities.includes('inscricao.marcarchegada')  ? '' : 'disabled';
+   const canEnviarZapp = abilities.includes('inscricao.marcarchegada')   ? '' : 'disabled';
+   const canSelecionar = abilities.includes('inscricao.selecionar')     ? '' : 'disabled';
+
+   // trasposição para checkbox
    const isChecked = row.chegada_traslado === 'SIM' ? 'checked' : '';
 
    return `
-    <button class="btn btn-xs btn-warning" data-custom-action="zap">Zap</button>
-    <button class="btn btn-xs btn-success" data-custom-action="selecionar">Selecionar</button>
+    <button class="btn btn-xs btn-warning" ${canEnviarZapp} data-custom-action="zap">Zap</button>
+    <button class="btn btn-xs btn-success" ${canSelecionar} data-custom-action="selecionar">Selecionar</button>
 
     <div class="form-check form-switch">
-      <input class="form-check-input" data-custom-action="trasladou" type="checkbox" data-viagem-id="x" data-pessoa-id="${row.pessoa_id}" data-rota-id="x" ${isChecked} >
+      <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-viagem-id="x" data-pessoa-id="${row.pessoa_id}" data-rota-id="x" ${isChecked} >
     </div>
   `;
 };
@@ -192,6 +236,7 @@ const showDeleteModal = ref(false);
 // Modal Zap
 const showZapModal = ref(false);
 const zapMensagem = ref('');
+const zapViagemEscolhida = ref('');
 const zapRow = ref(null);
 
 const onEdit = (row) => {
@@ -204,11 +249,26 @@ const onDelete = (row) => {
 };
 
 const onCustomAction = async ({ row, action, dataset, target }) => {
-   console.log('dataset:', dataset);
+   // console.log('dataset:', dataset);
+   console.log('Dados da Linha', row);
 
    if (action === 'zap') {
+      const inscricaoId = row.id;
+      fetchRotas();  // carrega lista de Rotas no <select>
       zapRow.value = row;
-      zapMensagem.value = `Olá ${row.nome}, sua viagem está confirmada.`;
+      zapMensagem.value = `Olá <b>${row.pessoa.nome_completo}</b> ( ${row.funcao.sigla} - ${row.pessoa.entidade.sigla})<br/><b>CHEGADA</b>: ${formatToBrDateTime(row.chegada_data_hora)} ${row.chegada_meio_transp} ${row.chegada_cia_transp}`;
+      zapViagemEscolhida.value = 
+        `<b>Evento</b>: Reu CFN 2025  <br/>
+         <b>Rota</b>: ${row.rota?.nome || 'Não Informada'} <br/>
+         <b>Viagem</b>: ${row.id} - ${formatToBrDateTime(row.data_hora)} <br/><br/>
+
+         <b>Rota</b>: Chegada: Aeroporto JK > Hotel Lets Idea Brasília <br/>
+         <b>Veículo</b>: City Sedan prata RAFAEL 4 lugar <br/>
+         <b>Observação</b>:         <br/>
+         <b>Capacidade</b>: 4       <br/>
+         <b>Lotado com</b>: 1       <br/>
+         <b>Vagas</b>: 3            <br/>
+         `;
       showZapModal.value = true;
    } else if (action === 'trasladou') {
       const inscricaoId = row.id;
@@ -222,12 +282,21 @@ const onCustomAction = async ({ row, action, dataset, target }) => {
       if (sucesso) {
          showToast({
             title: 'Sucesso',
-            message: 'Dados salvos com sucesso!',
-            color: 'success',
+            message: `Marcado Traslado Chegada ${isChecked} com sucesso!`,
          });
       }
    } else if (action === 'selecionar') {
       console.log('Selecionar viagem', row);
+   }
+};
+
+const fetchViagensPorRota = async (rotaId) => {
+   try {
+      viagensDaRota.value = []; // limpa anterior
+      const res = await api.get(`/viagem`, { params: { rota_id: rotaId } });
+      viagensDaRota.value = res.data;
+   } catch (err) {
+      console.error('Erro ao buscar viagens:', err);
    }
 };
 
@@ -245,10 +314,33 @@ const enviarZap = async () => {
    }
 };
 
-// function salvarViagemModal(inscricaoId, isChecked) {
-//    //  console.log('salvarViagemModal:', inscricaoId, isChecked);
+function salvarViagemModal(inscricaoId, isChecked) {
+   showToast({title: 'Alerta', message: 'Função não implementada ainda!', color: 'danger',});
 
-//    const sucesso = salvarViagem(inscricaoId, { chegada_traslado: isChecked });
+   const sucesso = salvarViagem(inscricaoId, {
+      chegada_traslado: viagemSelecionada.value,
+   });
 
-// }
+   if (sucesso) {
+      mostrarModal.value = false;
+      showToast({
+         title: 'Sucesso',
+         message: 'Dados salvos com sucesso!',
+         color: 'success',
+      });
+      return;
+   }
+}
+
+/**
+ * Funções do BASE CRUD Table
+ */
+function btnImprimir() {
+   crudTableRef.value?.btnImprimir()
+}
+
+function atualizarTabela() {
+  crudTableRef.value?.refreshTable()
+}
+
 </script>
