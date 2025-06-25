@@ -34,6 +34,39 @@
          <CButton color="primary" @click="enviarZap">Enviar</CButton>
       </CModalFooter>
    </CModal>
+
+   <!-- Confirma Excluir Modal  -->
+   <CModal
+      :visible="showDeleteModal"
+      @close="showDeleteModal = false"
+      backdrop="static"
+      keyboard="true"
+   >
+      <CModalHeader>
+         <strong>Confirmar Exclusão</strong>
+      </CModalHeader>
+      <CModalBody>
+         Tem certeza que deseja excluir este Registro:
+         <!-- <br /> -->
+         <!-- <b>{{
+            form.selectedToDelete.value?.descricao ||
+            form.selectedToDelete.value?.nome ||
+            'Nome ou Descrição não encontrada.'
+         }}</b>
+         ? -->
+         <!-- <pre>{{ JSON.stringify(form.selectedToDelete.value, null, 2) }}</pre> -->
+      </CModalBody>
+      <CModalFooter>
+         <CButton
+            color="btn btn-secondary btn-sm me-1"
+            @click="showDeleteModal = false"
+            >Cancelar</CButton
+         >
+         <CButton color="btn btn-danger btn-sm me-1" @click="confirmDelete"
+            >Excluir</CButton
+         >
+      </CModalFooter>
+   </CModal>
 </template>
 
 <script setup>
@@ -153,6 +186,9 @@ const extraColumnRender = (row) => {
   `;
 };
 
+// Delete Modal
+const showDeleteModal = ref(false);
+
 // Modal Zap
 const showZapModal = ref(false);
 const zapMensagem = ref('');
@@ -164,6 +200,7 @@ const onEdit = (row) => {
 
 const onDelete = (row) => {
    console.log('Excluir', row);
+   showDeleteModal.value = true;
 };
 
 const onCustomAction = async ({ row, action, dataset, target }) => {
