@@ -72,7 +72,7 @@
          <CButton color="btn btn-secondary btn-sm me-1" @click="showZapModal = false"
             >Cancelar</CButton
          >
-         <CButton color="btn btn-primary btn-sm me-1" @click="salvarViagemModal">Salvar</CButton>
+         <CButton color="btn btn-primary btn-sm me-1" @click="salvarViagemModal(viagemSelecionada)">Salvar</CButton>
       </CModalFooter>
    </CModal>
 
@@ -129,7 +129,7 @@ const viagensDaRota = ref([]);
 
 const { showToast } = useToast();
 
-const { marcarTrasladoChegada, fetchRotas, rotas, salvarViagem } = useEventos();
+const { marcarTrasladoChegada, fetchRotas, rotas } = useEventos();
 
 // recuperas as Autorizações (abilities) do JWT
 const abilities = getAbilities();
@@ -238,6 +238,7 @@ const showZapModal = ref(false);
 const zapMensagem = ref('');
 const zapViagemEscolhida = ref('');
 const zapRow = ref(null);
+const viagemSelecionada = ref(false);
 
 const onEdit = (row) => {
    console.log('Editar', row);
@@ -256,7 +257,7 @@ const onCustomAction = async ({ row, action, dataset, target }) => {
       const inscricaoId = row.id;
       fetchRotas();  // carrega lista de Rotas no <select>
       zapRow.value = row;
-      zapMensagem.value = `Olá <b>${row.pessoa.nome_completo}</b> ( ${row.funcao.sigla} - ${row.pessoa.entidade.sigla})<br/><b>CHEGADA</b>: ${formatToBrDateTime(row.chegada_data_hora)} ${row.chegada_meio_transp} ${row.chegada_cia_transp}`;
+      zapMensagem.value = `<b>${row.pessoa.nome_completo}</b> ( ${row.funcao.sigla} - ${row.pessoa.entidade.sigla})<br/><b>CHEGADA</b>: ${formatToBrDateTime(row.chegada_data_hora)} ${row.chegada_meio_transp} ${row.chegada_cia_transp}`;
       zapViagemEscolhida.value = 
         `<b>Evento</b>: Reu CFN 2025  <br/>
          <b>Rota</b>: ${row.rota?.nome || 'Não Informada'} <br/>
@@ -314,21 +315,30 @@ const enviarZap = async () => {
    }
 };
 
-function salvarViagemModal(inscricaoId, isChecked) {
-   showToast({title: 'Alerta', message: 'Função não implementada ainda!', color: 'danger',});
+// function salvarViagemModal(viagemId) {
 
-   const sucesso = salvarViagem(inscricaoId, {
-      chegada_traslado: viagemSelecionada.value,
-   });
+const salvarViagemModal = async (viagemId) => {   
 
-   if (sucesso) {
-      mostrarModal.value = false;
-      showToast({
-         title: 'Sucesso',
-         message: 'Dados salvos com sucesso!',
-         color: 'success',
-      });
+   const inscricaoId = zapRow.value?.id;
+
+   if (!inscricaoId || !viagemId) {
+      showToast({title: 'Alerta', message: `O código da Inscrição ${inscricaoId} e o da Viagem ${viagemId} são obrigatórios!`, color: 'danger',});   
       return;
+   }
+   // console.log('Salvar viagem modal', inscricaoId, viagemId);
+
+   try {
+      // await api.put(`${props.endpoint}/${itemToDelete.value.id}`);
+      await api.put(`/inscricao/setarchegadaviagem/${inscricaoId}`, { chegada_viagem_id: viagemId });
+      showToast({title: 'Alerta', message: `Registrada a Viagem ID ${id} para o Traslado de Chegada com sucesso!`});
+      // itemToDelete.value = null;
+      // showConfirmDelete.value = false;
+      refreshTable();
+      // zapViagemEscolhida
+      // refreshViagemEscolhida();
+   } catch (error) {
+      // console.error('Erro ao Setar a Viagem:', error);
+      // showToast({title: 'Erro', message: `Erro ao excluir o Registro ${id}! ` + error, color: 'danger',});
    }
 }
 
