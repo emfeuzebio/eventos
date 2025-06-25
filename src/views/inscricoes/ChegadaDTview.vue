@@ -1,0 +1,178 @@
+<!-- views/GenericCrudView.vue -->
+<template>
+   <BaseCrudTable
+      :columns="columns"
+      :ajax-url="ajaxUrl"
+      :externalFilters="{}"
+      :extra-column-render="extraColumnRender"
+      @edit="onEdit"
+      @delete="onDelete"
+      @custom="onCustomAction"
+   />
+
+   <CModal :visible="showZapModal" @close="showZapModal = false">
+      <CModalHeader>
+         <strong>Enviar WhatsApp</strong>
+      </CModalHeader>
+      <CModalBody>
+         <div class="mb-3">
+            <label class="form-label">Mensagem</label>
+            <textarea
+               v-model="zapMensagem"
+               class="form-control"
+               rows="4"
+            ></textarea>
+         </div>
+      </CModalBody>
+      <CModalFooter>
+         <CButton color="secondary" @click="showZapModal = false"
+            >Cancelar</CButton
+         >
+         <CButton color="primary" @click="enviarZap">Enviar</CButton>
+      </CModalFooter>
+   </CModal>
+</template>
+
+<script setup>
+import BaseCrudTable from '@/components/BaseCrudTable.vue';
+import { formatToBrDateTime } from '@/utils/dateFormat';
+import { useToast } from '@/composables/useToast';
+import { ref } from 'vue';
+import axios from 'axios';
+
+import { useEventos } from '@/composables/useEventos';
+const { salvarViagem } = useEventos();
+
+import {
+   CModal,
+   CModalHeader,
+   CModalBody,
+   CModalFooter,
+   CButton,
+} from '@coreui/vue';
+
+const { showToast } = useToast();
+
+const ajaxUrl = 'inscricao';
+
+const columns = [
+   { title: 'ID', data: 'id', width: '30px' },
+   {
+      title: 'Evento',
+      data: 'evento.sigla',
+      render: (data) => `${data} `,
+      className: 'text-left',
+      width: '90px',
+   },
+   {
+      title: 'Chegada',
+      data: null,
+      render: function (data, type, row) {
+         const meio = row.chegada_meio_transp || 'Meio';
+         const cia = row.chegada_cia_transp || 'Cia';
+         const dh = row.chegada_data_hora
+            ? formatToBrDateTime(`${row.chegada_data_hora}`)
+            : 'Data/Hora';
+         return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>`;
+      },
+      className: 'text-left',
+      width: '180px',
+   },
+   {
+      title: 'Pessoa',
+      data: null, // importante usar null quando o render vai acessar múltiplos campos
+      width: '300px',
+      className: 'text-left',
+      render: function (data, type, row) {
+         const nome = row.pessoa?.nome_social || 'Sem Nome';
+         const entidade = row.pessoa.entidade?.sigla || 'Sem Entidade';
+         const papel = row.funcao?.descricao || 'Sem Papel';
+         const modalidade = row.modalidade || 'Sem Modalidade';
+         return `<span class="fw-bold">${nome}</span> <br/> <small class="text-muted">${entidade}</small> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
+      },
+   },
+   {
+      title: 'Tranlado Chegada',
+      data: null,
+      class: 'dt-center small',
+      className: 'text-center',
+      width: '100px',
+      render: function (data, type, row) {
+         return `<span class=""> x </span>`;
+      },
+   },
+];
+
+const extraColumnRender = (row) => {
+   return `
+    <button class="btn btn-xs btn-warning" data-custom-action="zap">Zap</button>
+    <button class="btn btn-xs btn-success" data-custom-action="selecionar">Selecionar</button>
+
+    <div class="form-check form-switch">
+      <input class="form-check-input" data-custom-action="trasladou" type="checkbox" data-viagem-id="x" data-rota-id="x" >
+    </div>
+  `;
+};
+
+// Modal Zap
+const showZapModal = ref(false);
+const zapMensagem = ref('');
+const zapRow = ref(null);
+
+const onEdit = (row) => {
+   console.log('Editar', row);
+};
+
+const onDelete = (row) => {
+   console.log('Excluir', row);
+};
+
+const onCustomAction = async ({ row, action, dataset, target }) => {
+   console.log('dataset:', dataset);
+
+   if (action === 'zap') {
+      zapRow.value = row;
+      zapMensagem.value = `Olá ${row.nome}, sua viagem está confirmada.`;
+      showZapModal.value = true;
+   } else if (action === 'trasladou') {
+      const inscricaoId = row.id;
+      const isChecked = target.checked ? 'SIM' : 'NÃO';
+      // console.log('trasladou viagem', inscricaoId, isChecked);
+
+      const sucesso = await salvarViagem(inscricaoId, {
+         chegada_traslado: isChecked,
+      });
+
+      if (sucesso) {
+         showToast({
+            title: 'Sucesso',
+            message: 'Dados salvos com sucesso!',
+            color: 'success',
+         });
+      }
+   } else if (action === 'selecionar') {
+      console.log('Selecionar viagem', row);
+   }
+};
+
+const enviarZap = async () => {
+   try {
+      const id = zapRow.value?.id;
+      await axios.post(`/api/inscricao/zap/enviar/${id}`, {
+         mensagem: zapMensagem.value,
+      });
+      showZapModal.value = false;
+      alert('Mensagem enviada com sucesso!');
+   } catch (error) {
+      console.error('Erro ao enviar mensagem:', error);
+      alert('Erro ao enviar WhatsApp');
+   }
+};
+
+// function salvarViagemModal(inscricaoId, isChecked) {
+//    //  console.log('salvarViagemModal:', inscricaoId, isChecked);
+
+//    const sucesso = salvarViagem(inscricaoId, { chegada_traslado: isChecked });
+
+// }
+</script>

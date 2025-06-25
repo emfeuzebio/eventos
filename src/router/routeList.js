@@ -318,6 +318,12 @@ const routes = [
               path: '/cadastros/inscricoes',
               name: 'Inscrições',
               component: () => import('@/views/cadastros/InscricaosDatatablesGeneric.vue'),
+              // meta: { requiresAuth: true }, // Protege esta rota
+            },
+            {
+              path: '/inscricoes/inscricoes',
+              name: 'Inscrições Nova',
+              component: () => import('@/views/inscricoes/ChegadaDTview.vue'),
               // component: () => import('@/views/pages/Page404.vue'),
               // meta: { requiresAuth: true }, // Protege esta rota
             },

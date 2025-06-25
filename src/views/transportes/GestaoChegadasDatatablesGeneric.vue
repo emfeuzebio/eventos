@@ -6,14 +6,13 @@ import 'datatables.net-dt';
 import { formatToBrDateTime } from '@/utils/dateFormat';
 import { ref } from 'vue';
 import { useToast } from '@/composables/useToast';
-import api from '@/services/api'; 
+import api from '@/services/api';
 
 // import { h } from 'vue'
 
 const { showToast } = useToast();
 
 import { useEventos } from '@/composables/useEventos';
-// const { fetchRotas, fetchViagensDaRota, rotas, salvarViagem, viagensDaRota } = useEventos();
 const { fetchRotas, fetchViagensDaRota, rotas, salvarViagem } = useEventos();
 
 // const vnode = h(
@@ -24,11 +23,13 @@ const { fetchRotas, fetchViagensDaRota, rotas, salvarViagem } = useEventos();
 //   ]
 // )
 
-function bindsAds(table){
+function bindsAds(table) {
    table.on('click', '.btnToggleChegadaTraslado', (e) => {
       const inscricaoId = $(e.currentTarget).data('inscricao_id');
       const ativo = e.target.checked ? 'SIM' : 'NÃO';
-      console.log(`btnSelecionarViagem > Alterar inscricaoId ${inscricaoId} para ${ativo}`);         
+      console.log(
+         `btnSelecionarViagem > Alterar inscricaoId ${inscricaoId} para ${ativo}`
+      );
       // if (onClickEdit) onClickEdit(inscricaoId);
       // abrirModal();
    });
@@ -37,48 +38,51 @@ function bindsAds(table){
       const inscricaoId = $(e.currentTarget).data('inscricao_id');
       const viagemId = $(e.currentTarget).data('viagem_id');
       const rotaId = $(e.currentTarget).data('rota_id');
-      console.log(`btnToggleChegadaTraslado > InscricaoId ${inscricaoId}; ViagemId ${viagemId}; RotaId ${rotaId}`);         
+      console.log(
+         `btnToggleChegadaTraslado > InscricaoId ${inscricaoId}; ViagemId ${viagemId}; RotaId ${rotaId}`
+      );
       if (onClickSelectViagem) onClickSelectViagem(inscricaoId);
    });
 }
 
-const mostrarModal = ref(false)
+const mostrarModal = ref(false);
 
 // const viagens = ref([])          // será preenchida dinamicamente
-const rotaSelecionada = ref('')  // ID da rota selecionada
-const viagemSelecionada = ref('') // ID da viagem selecionada
+const rotaSelecionada = ref(''); // ID da rota selecionada
+const viagemSelecionada = ref(''); // ID da viagem selecionada
 const viagensDaRota = ref([]);
 
 const fetchViagensPorRota = async (rotaId) => {
-  try {
-   viagensDaRota.value = []   // limpa anterior
-    const res = await api.get(`/viagem`, { params: { rota_id: rotaId } })
-    viagensDaRota.value = res.data
-  } catch (err) {
-    console.error('Erro ao buscar viagens:', err)
-  }
-}
+   try {
+      viagensDaRota.value = []; // limpa anterior
+      const res = await api.get(`/viagem`, { params: { rota_id: rotaId } });
+      viagensDaRota.value = res.data;
+   } catch (err) {
+      console.error('Erro ao buscar viagens:', err);
+   }
+};
 
 function abrirModal() {
-  fetchRotas();
-  mostrarModal.value = true
+   fetchRotas();
+   mostrarModal.value = true;
 }
 
 function fecharModal() {
-  mostrarModal.value = false
+   mostrarModal.value = false;
 }
 
 function salvarViagemModal() {
-
    const inscricaoId = 1;
-   console.log('Salvar viagem:', inscricaoId, viagemSelecionada.value)
+   console.log('Salvar viagem:', inscricaoId, viagemSelecionada.value);
 
    // api.axios Salvar Viagem
    // const sucesso = salvarViagem(123, { chegou: 'SIM' });
-   const sucesso = salvarViagem(inscricaoId, { chegada_traslado: viagemSelecionada.value });
+   const sucesso = salvarViagem(inscricaoId, {
+      chegada_traslado: viagemSelecionada.value,
+   });
 
    if (sucesso) {
-      mostrarModal.value = false
+      mostrarModal.value = false;
       showToast({
          title: 'Sucesso',
          message: 'Dados salvos com sucesso!',
@@ -86,10 +90,7 @@ function salvarViagemModal() {
       });
       return;
    }
-   
 }
-
-
 
 // define a Entidade Principal da View
 const entity = 'inscricao';
@@ -118,14 +119,12 @@ var canPrint = false;
 // console.log('canPrint:', canPrint); // Isso deve ser true ou false
 
 function selecionarViagem(row) {
-  alert(`Selecionar Viagem: ${row.nome} (ID: ${row.viagem_id})`)
+   alert(`Selecionar Viagem: ${row.nome} (ID: ${row.viagem_id})`);
 }
-
-
 
 // define parâmetros das tabela de dados
 const columns = [
-   { title: 'ID', data: 'id', width: '30px'},
+   { title: 'ID', data: 'id', width: '30px' },
    {
       title: 'Evento',
       data: 'evento.sigla',
@@ -193,8 +192,8 @@ const columns = [
          return viagemAcoes;
          // return vnode;
 
-         // return `<span class="fw-bold">Botoes Ação</span> <br/> 
-         //         <small class="text-muted">${viagem}</small> <br/> 
+         // return `<span class="fw-bold">Botoes Ação</span> <br/>
+         //         <small class="text-muted">${viagem}</small> <br/>
          //         <small class="text-muted">Botão Check Chegou</small>
          //        `;
       },
@@ -235,56 +234,65 @@ const filters = [{}]; // nessse caso sem filtros
 //       })),
 //    },
 // ]);
-
 </script>
 
 <template>
-
    <div>
-    <button @click="abrirModal" class="btn btn-primary">Abrir Modal</button>
-   </div>   
+      <button @click="abrirModal" class="btn btn-primary">Abrir Modal</button>
+   </div>
 
-      <!-- Modal Selecionar Viagem de Traslado Chegada -->
-      <CModal
-         :visible="mostrarModal"
-         backdrop="static"
-         keyboard="true"
-      >
-         <CModalHeader>
-            <strong>Titulo</strong>
-         </CModalHeader>
-         <CModalBody>
-            <label class="form-label fw-bold">Selecione a Rota</label>
-            <CFormSelect
-               v-model="rotaSelecionada"
-               :options="[
-                  { value: '', label: 'Selecione' },
-                  ...rotas.map((rota) => ({
-                     value: rota.id,
-                     label: rota.nome,
-                  })),
-               ]"
-               @change="fetchViagensPorRota(rotaSelecionada)"
-            />
+   <!-- Modal Selecionar Viagem de Traslado Chegada -->
+   <CModal :visible="mostrarModal" backdrop="static" keyboard="true">
+      <CModalHeader>
+         <strong>Titulo</strong>
+      </CModalHeader>
+      <CModalBody>
+         <label class="form-label fw-bold">Selecione a Rota</label>
+         <CFormSelect
+            v-model="rotaSelecionada"
+            :options="[
+               { value: '', label: 'Selecione' },
+               ...rotas.map((rota) => ({
+                  value: rota.id,
+                  label: rota.nome,
+               })),
+            ]"
+            @change="fetchViagensPorRota(rotaSelecionada)"
+         />
 
-            <label class="form-label fw-bold">Selecione a Viagem</label>
-            <CFormSelect
-               v-model="viagemSelecionada"
-               :options="[
-                  { value: '', label: 'Selecione' },
-                  ...viagensDaRota.map((viagem) => ({
-                     value: viagem.id,
-                     label: 'Id: ' + viagem.id + ' - ' + formatToBrDateTime(`${viagem.data_hora}`) + ' - ' + viagem.veiculo.descricao,
-                  })),
-               ]"
-            />
-
-         </CModalBody>
-         <CModalFooter>
-            <CButton @click="fecharModal" class="btn btn-outline-secondary" size="sm">Cancelar</CButton>   
-            <CButton @click="salvarViagemModal" class="btn btn-outline-primary" size="sm">Salvar</CButton>
-         </CModalFooter>
-      </CModal>
+         <label class="form-label fw-bold">Selecione a Viagem</label>
+         <CFormSelect
+            v-model="viagemSelecionada"
+            :options="[
+               { value: '', label: 'Selecione' },
+               ...viagensDaRota.map((viagem) => ({
+                  value: viagem.id,
+                  label:
+                     'Id: ' +
+                     viagem.id +
+                     ' - ' +
+                     formatToBrDateTime(`${viagem.data_hora}`) +
+                     ' - ' +
+                     viagem.veiculo.descricao,
+               })),
+            ]"
+         />
+      </CModalBody>
+      <CModalFooter>
+         <CButton
+            @click="fecharModal"
+            class="btn btn-outline-secondary"
+            size="sm"
+            >Cancelar</CButton
+         >
+         <CButton
+            @click="salvarViagemModal"
+            class="btn btn-outline-primary"
+            size="sm"
+            >Salvar</CButton
+         >
+      </CModalFooter>
+   </CModal>
 
    <GenericCrud
       title="Cadastro de Estados "
@@ -339,6 +347,5 @@ const filters = [{}]; // nessse caso sem filtros
             {{ errors.value.regiao_id[0] }}
          </div>
       </template>
-
    </GenericCrud>
 </template>

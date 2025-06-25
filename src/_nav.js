@@ -387,6 +387,11 @@ export default [
         name: 'Inscrições',
         to: '/cadastros/inscricoes',
       },
+      {
+        component: 'CNavItem',
+        name: 'Inscrições Nova',
+        to: '/inscricoes/inscricoes',
+      },
     ],
   },
 
