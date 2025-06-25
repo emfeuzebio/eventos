@@ -1,9 +1,12 @@
 <!-- views/GenericCrudView.vue -->
 <template>
    <BaseCrudTable
+      title="Cadastro de Estados "
+      description="Gerenciamento do cadastro de Estados da Federação"
+      endpoint="inscricao"
+      :abilities="abilities"
       :columns="columns"
-      :ajax-url="ajaxUrl"
-      :externalFilters="{}"
+      :filters="filters"
       :extra-column-render="extraColumnRender"
       @edit="onEdit"
       @delete="onDelete"
@@ -37,11 +40,45 @@
 import BaseCrudTable from '@/components/BaseCrudTable.vue';
 import { formatToBrDateTime } from '@/utils/dateFormat';
 import { useToast } from '@/composables/useToast';
+import { getAbilities } from '@/services/AuthorizationsService';
 import { ref } from 'vue';
+import { computed } from 'vue';
 import axios from 'axios';
 
 import { useEventos } from '@/composables/useEventos';
-const { salvarViagem } = useEventos();
+const { marcarTrasladoChegada } = useEventos();
+
+// recuperas as Autorizações (abilities) do JWT
+const abilities = getAbilities();
+// console.log('Abilities carregadas:', JSON.parse(JSON.stringify(abilities)));
+
+// filtro da página - usar quando não há filtros
+const filters = [{}]; // nessse caso sem filtros
+
+// const filters = [
+//    {
+//       label: 'Estado',
+//       field: 'estado_id',
+//       type: 'select',
+//       options: estados.value.map((estado) => ({
+//          value: estado.id,
+//          label: estado.descricao,
+//       })),
+//    },
+// ];
+
+// Filtros da Página com valores fixos - filtro reativo aos dados carregados
+// const filters = computed(() => [
+//    {
+//       label: 'Estado',
+//       field: 'estado_id',
+//       type: 'select',
+//       // options: estados.value.map((estado) => ({
+//       //    value: estado.id,
+//       //    label: estado.descricao,
+//       // })),
+//    },
+// ]);
 
 import {
    CModal,
@@ -53,7 +90,7 @@ import {
 
 const { showToast } = useToast();
 
-const ajaxUrl = 'inscricao';
+// const ajaxUrl = 'inscricao';
 
 const columns = [
    { title: 'ID', data: 'id', width: '30px' },
@@ -104,12 +141,14 @@ const columns = [
 ];
 
 const extraColumnRender = (row) => {
+   const isChecked = row.chegada_traslado === 'SIM' ? 'checked' : '';
+
    return `
     <button class="btn btn-xs btn-warning" data-custom-action="zap">Zap</button>
     <button class="btn btn-xs btn-success" data-custom-action="selecionar">Selecionar</button>
 
     <div class="form-check form-switch">
-      <input class="form-check-input" data-custom-action="trasladou" type="checkbox" data-viagem-id="x" data-rota-id="x" >
+      <input class="form-check-input" data-custom-action="trasladou" type="checkbox" data-viagem-id="x" data-pessoa-id="${row.pessoa_id}" data-rota-id="x" ${isChecked} >
     </div>
   `;
 };
@@ -139,7 +178,7 @@ const onCustomAction = async ({ row, action, dataset, target }) => {
       const isChecked = target.checked ? 'SIM' : 'NÃO';
       // console.log('trasladou viagem', inscricaoId, isChecked);
 
-      const sucesso = await salvarViagem(inscricaoId, {
+      const sucesso = await marcarTrasladoChegada(inscricaoId, {
          chegada_traslado: isChecked,
       });
 

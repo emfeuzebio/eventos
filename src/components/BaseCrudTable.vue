@@ -1,6 +1,112 @@
 <!-- components/BaseCrudTable.vue -->
 <template>
-   <table ref="table" class="table table-striped" style="width: 100%"></table>
+   <CCol :xs="12">
+      <CCard class="mb-4">
+         <CCardHeader>
+            <strong>{{ title }}</strong>
+            <small v-if="description">- {{ description }}</small>
+         </CCardHeader>
+
+         <CCardBody>
+            <!-- Linha dos filtros, mensagens e botões -->
+            <div class="row align-items-center">
+               <!-- Coluna 1: Filtros -->
+               <div class="col-md-8 d-flex flex-wrap align-items-center gap-2">
+                  <div class="d-flex flex-wrap gap-21 mb-1">
+                     <div
+                        v-for="filter in props.filters"
+                        :key="filter.field"
+                        class="me-2"
+                     >
+                        Filtrar por:
+                        <label class="form-label fw-bold">
+                           {{ filter.label }}</label
+                        >
+                        <!-- {{ filtros }} -->
+                        <!-- {{ [filter.field] }} -->
+                        <!-- {{ filters[0].options }} -->
+
+                        <select
+                           v-if="filter.type === 'select'"
+                           v-model="filtros[filter.field]"
+                           class="form-select form-select-sm"
+                           @change="refreshTable"
+                        >
+                           <option value="">Todos</option>
+                           <option
+                              v-for="opt in filter.options"
+                              :key="opt.value"
+                              :value="opt.value"
+                           >
+                              {{ opt.label }}
+                           </option>
+                        </select>
+
+                        <CFormInput
+                           v-else-if="filter.type === 'text'"
+                           v-model="filtros[filter.field]"
+                           type="text"
+                           class="form-control-sm"
+                           @change="refreshTable"
+                        />
+
+                        <!-- Você pode expandir aqui para tipos como date, checkbox etc -->
+                     </div>
+                  </div>
+               </div>
+
+               <!-- Coluna 2: Alerta -->
+               <!-- <div class="col-md-4 text-center">
+                  <div
+                     v-if="alert.message"
+                     :class="`alert alert-${alert.type || 'info'} alert-dismissible fade show py-1 px-2 mb-0`" role="alert"
+                  >
+                     {{ alert.message }}
+                     <button
+                     type="button"
+                     class="btn btn-sm btn-close"
+                     @click="closeAlert"
+                     aria-label="Fechar"
+                     ></button>
+                  </div>
+               </div> -->
+
+               <!-- Coluna 3: Botões -->
+               <div class="col-md-4 text-end">
+                  <CButton
+                     class="btn btn-sm btn-outline-info me-1"
+                     v-if="canPrint"
+                     @click="btnImprimir"
+                     >Imprimir</CButton
+                  >
+                  <CButton
+                     class="btn btn-sm btn-outline-success me-1"
+                     v-if="canInsert"
+                     @click="form.insertNewModal"
+                     >Inserir Novo</CButton
+                  >
+                  <CButton
+                     class="btn btn-sm btn-outline-secondary"
+                     @click="refreshTable"
+                     >Recarregar
+                  </CButton>
+               </div>
+            </div>
+
+            <!-- linha da Tabela de dados -->
+            <div class="table-responsive col-md-12">
+               <table
+                  ref="table"
+                  class="display table table-striped table-bordered table-hover table-sm compact w-100"
+               ></table>
+               <!-- <table
+                  :id="tableId"
+                  class="display table table-striped table-bordered table-hover table-sm compact w-100"
+               ></table> -->
+            </div>
+         </CCardBody>
+      </CCard>
+   </CCol>
 </template>
 
 <script setup>
@@ -11,14 +117,26 @@ import 'datatables.net-dt';
 import api from '@/services/api';
 
 const props = defineProps({
+   title: String,
+   description: String,
+   endpoint: String,
+   abilities: {
+      type: Array,
+      default: () => [],
+   },
    columns: Array,
-   ajaxUrl: String,
-   externalFilters: {
+   filters: {
       type: Object,
       default: () => ({}),
    },
    extraColumnRender: Function,
 });
+
+// console.log('Props visíveis:', JSON.parse(JSON.stringify(props)));
+console.log('Props abilities:', JSON.parse(JSON.stringify(props.abilities)));
+// console.log('Props visíveis:', JSON.parse(JSON.stringify(props.columns)));
+
+console.log('Props filters:', JSON.parse(JSON.stringify(props.filters)));
 
 const emit = defineEmits(['edit', 'delete', 'custom']);
 
@@ -28,7 +146,7 @@ let dataTableInstance = null;
 const initTable = () => {
    dataTableInstance = $(table.value).DataTable({
       ajax: function (_data, callback, _settings) {
-         api.get(props.ajaxUrl, {
+         api.get(props.endpoint, {
             params: {
                // ...externalFilters.value,
             },
@@ -79,28 +197,6 @@ const initTable = () => {
       const row = dataTableInstance.row($(this).closest('tr')).data();
       emit('delete', row);
    });
-
-   //    $(table.value).on('click', '[data-custom-action]', function () {
-   //       const row = dataTableInstance.row($(this).closest('tr')).data();
-   //       const action = $(this).data('custom-action');
-   //       emit('custom', { row, action });
-   //    });
-
-   // Escuta eventos de ações personalizadas - FUNCIONADO
-   //    $(table.value).on('click change', '[data-custom-action]', function (e) {
-   //       const row = dataTableInstance.row($(this).closest('tr')).data();
-   //       const action = $(this).data('custom-action');
-
-   //       let value;
-
-   //       if ($(this).is(':checkbox')) {
-   //          value = $(this).prop('checked') ? 'SIM' : 'NÃO';
-   //       } else {
-   //          value = $(this).val(); // para botões ou inputs normais
-   //       }
-
-   //       emit('custom', { row, action, value });
-   //    });
 
    $(table.value).on('click', '[data-custom-action]', function (e) {
       const row = dataTableInstance.row($(this).closest('tr')).data();

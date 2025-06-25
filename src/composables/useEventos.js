@@ -87,37 +87,16 @@ export function useEventos(ativo = true) {
       }
     }   
 
-   const salvarViagem = async (id, dados) => {
+   const marcarTrasladoChegada = async (id, dados) => {
       try {
-         // console.log('salvarViagem:', id, dados);
          error.value = null;
-         await api.put(`/inscricao/${id}/marcarChegada`, dados);
+         await api.put(`/inscricao/marcarchegada/${id}`, dados);
          return true;
       } catch (err) {
          error.value = err;
          return false;
       }
    };
-
-
-   /*
-
-      2. Backend Laravel (exemplo) 
-      
-      // InscricaoController.php
-      public function atualizaTraslado(Request $request, $id)
-      {
-         $inscricao = Inscricao::findOrFail($id);
-         $request->validate([
-            'chegada_traslado' => ['required', 'in:SIM,NÃO'],
-         ]);
-         $inscricao->chegada_traslado = $request->chegada_traslado;
-         $inscricao->save();
-
-         return response()->json(['success' => true]);
-      }
-
-   */
 
    // onMounted(fetchEventos)
 
@@ -138,7 +117,7 @@ export function useEventos(ativo = true) {
       fetchViagens,  // caso queira recarregar manualmente
       fetchViagensDaRota,  // caso queira recarregar manualmente
 
-      salvarViagem, // 
+      marcarTrasladoChegada, // 
       error,
    };
 }
