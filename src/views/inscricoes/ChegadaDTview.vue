@@ -24,7 +24,7 @@
       @custom="onCustomAction"
    />
 
-   <!-- Modal Selecionar viagem -->
+   <!-- Viagem Selecionar Modal -->
    <CModal
       :visible="showZapModal"
       @close="showZapModal = false"
@@ -88,49 +88,90 @@
       </CModalFooter>
    </CModal>
 
-   <!-- Modal Confirma Excluir -->
+   <!-- Editar Modal -->
    <CModal
-      :visible="showDeleteModal"
-      @close="showDeleteModal = false"
+      :visible="showEditModal"
+      @close="showEditModal = false"
       backdrop="static"
       keyboard="true"
    >
       <CModalHeader>
-         <strong>Confirmar Exclusão</strong>
+         <strong>Editar Registro</strong>
       </CModalHeader>
       <CModalBody>
-         Tem certeza que deseja excluir este Registro:
-         <!-- <br /> -->
-         <!-- <b>{{
-            form.selectedToDelete.value?.descricao ||
-            form.selectedToDelete.value?.nome ||
-            'Nome ou Descrição não encontrada.'
-         }}</b>
-         ? -->
-         <!-- <pre>{{ JSON.stringify(form.selectedToDelete.value, null, 2) }}</pre> -->
+
+         <CFormInput
+            v-model="formData.nome_completo"
+            label="Nome da Pessoa"
+            class="form-control "
+            :class="{ 'is-invalid': formError.nome_completo }"
+            placeholder="João José Maria"         
+         />
+         <div class="form-error" v-if="formError.nome_completo">
+            {{ formError.nome_completo[0] }}
+         </div>
+
+         <CFormSelect
+            v-model="formData.modalidade"
+            label="Modalidade"
+            class="form-control "
+            :options="[
+               { value: '', label: 'Selecione' },
+               { value: 'Presencial', label: 'Presencial' },
+               { value: 'Virtual', label: 'Virtual' },
+            ]"
+         />
+         <div class="form-error" v-if="formError.modalidade">
+            {{ formError.modalidade[0] }}
+         </div>
+
+         <CFormSelect
+            v-model="formData.chegada_meio_transp"
+            label="Chegada Meio de Transporte"
+            class="form-control "
+            :options="[
+               { value: '', label: 'Selecione' },
+               { value: 'Aéreo', label: 'Aéreo' },
+               { value: 'Rodoviário', label: 'Rodoviário' },
+               { value: 'Rodo Particular', label: 'Rodo Particular' },
+               { value: 'Não Informado', label: 'Não Informado' },
+            ]"
+         />
+         <div class="form-error" v-if="formError.chegada_meio_transp">
+            {{ formError.chegada_meio_transp[0] }}
+         </div>
+
+         <CFormInput
+            v-model="formData.chegada_cia_transp"
+            label="Chegada Cia + Nº Voo/Ônibus"
+            class="form-control "
+            :class="{ 'is-invalid': formError.chegada_cia_transp }"
+            placeholder="LATAM, GOL, AZUL, etc."         
+         />
+         <div class="form-error" v-if="formError.chegada_cia_transp">
+            {{ formError.chegada_cia_transp[0] }}
+         </div>
+
+         <pre>{{ formData.value }}</pre>
+         <pre>{{ JSON.stringify(formData.value) }}</pre>
+
       </CModalBody>
       <CModalFooter>
-         <CButton
-            color="btn btn-secondary btn-sm me-1"
-            @click="showDeleteModal = false"
-            >Cancelar</CButton
-         >
-         <CButton color="btn btn-danger btn-sm me-1" @click="confirmDelete"
-            >Excluir</CButton
-         >
+         <CButton color="btn btn-sm btn-secondary me-1" @click="showEditModal = false" >Cancelar</CButton>
+         <CButton color="btn btn-sm btn-primary   me-1" @click="saveEditModal">Salvar</CButton>
       </CModalFooter>
    </CModal>
 </template>
 
 <script setup>
 import BaseCrudTable from '@/components/BaseCrudTable.vue';
+import api from '@/services/api';
 import { formatToBrDateTime } from '@/utils/dateFormat';
 import { useToast } from '@/composables/useToast';
 import { getAbilities } from '@/services/AuthorizationsService';
+import { useEventos } from '@/composables/useEventos';
 import { ref } from 'vue';
-import api from '@/services/api';
 import { computed } from 'vue';
-import axios from 'axios';
 import { nextTick } from 'vue';
 
 import {
@@ -140,48 +181,81 @@ import {
    CModalFooter,
    CButton,
 } from '@coreui/vue';
-import { useEventos } from '@/composables/useEventos';
 
-const crudTableRef = ref();
+
+/**
+ * Constantes e Variáveis Reativas BASE do CRUD DataTable
+ */
+const crudTableRef = ref();            // ref para o componente BaseCrudTable
+
+const formData  = ref({});        // campos do Form Edit Dados
+const formError = ref({});        // erros  do Form Edit Dados
+
+const { showToast } = useToast();      // Toasts de Alerta
+
+const showDeleteModal = ref(false);    // Delete Modal
+const showEditModal = ref(false);      // Edit Modal
+
+const abilities = getAbilities();      // recupera do JWR as abilities do usuário logado
+// console.log('Abilities carregadas:', JSON.parse(JSON.stringify(abilities))); 
+
+
+
+/**
+ * Constantes e Variáveis Reativas ESPECIALIZADAS do CRUD DataTable
+ */
 
 const viagensDaRota = ref([]);
-
-const { showToast } = useToast();
+const viagemSelecionada = ref(false);
+const rotaSelecionada = ref(false);
 
 const { marcarTrasladoChegada, fetchRotas, rotas } = useEventos();
 
-// recuperas as Autorizações (abilities) do JWT
-const abilities = getAbilities();
-// console.log('Abilities carregadas:', JSON.parse(JSON.stringify(abilities)));
+// Modal Zap
+const showZapModal = ref(false);
+const zapMensagem = ref('');
+const zapViagemEscolhida = ref('');
+const zapRow = ref(null);
 
-// filtro da página - usar quando não há filtros
-const filters = [{}]; // nessse caso sem filtros
 
-// const filters = [
-//    {
-//       label: 'Estado',
-//       field: 'estado_id',
-//       type: 'select',
-//       options: estados.value.map((estado) => ({
-//          value: estado.id,
-//          label: estado.descricao,
-//       })),
-//    },
-// ];
 
-// Filtros da Página com valores fixos - filtro reativo aos dados carregados
-// const filters = computed(() => [
-//    {
-//       label: 'Estado',
-//       field: 'estado_id',
-//       type: 'select',
-//       // options: estados.value.map((estado) => ({
-//       //    value: estado.id,
-//       //    label: estado.descricao,
-//       // })),
-//    },
-// ]);
+/**
+ * Filtros ESPECIALIZADAS do CRUD DataTable 
+ */
+const filters = [{}];         // sem filtros
 
+/*
+const filters = [
+   {
+      label: 'Estado',
+      field: 'estado_id',
+      type: 'select',
+      options: estados.value.map((estado) => ({
+         value: estado.id,
+         label: estado.descricao,
+      })),
+   },
+];
+
+Filtros da Página com valores fixos - filtro reativo aos dados carregados
+const filters = computed(() => [
+   {
+      label: 'Estado',
+      field: 'estado_id',
+      type: 'select',
+      // options: estados.value.map((estado) => ({
+      //    value: estado.id,
+      //    label: estado.descricao,
+      // })),
+   },
+]);
+
+*/
+
+
+/**
+ * Colunas BASE do CRUD DataTable
+ */
 const columns = [
    { title: 'ID', data: 'id', width: '30px' },
    {
@@ -230,6 +304,9 @@ const columns = [
    },
 ];
 
+/**
+ * coluna ESPECIALIZADAS do CRUD DataTable
+ */
 const extraColumnRender = (row) => {
    // controle de acesso
    const canMarcarcheg = abilities.includes('inscricao.marcarchegada')
@@ -255,27 +332,10 @@ const extraColumnRender = (row) => {
   `;
 };
 
-// Delete Modal
-const showDeleteModal = ref(false);
 
-// Modal Zap
-const showZapModal = ref(false);
-const zapMensagem = ref('');
-const zapViagemEscolhida = ref('');
-const zapRow = ref(null);
-
-const rotaSelecionada = ref(false);
-const viagemSelecionada = ref(false);
-
-const onEdit = (row) => {
-   console.log('Editar', row);
-};
-
-const onDelete = (row) => {
-   console.log('Excluir', row);
-   showDeleteModal.value = true;
-};
-
+/**
+ * Funções ESPECIALIZADAS do CRUD DataTable
+ */
 const onCustomAction = async ({ row, action, dataset, target }) => {
    console.log('dataset:', dataset);
    console.log('Dados da Linha', row);
@@ -331,7 +391,7 @@ const onCustomAction = async ({ row, action, dataset, target }) => {
       // console.log('trasladou viagem', inscricaoId, isChecked);
 
       const sucesso = await marcarTrasladoChegada(inscricaoId, {
-         chegada_traslado: isChecked,
+         traslado_chegada_executou: isChecked,
       });
 
       if (sucesso) {
@@ -435,6 +495,87 @@ function atualizarTabela() {
    crudTableRef.value?.refreshTable();
 }
 
+const onEdit = (row) => {
+   console.log('Editar', row);
+   formError.value = {};
+   showEditModal.value = true;
+
+   /**
+    * Carrega os dados da linha DataTables para o formulário de edição - Uma a um
+    */
+
+   // campos Chaves Primária e Estrangeiras
+   formData.value.id = row?.id || '';
+   formData.value.evento_id = row?.evento_id || '';
+   formData.value.pessoa_id = row?.pessoa_id || '';
+   formData.value.funcao_id = row?.funcao_id || '';
+
+   // campos não editados nesse formulário
+   formData.value.ativo = row?.ativo || 'SIM';
+
+   // campo de dados
+   formData.value.nome_completo = row.pessoa?.nome_completo || '';
+   formData.value.modalidade = row?.modalidade || '';
+   formData.value.chegada_meio_transp = row?.chegada_meio_transp || '';
+   formData.value.chegada_cia_transp = row?.chegada_cia_transp || '';
+   // TODO Carrega os dados usando row...
+
+   // TODO Carrega os dados do Banco de Dados para o formulário de edição
+   // const inscricaoId = row.value?.id;
+   // api.get('/inscricao/${inscricaoId}')...   
+
+};
+
+// NOVO
+const saveEditModal = async () => {
+   // console.log('Salvar Edit Modal', formData.value);
+
+   try {
+      // if (this.modalModo === 'edit') {
+      //    await api.put(`veiculo/${this.form.id}`, this.form); // atualiza o registro
+      // } else {
+      //    await api.post('veiculo', this.form); // insere um novo registro
+      // }
+
+      await api.put(`inscricao/${formData.value.id}`, formData.value); // atualiza o registro
+
+      showToast({title: 'Sucesso',message: `Inscrição ID ${formData.value.id} atualizada com sucesso.`,});
+      showEditModal.value = false;
+      atualizarTabela();
+   } catch (error) {
+      if (error.response?.status === 422) {
+         // console.log('Erro 422 - Há erros de validação no formError');
+         formError.value = error.response.data.errors || {};
+      }
+   } finally {
+      // loading.value = false;
+   }
+
+   // } catch (error) {
+      // const status = error.response?.status;
+
+      // if (this.responseErrors.includes(status)) {
+      //    // Validação da API (ex: Laravel retorna 422 com { errors: { campo: ['msg'] } })
+      //    const errors = error.response.data.errors;
+      //    this.fieldErrors = {};
+
+      //    for (const campo in errors) {
+      //       this.fieldErrors[campo] = errors[campo][0];
+      //    }
+      //    this.formError =
+      //       (error.response.data.error
+      //          ? error.response.data.error + ' '
+      //          : '') + error.response.data.message ||
+      //       'Corrija os campos destacados.';
+      // }
+   // }   
+}
+
+const onDelete = (row) => {
+   console.log('Excluir', row);
+   showDeleteModal.value = true;
+};
+
 // const enviarZap = async () => {
 //    try {
 //       const id = zapRow.value?.id;
@@ -449,5 +590,4 @@ function atualizarTabela() {
 //    }
 // };
 
-// function salvarViagemModal(viagemId)
 </script>

@@ -175,7 +175,7 @@ const initTable = () => {
          })
             .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
             .catch((error) => {
-               console.error('Erro ao carregar dados:', error);
+               // console.error('Erro ao carregar dados:', error);
                callback({ data: [] }); // evita que a tabela quebre
             });
       },
@@ -321,5 +321,11 @@ defineExpose({
    font-size: 15px;
    /* font-weight: bold; */
    /* font-size: medium; */
+}
+
+.form-label {
+  margin-bottom: 1px;
+  margin-top: 12px;
+  font-weight: bold;
 }
 </style>

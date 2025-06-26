@@ -44,14 +44,17 @@ api.interceptors.response.use(
     stopLoading();
     // if (error.response?.status === 401) {
     // if (error.response && error.response.status === 401) {      
-    if (error.response?.status == 401) {
-      // console.log('Token não fornecido ou malformado > Go to Page Login"')
+    // if (error.response?.status == 401) {
+    // }
+    
+    if (error.response && error.response?.status == 401) {
+      // showError(error.response?.data?.error || '401 - Token não fornecido ou malformado > Go to Page Login.')
       removeToken()
       router.push('/pages/login')
     } else if (error.response?.status == 419) {
       showError(error.response?.data?.error || '419 - Erro inesperado.')
     } 
-    else if (error.response?.status == 404) {
+    else if (error.response && error.response?.status == 404) {
       showError(error.response?.data?.message || '404 - Erro inesperado.')
     }
     // Não sendo erros de campos do formulário (422), exibe o erro
