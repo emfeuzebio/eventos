@@ -1,12 +1,13 @@
 <!-- views/GenericCrudView.vue -->
 <template>
-
-   <CButton class="btn btn-sm btn-outline-warning me-1 mb-2"
-      @click="atualizarTabela">Recarregar da View Especializada
+   <CButton
+      class="btn btn-sm btn-outline-warning me-1 mb-2"
+      @click="atualizarTabela"
+      >Recarregar da View Especializada
    </CButton>
 
-   <CButton class="btn btn-sm btn-outline-info me-1 mb-2"
-      @click="btnImprimir">Imprimir
+   <CButton class="btn btn-sm btn-outline-info me-1 mb-2" @click="btnImprimir"
+      >Imprimir
    </CButton>
 
    <BaseCrudTable
@@ -24,13 +25,16 @@
    />
 
    <!-- Modal Selecionar viagem -->
-   <CModal :visible="showZapModal" @close="showZapModal = false" backdrop="static">
+   <CModal
+      :visible="showZapModal"
+      @close="showZapModal = false"
+      backdrop="static"
+   >
       <CModalHeader>
          <strong>Marcar Viagem </strong>
       </CModalHeader>
       <CModalBody>
-
-         <label class="form-label fw-bold mb-1 mt-0" >Dados da Chegada</label>
+         <label class="form-label fw-bold mb-1 mt-0">Dados da Chegada</label>
          <CAlert color="primary" v-html="zapMensagem"></CAlert>
 
          <label class="form-label fw-bold mb-1 mt-0">Selecione a Rota</label>
@@ -51,6 +55,7 @@
             v-model="viagemSelecionada"
             :options="[
                { value: '', label: 'Selecione' },
+               { value: 'remove', label: 'Remover a Viagem Atual' },
                ...viagensDaRota.map((viagem) => ({
                   value: viagem.id,
                   label:
@@ -64,15 +69,22 @@
             ]"
          />
 
-         <label class="form-label fw-bold mb-1 mt-2">Dados do Traslado de Chegada escolhido</label>
+         <label class="form-label fw-bold mb-1 mt-2"
+            >Dados da Viagem de Traslado de Chegada escolhida</label
+         >
          <CAlert color="light" v-html="zapViagemEscolhida"></CAlert>
-
       </CModalBody>
       <CModalFooter>
-         <CButton color="btn btn-secondary btn-sm me-1" @click="showZapModal = false"
-            >Cancelar</CButton
+         <CButton
+            color="btn btn-secondary btn-sm me-1"
+            @click="showZapModal = false"
+            >Fechar</CButton
          >
-         <CButton color="btn btn-primary btn-sm me-1" @click="salvarViagemModal(viagemSelecionada)">Salvar</CButton>
+         <CButton
+            color="btn btn-primary btn-sm me-1"
+            @click="salvarViagemModal(viagemSelecionada)"
+            >Salvar</CButton
+         >
       </CModalFooter>
    </CModal>
 
@@ -108,7 +120,6 @@
          >
       </CModalFooter>
    </CModal>
-
 </template>
 
 <script setup>
@@ -120,10 +131,18 @@ import { ref } from 'vue';
 import api from '@/services/api';
 import { computed } from 'vue';
 import axios from 'axios';
-import { CModal, CModalHeader, CModalBody, CModalFooter, CButton, } from '@coreui/vue';
+import { nextTick } from 'vue';
+
+import {
+   CModal,
+   CModalHeader,
+   CModalBody,
+   CModalFooter,
+   CButton,
+} from '@coreui/vue';
 import { useEventos } from '@/composables/useEventos';
 
-const crudTableRef = ref()
+const crudTableRef = ref();
 
 const viagensDaRota = ref([]);
 
@@ -213,15 +232,21 @@ const columns = [
 
 const extraColumnRender = (row) => {
    // controle de acesso
-   const canMarcarcheg = abilities.includes('inscricao.marcarchegada')  ? '' : 'disabled';
-   const canEnviarZapp = abilities.includes('inscricao.marcarchegada')   ? '' : 'disabled';
-   const canSelecionar = abilities.includes('inscricao.selecionar')     ? '' : 'disabled';
+   const canMarcarcheg = abilities.includes('inscricao.marcarchegada')
+      ? ''
+      : 'disabled';
+   const canEnviarZapp = abilities.includes('inscricao.marcarchegada')
+      ? ''
+      : 'disabled';
+   const canSelecionar = abilities.includes('inscricao.selecionar')
+      ? ''
+      : 'disabled';
 
    // trasposição para checkbox
    const isChecked = row.chegada_traslado === 'SIM' ? 'checked' : '';
 
    return `
-    <button class="btn btn-xs btn-warning" ${canEnviarZapp} data-custom-action="zap">Zap</button>
+    <button class="btn btn-xs btn-warning" ${canEnviarZapp} data-custom-action="zap" data-viagem-id="${row.traslado_chegada_viagem_id}">Zap</button>
     <button class="btn btn-xs btn-success" ${canSelecionar} data-custom-action="selecionar">Selecionar</button>
 
     <div class="form-check form-switch">
@@ -238,6 +263,8 @@ const showZapModal = ref(false);
 const zapMensagem = ref('');
 const zapViagemEscolhida = ref('');
 const zapRow = ref(null);
+
+const rotaSelecionada = ref(false);
 const viagemSelecionada = ref(false);
 
 const onEdit = (row) => {
@@ -250,26 +277,53 @@ const onDelete = (row) => {
 };
 
 const onCustomAction = async ({ row, action, dataset, target }) => {
-   // console.log('dataset:', dataset);
+   console.log('dataset:', dataset);
    console.log('Dados da Linha', row);
 
    if (action === 'zap') {
       const inscricaoId = row.id;
-      fetchRotas();  // carrega lista de Rotas no <select>
+      zapViagemEscolhida.value = `Viagem de Traslado de Chegada não selecionada.`;
+      fetchRotas(); // carrega lista de Rotas no <select>
       zapRow.value = row;
-      zapMensagem.value = `<b>${row.pessoa.nome_completo}</b> ( ${row.funcao.sigla} - ${row.pessoa.entidade.sigla})<br/><b>CHEGADA</b>: ${formatToBrDateTime(row.chegada_data_hora)} ${row.chegada_meio_transp} ${row.chegada_cia_transp}`;
-      zapViagemEscolhida.value = 
-        `<b>Evento</b>: Reu CFN 2025  <br/>
-         <b>Rota</b>: ${row.rota?.nome || 'Não Informada'} <br/>
-         <b>Viagem</b>: ${row.id} - ${formatToBrDateTime(row.data_hora)} <br/><br/>
 
-         <b>Rota</b>: Chegada: Aeroporto JK > Hotel Lets Idea Brasília <br/>
-         <b>Veículo</b>: City Sedan prata RAFAEL 4 lugar <br/>
-         <b>Observação</b>:         <br/>
-         <b>Capacidade</b>: 4       <br/>
-         <b>Lotado com</b>: 1       <br/>
-         <b>Vagas</b>: 3            <br/>
-         `;
+      zapMensagem.value = `<b>${row.pessoa.nome_completo}</b> ( ${
+         row.funcao.sigla
+      } - ${
+         row.pessoa.entidade.sigla
+      })<br/><b>CHEGADA</b>: ${formatToBrDateTime(row.chegada_data_hora)} ${
+         row.chegada_meio_transp
+      } ${row.chegada_cia_transp}`;
+
+      // const viagemId = dataset.viagemId || row.traslado_chegada_viagem_id;
+      // const viagemId = dataset.viagemId ?? '0';
+      // const viagemId = dataset.viagemId != 'null' ? dataset.viagemId : '0';
+
+      if (dataset.viagemId != 'null') {
+         const viagem = await api.get(
+            `/inscricao/viagemmarcada/${dataset.viagemId}`
+         );
+
+         zapViagemEscolhida.value = `
+               <b>Evento</b>: ${
+                  viagem.data.evento_nome || 'Não Informado'
+               } <br/>
+               <b>Rota</b>:   ${viagem.data.nome || 'Não Informada'} <br/>
+               <b>Viagem</b>: ${viagem.data.data_hora_br} - ${
+            viagem.data.descricao
+         } - <br/><br/>
+
+               <b>Rota</b>:       ${viagem.data.nome || '?'}<br/>
+               <b>Veículo</b>:    ${viagem.data.descricao || '?'} <br/>
+               <b>Observação</b>: ${viagem.data.observacao || '?'} <br/>
+               <b>Capacidade</b>: ${viagem.data.capacidade || '?'} <br/>
+               <b>Lotado com</b>: ${viagem.data.lotacao || '?'} <br/>
+               <b>Vagas</b>:      ${viagem.data.vagas || '?'} <br/>
+               `;
+      }
+
+      // zapViagemEscolhida.value = `<b>Atualizar aqui</b>`;
+      viagemSelecionada.value = ''; // limpa a seleção anterior
+      rotaSelecionada.value = ''; // limpa a seleção anterior
       showZapModal.value = true;
    } else if (action === 'trasladou') {
       const inscricaoId = row.id;
@@ -301,56 +355,99 @@ const fetchViagensPorRota = async (rotaId) => {
    }
 };
 
-const enviarZap = async () => {
-   try {
-      const id = zapRow.value?.id;
-      await axios.post(`/api/inscricao/zap/enviar/${id}`, {
-         mensagem: zapMensagem.value,
-      });
-      showZapModal.value = false;
-      alert('Mensagem enviada com sucesso!');
-   } catch (error) {
-      console.error('Erro ao enviar mensagem:', error);
-      alert('Erro ao enviar WhatsApp');
-   }
-};
-
-// function salvarViagemModal(viagemId) {
-
-const salvarViagemModal = async (viagemId) => {   
-
+const salvarViagemModal = async (viagemId) => {
    const inscricaoId = zapRow.value?.id;
 
    if (!inscricaoId || !viagemId) {
-      showToast({title: 'Alerta', message: `O código da Inscrição ${inscricaoId} e o da Viagem ${viagemId} são obrigatórios!`, color: 'danger',});   
+      showToast({
+         title: 'Alerta',
+         message: `O código da Inscrição ${inscricaoId} e o da Viagem ${viagemId} são obrigatórios!`,
+         color: 'danger',
+      });
       return;
    }
-   // console.log('Salvar viagem modal', inscricaoId, viagemId);
 
    try {
-      // await api.put(`${props.endpoint}/${itemToDelete.value.id}`);
-      await api.put(`/inscricao/setarchegadaviagem/${inscricaoId}`, { chegada_viagem_id: viagemId });
-      showToast({title: 'Alerta', message: `Registrada a Viagem ID ${id} para o Traslado de Chegada com sucesso!`});
+      const res = await api.put(`/inscricao/alternarchegada/${inscricaoId}`, {
+         viagem_id: viagemId,
+      });
+      // console.log('Resposta do servidor:', res.data.message);
+
+      if (viagemId == 'remove') {
+         showToast({
+            title: 'Alerta',
+            message: res.data.message,
+            // message: `Removeu a Viagem ID ${inscricaoId} do Traslado de Chegada com sucesso!`,
+         });
+         zapViagemEscolhida.value = `Viagem de Traslado de Chegada não selecionada.`;
+      } else {
+         showToast({
+            title: 'Alerta',
+            message: res.data.message,
+            // message: `Inseriu a Viagem ID ${inscricaoId} do Traslado de Chegada com sucesso!`,
+         });
+
+         const viagem = await api.get(`/inscricao/viagemmarcada/${viagemId}`);
+         // console.log('Resposta do servidor:', viagem.data.message);
+
+         zapViagemEscolhida.value = `
+            <b>Evento</b>: ${viagem.data.evento_nome || 'Não Informado'} <br/>
+            <b>Rota</b>:   ${viagem.data.nome || 'Não Informada'} <br/>
+            <b>Viagem</b>: ${viagem.data.data_hora_br} - ${
+            viagem.data.descricao
+         } - <br/><br/>
+
+            <b>Rota</b>:       ${viagem.data.nome || '?'}<br/>
+            <b>Veículo</b>:    ${viagem.data.descricao || '?'} <br/>
+            <b>Observação</b>: ${viagem.data.observacao || '?'} <br/>
+            <b>Capacidade</b>: ${viagem.data.capacidade || '?'} <br/>
+            <b>Lotado com</b>: ${viagem.data.lotacao || '?'} <br/>
+            <b>Vagas</b>:      ${viagem.data.vagas || '?'} <br/>
+            `;
+      }
+      atualizarTabela();
+
+      // showToast({title: 'Alerta', message: `Registrada a Viagem ID ${id} para o Traslado de Chegada com sucesso!`});
       // itemToDelete.value = null;
       // showConfirmDelete.value = false;
-      refreshTable();
       // zapViagemEscolhida
       // refreshViagemEscolhida();
+      // refreshTable();
+      // zapViagemEscolhida.value = `<b>Atualizar aqui</b>`;
+      // zapViagemEscolhida.value = 'xxx';
+      // nextTick(() => {
+      //    zapViagemEscolhida.value = 'xxx';
+      // });
    } catch (error) {
       // console.error('Erro ao Setar a Viagem:', error);
       // showToast({title: 'Erro', message: `Erro ao excluir o Registro ${id}! ` + error, color: 'danger',});
    }
-}
+};
 
 /**
  * Funções do BASE CRUD Table
  */
 function btnImprimir() {
-   crudTableRef.value?.btnImprimir()
+   crudTableRef.value?.btnImprimir();
 }
 
 function atualizarTabela() {
-  crudTableRef.value?.refreshTable()
+   crudTableRef.value?.refreshTable();
 }
 
+// const enviarZap = async () => {
+//    try {
+//       const id = zapRow.value?.id;
+//       await axios.post(`/api/inscricao/zap/enviar/${id}`, {
+//          mensagem: zapMensagem.value,
+//       });
+//       showZapModal.value = false;
+//       alert('Mensagem enviada com sucesso!');
+//    } catch (error) {
+//       console.error('Erro ao enviar mensagem:', error);
+//       alert('Erro ao enviar WhatsApp');
+//    }
+// };
+
+// function salvarViagemModal(viagemId)
 </script>
