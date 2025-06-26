@@ -88,8 +88,6 @@
             </div>
          </CCardBody>
       </CCard>
-
-      
    </CCol>
 
    <!-- Modal Confirma Excluir -->
@@ -98,31 +96,47 @@
       @close="cancelDelete"
       backdrop="static"
       keyboard="false"
-      >
+   >
       <CModalHeader>
          <strong>Confirmar Exclusão</strong>
       </CModalHeader>
       <CModalBody>
-         Tem certeza que deseja excluir: 
-         <strong>{{ itemToDelete?.pessoa.nome_completo || 'este item' }}</strong> ?
+         Tem certeza que deseja excluir:
+         <strong>{{
+            itemToDelete?.pessoa.nome_completo || 'este item'
+         }}</strong>
+         ?
       </CModalBody>
       <CModalFooter>
-         <CButton color="btn btn-sm btn-outline-secondary me-1" @click="cancelDelete">Cancelar</CButton>
-         <CButton color="btn btn-sm btn-outline-danger    me-1" @click="confirmDelete">Excluir</CButton>
+         <CButton
+            color="btn btn-sm btn-outline-secondary me-1"
+            @click="cancelDelete"
+            >Cancelar</CButton
+         >
+         <CButton
+            color="btn btn-sm btn-outline-danger    me-1"
+            @click="confirmDelete"
+            >Excluir</CButton
+         >
       </CModalFooter>
    </CModal>
-
 </template>
 
 <script setup>
 import { onMounted, watch, ref, onUnmounted } from 'vue';
-import { CModal, CModalHeader, CModalBody, CModalFooter, CButton } from '@coreui/vue';
+import {
+   CModal,
+   CModalHeader,
+   CModalBody,
+   CModalFooter,
+   CButton,
+} from '@coreui/vue';
 import $ from 'jquery';
 import 'datatables.net-dt';
+// import 'datatables.net-dt';
 // import 'datatables.net-bs5';
 import api from '@/services/api';
 import { useToast } from '@/composables/useToast';
-
 
 const props = defineProps({
    title: String,
@@ -159,11 +173,11 @@ const initTable = () => {
                // ...externalFilters.value,
             },
          })
-         .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
-         .catch((error) => {
-            console.error('Erro ao carregar dados:', error);
-            callback({ data: [] }); // evita que a tabela quebre
-         });
+            .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
+            .catch((error) => {
+               console.error('Erro ao carregar dados:', error);
+               callback({ data: [] }); // evita que a tabela quebre
+            });
       },
       responsive: true,
       processing: false,
@@ -223,28 +237,32 @@ const initTable = () => {
 };
 
 function refreshTable() {
-   if (!dataTableInstance) {      
+   if (!dataTableInstance) {
       console.warn('DataTable ainda não está inicializado.');
       return;
    }
-  dataTableInstance?.ajax?.reload(null, false)
+   dataTableInstance?.ajax?.reload(null, false);
 }
 
 function btnImprimir() {
-   showToast({title: 'Alerta', message: 'Imprimir não implementado ainda!', color: 'danger',});
+   showToast({
+      title: 'Alerta',
+      message: 'Imprimir não implementado ainda!',
+      color: 'danger',
+   });
 }
 
 const showConfirmDelete = ref(false);
 const itemToDelete = ref(null);
 
 function openDeleteModal(row) {
-  itemToDelete.value = row;
-  showConfirmDelete.value = true;
+   itemToDelete.value = row;
+   showConfirmDelete.value = true;
 }
 
 function cancelDelete() {
-  showConfirmDelete.value = false;
-  itemToDelete.value = null;
+   showConfirmDelete.value = false;
+   itemToDelete.value = null;
 }
 
 const confirmDelete = async () => {
@@ -253,7 +271,10 @@ const confirmDelete = async () => {
 
    try {
       await api.delete(`${props.endpoint}/${itemToDelete.value.id}`);
-      showToast({title: 'Alerta', message: `Registro ${id} excluído com sucesso!`});
+      showToast({
+         title: 'Alerta',
+         message: `Registro ${id} excluído com sucesso!`,
+      });
       itemToDelete.value = null;
       showConfirmDelete.value = false;
       refreshTable();
@@ -262,7 +283,6 @@ const confirmDelete = async () => {
       // showToast({title: 'Erro', message: `Erro ao excluir o Registro ${id}! ` + error, color: 'danger',});
    }
 };
-
 
 onMounted(() => {
    initTable();
@@ -276,10 +296,9 @@ onUnmounted(() => {
 
 // Expõe a função para componentes pais
 defineExpose({
-  refreshTable,
-  btnImprimir,
-})
-
+   refreshTable,
+   btnImprimir,
+});
 </script>
 
 <style>
