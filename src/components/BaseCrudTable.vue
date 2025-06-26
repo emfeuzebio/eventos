@@ -133,7 +133,6 @@ import {
 } from '@coreui/vue';
 import $ from 'jquery';
 import 'datatables.net-dt';
-// import 'datatables.net-dt';
 // import 'datatables.net-bs5';
 import api from '@/services/api';
 import { useToast } from '@/composables/useToast';
@@ -195,6 +194,7 @@ const initTable = () => {
             title: 'Ações',
             data: null,
             orderable: false,
+            width: '250px',
             render: (data, type, row) => {
                let html = `
                     <button class="btn btn-xs btn-outline-primary me-1 btn-edit">Editar</button>
@@ -212,12 +212,13 @@ const initTable = () => {
 
    $(table.value).on('click', '.btn-edit', function () {
       const row = dataTableInstance.row($(this).closest('tr')).data();
+      console.log('Base Crud Edit', row);
       emit('edit', row);
    });
 
    $(table.value).on('click', '.btn-delete', function () {
       const row = dataTableInstance.row($(this).closest('tr')).data();
-      console.log('Excluir', row);
+      console.log('Base Crud Excluir', row);
       openDeleteModal(row);
       // emit('delete', row);
    });
@@ -226,6 +227,7 @@ const initTable = () => {
       const row = dataTableInstance.row($(this).closest('tr')).data();
       const action = this.dataset.customAction; // NÃO use $(this).data()
       const dataset = { ...this.dataset }; // aqui copia todos os data-*
+      console.log(`Base Crud Action [${action}]`, row);
 
       emit('custom', {
          row,

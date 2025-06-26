@@ -3,7 +3,7 @@
    <CButton
       class="btn btn-sm btn-outline-warning me-1 mb-2"
       @click="atualizarTabela"
-      >Recarregar da View Especializada
+      >Recarregar
    </CButton>
 
    <CButton class="btn btn-sm btn-outline-info me-1 mb-2" @click="btnImprimir"
@@ -161,6 +161,7 @@
          <CButton color="btn btn-sm btn-primary   me-1" @click="saveEditModal">Salvar</CButton>
       </CModalFooter>
    </CModal>
+   
 </template>
 
 <script setup>
@@ -337,8 +338,9 @@ const extraColumnRender = (row) => {
  * Funções ESPECIALIZADAS do CRUD DataTable
  */
 const onCustomAction = async ({ row, action, dataset, target }) => {
-   console.log('dataset:', dataset);
-   console.log('Dados da Linha', row);
+   // console.log('dataset:', dataset);
+   console.log(`Custon Action [${action}] dataset:`, dataset);
+   console.log(`Custon Action [${action}] Dados da Linha:`, row);
 
    if (action === 'zap') {
       const inscricaoId = row.id;
@@ -495,6 +497,11 @@ function atualizarTabela() {
    crudTableRef.value?.refreshTable();
 }
 
+const onDelete = (row) => {
+   // console.log('Excluir', row);
+   showDeleteModal.value = true;
+};
+
 const onEdit = (row) => {
    console.log('Editar', row);
    formError.value = {};
@@ -550,44 +557,7 @@ const saveEditModal = async () => {
    } finally {
       // loading.value = false;
    }
-
-   // } catch (error) {
-      // const status = error.response?.status;
-
-      // if (this.responseErrors.includes(status)) {
-      //    // Validação da API (ex: Laravel retorna 422 com { errors: { campo: ['msg'] } })
-      //    const errors = error.response.data.errors;
-      //    this.fieldErrors = {};
-
-      //    for (const campo in errors) {
-      //       this.fieldErrors[campo] = errors[campo][0];
-      //    }
-      //    this.formError =
-      //       (error.response.data.error
-      //          ? error.response.data.error + ' '
-      //          : '') + error.response.data.message ||
-      //       'Corrija os campos destacados.';
-      // }
-   // }   
 }
 
-const onDelete = (row) => {
-   console.log('Excluir', row);
-   showDeleteModal.value = true;
-};
-
-// const enviarZap = async () => {
-//    try {
-//       const id = zapRow.value?.id;
-//       await axios.post(`/api/inscricao/zap/enviar/${id}`, {
-//          mensagem: zapMensagem.value,
-//       });
-//       showZapModal.value = false;
-//       alert('Mensagem enviada com sucesso!');
-//    } catch (error) {
-//       console.error('Erro ao enviar mensagem:', error);
-//       alert('Erro ao enviar WhatsApp');
-//    }
-// };
 
 </script>
