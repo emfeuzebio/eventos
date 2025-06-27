@@ -9,6 +9,8 @@ export function useEventos(ativo = true) {
    const estados = ref([]);
    const regioes = ref([]);
    const viagens = ref([]);
+   const inscricoes = ref([]);
+   const inscricao = ref([]);
    const viagensDaRota = ref([]);
    const error = ref(null);
 
@@ -87,6 +89,39 @@ export function useEventos(ativo = true) {
       }
     }   
 
+   const fetchInscricoes = async (eventoId) => {
+      try {
+         error.value = null;
+           const res = await api.get('/inscricao', {
+            params: {
+               ativo: 'SIM',
+               eventoId: eventoId,
+            },
+         });
+         inscricoes.value = res.data;
+      } catch (err) {
+         console.error(`Erro ao carregar a lista de Inscrições Ativas do Evento ${eventoId}:`, err)
+         error.value = err;
+      }
+   };
+
+   const getInscricao = async (inscricaoId) => {
+      try {
+         error.value = null;
+           const res = await api.get(`/inscricao/${inscricaoId}`, {
+            params: {
+               ativo: 'SIM',
+            },
+         });
+         // inscricao.value = res.data;
+         return res.data;
+      } catch (err) {
+         console.error(`Erro ao carregar a Inscrição Ativas ID ${inscricaoId}:`, err)
+         error.value = err;
+      }
+   };
+
+
    const marcarTrasladoChegada = async (id, dados) => {
       try {
          error.value = null;
@@ -107,7 +142,10 @@ export function useEventos(ativo = true) {
       estados,
       regioes,
       viagens,
+      inscricoes,      
       viagensDaRota,
+
+      inscricao,
       
       fetchEventos,  // caso queira recarregar manualmente
       fetchVeiculos, // caso queira recarregar manualmente
@@ -116,6 +154,9 @@ export function useEventos(ativo = true) {
       fetchRegioes,  // caso queira recarregar manualmente
       fetchViagens,  // caso queira recarregar manualmente
       fetchViagensDaRota,  // caso queira recarregar manualmente
+      fetchInscricoes,  // caso queira recarregar manualmente
+
+      getInscricao,     // caso queira recarregar manualmente uma inscrição específica
 
       marcarTrasladoChegada, // 
       error,

@@ -10,6 +10,12 @@
       >Imprimir
    </CButton>
 
+   <CButton
+      class="btn btn-sm btn-outline-success me-1 mb-2"
+      @click="btnFormModal(1)"
+      >Form Modal
+   </CButton>
+
    <BaseCrudTable
       ref="crudTableRef"
       title="Cadastro de Estados "
@@ -72,7 +78,7 @@
          <label class="form-label fw-bold mb-1 mt-2"
             >Dados da Viagem de Traslado de Chegada escolhida</label
          >
-         <CAlert color="light" v-html="zapViagemEscolhida"></CAlert>
+         <CAlert color="dark" v-html="zapViagemEscolhida"></CAlert>
       </CModalBody>
       <CModalFooter>
          <CButton
@@ -99,13 +105,12 @@
          <strong>Editar Registro</strong>
       </CModalHeader>
       <CModalBody>
-
          <CFormInput
             v-model="formData.nome_completo"
             label="Nome da Pessoa"
-            class="form-control "
+            class="form-control"
             :class="{ 'is-invalid': formError.nome_completo }"
-            placeholder="João José Maria"         
+            placeholder="João José Maria"
          />
          <div class="form-error" v-if="formError.nome_completo">
             {{ formError.nome_completo[0] }}
@@ -114,7 +119,7 @@
          <CFormSelect
             v-model="formData.modalidade"
             label="Modalidade"
-            class="form-control "
+            class="form-control"
             :options="[
                { value: '', label: 'Selecione' },
                { value: 'Presencial', label: 'Presencial' },
@@ -128,7 +133,7 @@
          <CFormSelect
             v-model="formData.chegada_meio_transp"
             label="Chegada Meio de Transporte"
-            class="form-control "
+            class="form-control"
             :options="[
                { value: '', label: 'Selecione' },
                { value: 'Aéreo', label: 'Aéreo' },
@@ -144,9 +149,9 @@
          <CFormInput
             v-model="formData.chegada_cia_transp"
             label="Chegada Cia + Nº Voo/Ônibus"
-            class="form-control "
+            class="form-control"
             :class="{ 'is-invalid': formError.chegada_cia_transp }"
-            placeholder="LATAM, GOL, AZUL, etc."         
+            placeholder="LATAM, GOL, AZUL, etc."
          />
          <div class="form-error" v-if="formError.chegada_cia_transp">
             {{ formError.chegada_cia_transp[0] }}
@@ -154,14 +159,28 @@
 
          <pre>{{ formData.value }}</pre>
          <pre>{{ JSON.stringify(formData.value) }}</pre>
-
       </CModalBody>
       <CModalFooter>
-         <CButton color="btn btn-sm btn-secondary me-1" @click="showEditModal = false" >Cancelar</CButton>
-         <CButton color="btn btn-sm btn-primary   me-1" @click="saveEditModal">Salvar</CButton>
+         <CButton
+            color="btn btn-sm btn-secondary me-1"
+            @click="showEditModal = false"
+            >Cancelar</CButton
+         >
+         <CButton color="btn btn-sm btn-primary   me-1" @click="saveEditModal"
+            >Salvar</CButton
+         >
       </CModalFooter>
    </CModal>
-   
+
+   <FormModal
+      :visible="formModalVisivel"
+      :title="'Editar'"
+      :conteudo="'Conteúdo do Formulário'"
+      :formData="formDataModal"
+      @close="formModalVisivel = false"
+      @save="salvarDados"
+      @destroy="destroyDados"
+   />
 </template>
 
 <script setup>
@@ -174,6 +193,7 @@ import { useEventos } from '@/composables/useEventos';
 import { ref } from 'vue';
 import { computed } from 'vue';
 import { nextTick } from 'vue';
+import FormModal from '@/components/FormModal.vue';
 
 import {
    CModal,
@@ -183,24 +203,21 @@ import {
    CButton,
 } from '@coreui/vue';
 
-
 /**
  * Constantes e Variáveis Reativas BASE do CRUD DataTable
  */
-const crudTableRef = ref();            // ref para o componente BaseCrudTable
+const crudTableRef = ref(); // ref para o componente BaseCrudTable
 
-const formData  = ref({});        // campos do Form Edit Dados
-const formError = ref({});        // erros  do Form Edit Dados
+const formData = ref({}); // campos do Form Edit Dados
+const formError = ref({}); // erros  do Form Edit Dados
 
-const { showToast } = useToast();      // Toasts de Alerta
+const { showToast } = useToast(); // Toasts de Alerta
 
-const showDeleteModal = ref(false);    // Delete Modal
-const showEditModal = ref(false);      // Edit Modal
+const showDeleteModal = ref(false); // Delete Modal
+const showEditModal = ref(false); // Edit Modal
 
-const abilities = getAbilities();      // recupera do JWR as abilities do usuário logado
-// console.log('Abilities carregadas:', JSON.parse(JSON.stringify(abilities))); 
-
-
+const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
+// console.log('Abilities carregadas:', JSON.parse(JSON.stringify(abilities)));
 
 /**
  * Constantes e Variáveis Reativas ESPECIALIZADAS do CRUD DataTable
@@ -210,7 +227,15 @@ const viagensDaRota = ref([]);
 const viagemSelecionada = ref(false);
 const rotaSelecionada = ref(false);
 
-const { marcarTrasladoChegada, fetchRotas, rotas } = useEventos();
+const {
+   marcarTrasladoChegada,
+   fetchRotas,
+   rotas,
+   fetchInscricoes,
+   inscricoes,
+   getInscricao,
+   inscricao,
+} = useEventos();
 
 // Modal Zap
 const showZapModal = ref(false);
@@ -218,12 +243,10 @@ const zapMensagem = ref('');
 const zapViagemEscolhida = ref('');
 const zapRow = ref(null);
 
-
-
 /**
- * Filtros ESPECIALIZADAS do CRUD DataTable 
+ * Filtros ESPECIALIZADAS do CRUD DataTable
  */
-const filters = [{}];         // sem filtros
+const filters = [{}]; // sem filtros
 
 /*
 const filters = [
@@ -252,7 +275,6 @@ const filters = computed(() => [
 ]);
 
 */
-
 
 /**
  * Colunas BASE do CRUD DataTable
@@ -324,8 +346,7 @@ const extraColumnRender = (row) => {
    const isChecked = row.chegada_traslado === 'SIM' ? 'checked' : '';
 
    return `
-    <button class="btn btn-xs btn-warning" ${canEnviarZapp} data-custom-action="zap" data-viagem-id="${row.traslado_chegada_viagem_id}">Zap</button>
-    <button class="btn btn-xs btn-success" ${canSelecionar} data-custom-action="selecionar">Selecionar</button>
+    <button class="btn btn-xs btn-outline-info" ${canEnviarZapp} data-custom-action="zap" data-viagem-id="${row.traslado_chegada_viagem_id}">Marcar Viagem</button>
 
     <div class="form-check form-switch">
       <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-viagem-id="x" data-pessoa-id="${row.pessoa_id}" data-rota-id="x" ${isChecked} >
@@ -333,6 +354,7 @@ const extraColumnRender = (row) => {
   `;
 };
 
+//     <button class="btn btn-xs btn-success" ${canSelecionar} data-custom-action="selecionar">Selecionar</button>
 
 /**
  * Funções ESPECIALIZADAS do CRUD DataTable
@@ -493,6 +515,70 @@ function btnImprimir() {
    crudTableRef.value?.btnImprimir();
 }
 
+// FORM MODAL
+const formModalVisivel = ref(false);
+const formDataModal = ref({});
+
+/**
+ * FUNCIONA
+ * MELHOR para Vue 3 + Composition API
+ * se você está dentro de uma função async, e ainda quiser manter o await, a versão mínima com await seria:
+ * Isso garante que, se getInscricao(1) retornar null ou undefined, o spread será feito em um objeto vazio, evitando erro.
+ * Sem .finally()
+ *
+ * arrow function (Function Expression)
+ * No seu caso com Vue 3 <script setup>:
+ * Como você está trabalhando com Vue 3 + Composition API, o ideal e mais limpo é:
+ */
+// const btnFormModal = async () => {
+//    formDataModal.value = { ...((await getInscricao(1)) || {}) };
+//    formModalVisivel.value = true;
+// };
+
+/**
+ * MELHOR para Vue 3 + Composition API
+ * versão const btnFormModal()
+ * sem await usando Promise.then
+ * Aqui usamos .finally() para garantir que o modal será exibido mesmo se os dados vierem vazios
+ *
+ * arrow function (Function Expression)
+ * No seu caso com Vue 3 <script setup>:
+ * Como você está trabalhando com Vue 3 + Composition API, o ideal e mais limpo é:
+ */
+const btnFormModal = (inscricaoId) =>
+   getInscricao(inscricaoId)
+      .then((data) => (formDataModal.value = { ...(data || {}) }))
+      .finally(() => {
+         formModalVisivel.value = true;
+      });
+
+/**
+ * versão function btnFormModal()
+ * sem await usando Promise.then
+ * Aqui usamos .finally() para garantir que o modal será exibido mesmo se os dados vierem vazios
+ *
+ * Função declarada (Function Declaration) Antiga mais usada Vue2 Código tradicional (script options, Vue 2)
+ * É elevada (hoisted): pode ser chamada antes mesmo da sua definição no código.
+ *
+ */
+// function btnFormModal(inscricaoId) {
+//    getInscricao(inscricaoId)
+//       .then((data) => (formDataModal.value = { ...(data || {}) }))
+//       .finally(() => {
+//          formModalVisivel.value = true;
+//       });
+// }
+
+function salvarDados(dados) {
+   console.log('Dados salvos:', dados);
+   formModalVisivel.value = false;
+}
+
+function destroyDados(dados) {
+   console.log('destroyDados:', dados);
+   formModalVisivel.value = false;
+}
+
 function atualizarTabela() {
    crudTableRef.value?.refreshTable();
 }
@@ -529,8 +615,7 @@ const onEdit = (row) => {
 
    // TODO Carrega os dados do Banco de Dados para o formulário de edição
    // const inscricaoId = row.value?.id;
-   // api.get('/inscricao/${inscricaoId}')...   
-
+   // api.get('/inscricao/${inscricaoId}')...
 };
 
 // NOVO
@@ -546,7 +631,10 @@ const saveEditModal = async () => {
 
       await api.put(`inscricao/${formData.value.id}`, formData.value); // atualiza o registro
 
-      showToast({title: 'Sucesso',message: `Inscrição ID ${formData.value.id} atualizada com sucesso.`,});
+      showToast({
+         title: 'Sucesso',
+         message: `Inscrição ID ${formData.value.id} atualizada com sucesso.`,
+      });
       showEditModal.value = false;
       atualizarTabela();
    } catch (error) {
@@ -557,7 +645,5 @@ const saveEditModal = async () => {
    } finally {
       // loading.value = false;
    }
-}
-
-
+};
 </script>
