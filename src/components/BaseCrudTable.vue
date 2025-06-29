@@ -136,6 +136,7 @@ import 'datatables.net-dt';
 // import 'datatables.net-bs5';
 import api from '@/services/api';
 import { useToast } from '@/composables/useToast';
+import { color } from 'chart.js/helpers';
 
 const props = defineProps({
    title: String,
@@ -212,8 +213,9 @@ const initTable = () => {
 
    $(table.value).on('click', '.btn-edit', function () {
       const row = dataTableInstance.row($(this).closest('tr')).data();
-      console.log('Base Crud Edit', row);
-      emit('edit', row);
+      // console.log('Base Crud Edit', row);
+      const getData = async () => await loadDataFormModal(row.id);
+      emit('edit', row, getData);
    });
 
    $(table.value).on('click', '.btn-delete', function () {
@@ -266,6 +268,43 @@ function cancelDelete() {
    showConfirmDelete.value = false;
    itemToDelete.value = null;
 }
+
+const loadDataFormModal = async (id = 0) => {
+   const endpoint = props.endpoint;
+   // console.log('loadDataFormModal: ', endpoint, id);
+
+   try {
+      const res = await api.get(`${endpoint}/${id}`);
+      // const res = await api
+      //    .get(`${endpoint}/${id}`)
+      //    .then((response) => response.data);
+
+      // formDataModal.value = { ...fields, ...res.data }; // carrega os dados do response para o form Modal
+
+      console.log('loadDataFormModal: Dados carregados:', res.data);
+      return res.data; // Retorna os dados carregados
+   } catch (error) {
+      console.error(`Erro ao carregar a Inscrição ID ${id}:`, error);
+   }
+};
+
+// USADO NO GENERIC CRUD QUANDO O EDIT FORM MODAL COM SLOT ESTÁ NESTE ARQUIVO
+// async function load(id = 0) {
+//    try {
+//       loading.value = true;
+//       const res = await api.get(`${endpoint}/${id}`);
+//       form.value = { ...fields, ...res.data }; // carrega os dados do response para o form Modal
+//       isEditing.value = id ?? false; // controle se é edição ou novo registro
+//       formError.value = ''; // limpa o form errors
+//       clearFieldErrors(); // limpa o filds errors
+//       editModalVisible.value = true; // mostra o modal
+//    } catch (err) {
+//       formError.value =
+//          err.response?.data?.message || 'Erro ao carregar dados';
+//    } finally {
+//       loading.value = false;
+//    }
+// }
 
 const confirmDelete = async () => {
    // Usado quando emitia para página Pai o delete event
@@ -326,8 +365,8 @@ defineExpose({
 }
 
 .form-label {
-  margin-bottom: 1px;
-  margin-top: 12px;
-  font-weight: bold;
+   margin-bottom: 1px;
+   margin-top: 12px;
+   font-weight: bold;
 }
 </style>

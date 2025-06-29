@@ -1,15 +1,76 @@
 <template>
-   <CModal :visible="visible" @close="$emit('close')" backdrop="static">
+   <CModal
+      :visible="visible"
+      @close="$emit('close')"
+      backdrop="static"
+      fullscreen
+   >
       <CModalHeader>
          <CModalTitle>{{ title }}</CModalTitle>
       </CModalHeader>
 
       <CModalBody>
-         <CForm> Componente de formulário aqui! </CForm>
-         visible: {{ visible }} <br />
-         {{ conteudo }}
+         <!-- visible: {{ visible }} <br /> -->
+         <CForm>
+            <CRow class="mb-3 align-items-center">
+               <CCol sm="4">
+                  <CFormLabel>Chegada Meio Transporte:</CFormLabel>
+               </CCol>
+               <CCol sm="8">
+                  <CFormInput
+                     id="nome"
+                     v-model="formData.chegada_meio_transp"
+                     type="text"
+                     placeholder="Digite"
+                     class="form-control"
+                  />
+                  <div class="form-error" v-if="formError.chegada_meio_transp">
+                     {{ formError.chegada_meio_transp[0] }}
+                  </div>
+               </CCol>
 
-         {{ formData }}
+               <CRow class="mb-3 align-items-center">
+                  <CCol sm="4">
+                     <CFormLabel for="categoria">modalidade:</CFormLabel>
+                  </CCol>
+                  <CCol sm="8">
+                     <CFormSelect
+                        id="categoria"
+                        v-model="formData.modalidade"
+                        class="form-control"
+                     >
+                        <option disabled value="">
+                           Selecione uma modalidade
+                        </option>
+                        <option value="Presencial">Presencial</option>
+                        <option value="Virtual">Virtual</option>
+                     </CFormSelect>
+                     <div class="form-error" v-if="formError.modalidade">
+                        {{ formError.modalidade[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
+               <CRow class="mb-3 align-items-center">
+                  <CCol sm="4">
+                     <CFormLabel>Observações:</CFormLabel>
+                  </CCol>
+                  <CCol sm="8">
+                     <CFormTextarea
+                        id="descricao"
+                        v-model="formData.observacao"
+                        rows="3"
+                        placeholder="Descreva aqui..."
+                     />
+                     <div class="form-error" v-if="formError.observacao">
+                        {{ formError.observacao[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+            </CRow>
+         </CForm>
+         <!-- {{ conteudo }} <br /> -->
+         <!-- formData: {{ formData }} -->
       </CModalBody>
 
       <CModalFooter>
@@ -27,22 +88,13 @@ const props = defineProps({
    title: String,
    conteudo: String,
    formData: Object,
+   formError: Object,
 });
 const emit = defineEmits(['close', 'save', 'destroy']);
 
 function submitForm() {
-   //   let valid = true
-   //   Object.keys(errors).forEach((k) => (errors[k] = null))
-
-   //   for (const field of props.fields) {
-   //     if (field.required && !formData[field.name]) {
-   //       errors[field.name] = 'Este campo é obrigatório'
-   //       valid = false
-   //     }
-   //   }
-
-   //   if (valid) emit('save', { ...formData })
-   emit('save', { nome: 'Teste', email: 'teste@example.com' });
-   emit('destroy', {});
+   //    emit('save', { nome: 'Teste', email: 'teste@example.com' });
+   //    emit('destroy', {});
+   emit('save', { ...props.formData });
 }
 </script>

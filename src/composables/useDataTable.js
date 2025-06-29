@@ -1,19 +1,19 @@
 import { ref } from 'vue';
 import $ from 'jquery';
 import 'datatables.net-dt';
-import api from '@/services/api'; 
-import { createTooltip } from 'floating-vue'
+import api from '@/services/api';
+import { createTooltip } from 'floating-vue';
 
-
-export function useDataTable({ 
+export function useDataTable({
    tableId,
    endpoint,
    columns,
    onClickEdit,
    onClickDelete,
    onClickShow,
-   onClickSelectViagem,
+   onClickExtraAction,
    externalFilters,
+   refreshTable,
 }) {
    const dataTable = ref(null);
 
@@ -27,7 +27,7 @@ export function useDataTable({
          ajax: function (_data, callback, _settings) {
             api.get(endpoint, {
                params: {
-                  ...externalFilters.value
+                  ...externalFilters.value,
                },
             })
                .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
@@ -49,23 +49,23 @@ export function useDataTable({
             [5, 10, 25, 50, 100, -1],
             [5, 10, 25, 50, 100, 'Todos'],
          ],
-         pageLength: 10, 
+         pageLength: 10,
          drawCallback() {
             bindTableEvents();
 
             // Reaplica tooltips após o DataTable ser renderizado
             const tooltipEls = document.querySelectorAll('[data-v-tooltip]');
-    
-            tooltipEls.forEach(el => {
-              // Evita reaplicar
-              if (!el._tooltipInstance) {
-                const content = el.getAttribute('data-v-tooltip')
-                el._tooltipInstance = createTooltip(el, {
-                  content,
-                  placement: 'top',
-                })
-              }
-            });            
+
+            tooltipEls.forEach((el) => {
+               // Evita reaplicar
+               if (!el._tooltipInstance) {
+                  const content = el.getAttribute('data-v-tooltip');
+                  el._tooltipInstance = createTooltip(el, {
+                     content,
+                     placement: 'top',
+                  });
+               }
+            });
          },
       });
    }
@@ -102,25 +102,26 @@ export function useDataTable({
          if (onClickShow) onClickShow(id);
       });
 
+      table.on('click', '[data-custom-action]', function (e) {
+         e.preventDefault(); // Evita o comportamento padrão do link ou botão
+
+         const id = $(this).closest('tr').attr('id'); // pega o id da linha, se preciso pode pegar o Id do botao
+         const row = dataTable.value.row(`#${id}`).data();
+         const action = $(e.currentTarget).data('custom-action');
+         const dataset = $(e.currentTarget).data();
+         // console.log(`Base Crud Action [${action}]`, id, dataset, row);
+
+         if (onClickExtraAction) onClickExtraAction(id, action, row, dataset);
+      });
 
       // Eventos adicionais para view especializada
-      // Por ora estão aqui, depois levar para view especializada
-         table.on('click', '.btnToggleChegadaTraslado', (e) => {
-            const inscricaoId = $(e.currentTarget).data('inscricao_id');
-            const ativo = e.target.checked ? 'SIM' : 'NÃO';
-            console.log(`btnToggleChegadaTraslado > Alterar inscricaoId ${inscricaoId} para ${ativo}`);         
-            // if (onClickEdit) onClickEdit(inscricaoId);
-            // abrirModal();
-         });
-      
-         table.on('click', '.btnSelecionarViagem', (e) => {
-            const inscricaoId = $(e.currentTarget).data('inscricao_id');
-            const viagemId = $(e.currentTarget).data('viagem_id');
-            const rotaId = $(e.currentTarget).data('rota_id');
-            console.log(`btnSelecionarViagem > InscricaoId ${inscricaoId}; ViagemId ${viagemId}; RotaId ${rotaId}`);
-            if (onClickSelectViagem) onClickSelectViagem(inscricaoId);
-         });      
-       
+      // table.on('click', '.btnSelecionarViagem', (e) => {
+      //    const inscricaoId = $(e.currentTarget).data('inscricao_id');
+      //    const viagemId = $(e.currentTarget).data('viagem_id');
+      //    const rotaId = $(e.currentTarget).data('rota_id');
+      //    console.log(`btnSelecionarViagem > InscricaoId ${inscricaoId}; ViagemId ${viagemId}; RotaId ${rotaId}`);
+      //    if (onClickSelectViagem) onClickSelectViagem(inscricaoId);
+      // });
    }
 
    return {

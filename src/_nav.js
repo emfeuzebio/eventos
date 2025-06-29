@@ -320,12 +320,32 @@ export default [
     name: 'Negócio',
   },
 
+  // Inscrições
+  {
+    component: 'CNavGroup',
+    name: 'Inscrições',
+    to: '/Inscrições',
+    icon: 'cil-envelope-open',
+    items: [
+      {
+        component: 'CNavItem',
+        name: 'Inscrições Generic Old',
+        to: '/cadastros/inscricoes',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Chegadas TD Crud',
+        to: '/inscricoes/inscricoes',
+      },
+    ],
+  },  
+
   // Transportes
   {
     component: 'CNavGroup',
     name: 'Transportes',
     to: '/transportes',
-    icon: 'cil-envelope-open',
+    icon: 'cil-layers',
     items: [
       {
         component: 'CNavItem',
@@ -349,7 +369,7 @@ export default [
       },
       {
         component: 'CNavItem',
-        name: 'Gestão Chegadas',
+        name: 'Gestão Chegadas OLD',
         to: '/transportes/chegadas',
       },
     ],
@@ -360,7 +380,7 @@ export default [
     component: 'CNavGroup',
     name: 'Cadastros',
     to: '/cadastros',
-    icon: 'cil-envelope-open',
+    icon: 'cil-list',
     items: [
       {
         component: 'CNavItem',
@@ -381,16 +401,6 @@ export default [
         component: 'CNavItem',
         name: 'Regiões do País',
         to: '/cadastros/regioes',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Inscrições',
-        to: '/cadastros/inscricoes',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Inscrições Nova',
-        to: '/inscricoes/inscricoes',
       },
     ],
   },

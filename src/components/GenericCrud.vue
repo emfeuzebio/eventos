@@ -188,6 +188,7 @@ const props = defineProps({
    columns: Array,
    defaultValues: Object,
    abilities: Array,
+   extraColumnRender: Function,
    filters: Array,
    default: () => [],
    canInsert: Boolean,
@@ -227,39 +228,60 @@ function btnImprimir() {
    });
 }
 
-// Tabela de Dados
-const { init, refreshTable } = useDataTable({
-   tableId,
-   endpoint: props.endpoint,
-   externalFilters: filtros,
-   autoWidth: false, // desativa o ajuste automático para que a largura definida funcione
-   columns: [
-      ...props.columns,
-      {
-         title: 'Ações',
-         data: null,
-         sortable: false,
-         className: 'text-center',
-         width: '120px',
-         render(data, type, row) {
-            return (
-               `
-          <button class="btnEdit btn btn-xs btn-outline-primary me-1" data-id="${row.id}" data-v-tooltip="Editar o registro atual" ` +
-               (props.canUpdate ? '' : 'disabled') +
-               ` >Editar</button>
-          <button class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" data-v-tooltip="Excluir o registro atual"` +
-               (props.canDelete ? '' : 'disabled') +
-               ` >Excluir</button>
-        `
-            );
-         },
-      },
-   ],
+const emit = defineEmits(['edit', 'delete', 'custom', 'extraAction']);
 
-   // onClickSelectViagem: () => fetchRegioes(),
-   onClickSelectViagem: () => abrirModal(),
-   onClickEdit: (id) => form.load(id),
-   onClickDelete: (rowData) => form.confirmDeleteModal(rowData),
+// Tabela de Dados
+const { init, refreshTable } = useDataTable(
+   {
+      tableId,
+      endpoint: props.endpoint,
+      externalFilters: filtros,
+      autoWidth: false, // desativa o ajuste automático para que a largura definida funcione
+      columns: [
+         ...props.columns,
+         {
+            title: 'Ações',
+            data: null,
+            sortable: false,
+            className: 'text-center',
+            width: '240px',
+            render(data, type, row) {
+               let html =
+                  `<button class="btnEdit btn btn-xs btn-outline-primary me-1" data-id="${row.id}" data-v-tooltip="Editar o registro atual" ` +
+                  (props.canUpdate ? '' : 'disabled') +
+                  ` >Editar</button>
+                  <button class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" data-v-tooltip="Excluir o registro atual"` +
+                  (props.canDelete ? '' : 'disabled') +
+                  ` >Excluir</button>`;
+
+               if (props.extraColumnRender) {
+                  html += props.extraColumnRender(row);
+               }
+               return html;
+            },
+         },
+      ],
+
+      // onClickSelectViagem: () => fetchRegioes(),
+      onClickSelectViagem: () => abrirModal(),
+      onClickEdit: (id) => form.load(id),
+      onClickDelete: (rowData) => form.confirmDeleteModal(rowData),
+      onClickExtraAction: (id, action, row, dataset) => {
+         emit('extraAction', { id, action, row, dataset });
+         // console.log('onClickExtraAction', id, action, row, dataset);
+      },
+   },
+   emit
+);
+
+/**
+ * defineExpose() - Expõe o método pro componente pai
+ * refreshTable é uma função dentro do composable useDataTable() exposta acima.
+ * Mas para expô-la para a view Pai acima desta que estamos que é filha
+ * precisamos usar defineExpose()
+ */
+defineExpose({
+   refreshTable,
 });
 
 // Formulário
@@ -268,20 +290,17 @@ const form = useForm({
    defaultValues: props.defaultValues ?? {},
    onSaved: () => {
       refreshTable();
-      // showAlert('success', 'Registro salvo com sucesso.');
       showToast({
          title: 'Sucesso',
-         message: 'Dados salvos com sucesso!',
-         color: 'success',
+         message: 'Registro salvo com sucesso!',
+         // color: 'success',
       });
    },
    afterDelete: () => {
       refreshTable();
-      // showAlert('success', 'Registro excluído com sucesso.');
       showToast({
          title: 'Sucesso',
          message: 'Registro excluído com sucesso!',
-         color: 'success',
       });
    },
 });

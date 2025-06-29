@@ -12,14 +12,14 @@
 
    <CButton
       class="btn btn-sm btn-outline-success me-1 mb-2"
-      @click="btnFormModal(1)"
+      @click="loadDataFormModal(1)"
       >Form Modal
    </CButton>
 
    <BaseCrudTable
       ref="crudTableRef"
-      title="Cadastro de Estados "
-      description="Gerenciamento do cadastro de Estados da Federação"
+      title="Translados de Chegada "
+      description="Gerenciamento das viagens de Traanslados de Chegada"
       endpoint="inscricao"
       :abilities="abilities"
       :columns="columns"
@@ -94,15 +94,15 @@
       </CModalFooter>
    </CModal>
 
-   <!-- Editar Modal -->
+   <!-- Editar Chegada Modal -->
    <CModal
-      :visible="showEditModal"
-      @close="showEditModal = false"
+      :visible="showEditarChegadaModal"
+      @close="showEditarChegadaModal = false"
       backdrop="static"
       keyboard="true"
    >
       <CModalHeader>
-         <strong>Editar Registro</strong>
+         <strong>Editar Chegada</strong>
       </CModalHeader>
       <CModalBody>
          <CFormInput
@@ -111,6 +111,7 @@
             class="form-control"
             :class="{ 'is-invalid': formError.nome_completo }"
             placeholder="João José Maria"
+            disabled
          />
          <div class="form-error" v-if="formError.nome_completo">
             {{ formError.nome_completo[0] }}
@@ -163,22 +164,24 @@
       <CModalFooter>
          <CButton
             color="btn btn-sm btn-secondary me-1"
-            @click="showEditModal = false"
+            @click="showEditarChegadaModal = false"
             >Cancelar</CButton
          >
-         <CButton color="btn btn-sm btn-primary   me-1" @click="saveEditModal"
+         <CButton color="btn btn-sm btn-primary   me-1" @click="salvarChegada"
             >Salvar</CButton
          >
       </CModalFooter>
    </CModal>
 
+   <!-- Editar Modal -->
    <FormModal
-      :visible="formModalVisivel"
+      :visible="showEditModal"
       :title="'Editar'"
       :conteudo="'Conteúdo do Formulário'"
       :formData="formDataModal"
-      @close="formModalVisivel = false"
-      @save="salvarDados"
+      :formError="formError"
+      @close="showEditModal = false"
+      @save="saveEditModal"
       @destroy="destroyDados"
    />
 </template>
@@ -222,6 +225,8 @@ const abilities = getAbilities(); // recupera do JWR as abilities do usuário lo
 /**
  * Constantes e Variáveis Reativas ESPECIALIZADAS do CRUD DataTable
  */
+
+const showEditarChegadaModal = ref(false);
 
 const viagensDaRota = ref([]);
 const viagemSelecionada = ref(false);
@@ -332,6 +337,9 @@ const columns = [
  */
 const extraColumnRender = (row) => {
    // controle de acesso
+   const canEditarChegada = abilities.includes('inscricao.marcarchegada')
+      ? ''
+      : 'disabled';
    const canMarcarcheg = abilities.includes('inscricao.marcarchegada')
       ? ''
       : 'disabled';
@@ -346,6 +354,8 @@ const extraColumnRender = (row) => {
    const isChecked = row.chegada_traslado === 'SIM' ? 'checked' : '';
 
    return `
+    <button class="btn btn-xs btn-outline-success" ${canEditarChegada} data-custom-action="editarChegada" data-inscricao-id="${row.id}">Editar Chegada</button>
+
     <button class="btn btn-xs btn-outline-info" ${canEnviarZapp} data-custom-action="zap" data-viagem-id="${row.traslado_chegada_viagem_id}">Marcar Viagem</button>
 
     <div class="form-check form-switch">
@@ -361,10 +371,13 @@ const extraColumnRender = (row) => {
  */
 const onCustomAction = async ({ row, action, dataset, target }) => {
    // console.log('dataset:', dataset);
-   console.log(`Custon Action [${action}] dataset:`, dataset);
-   console.log(`Custon Action [${action}] Dados da Linha:`, row);
+   // console.log(`Custon Action [${action}] dataset:`, dataset);
+   console.log(`Custon Action [${action}] Dados da Linha:`, row, dataset);
 
-   if (action === 'zap') {
+   if (action === 'editarChegada') {
+      // console.log('editarChegada', row, action, dataset);
+      editarChegada(row, dataset);
+   } else if (action === 'zap') {
       const inscricaoId = row.id;
       zapViagemEscolhida.value = `Viagem de Traslado de Chegada não selecionada.`;
       fetchRotas(); // carrega lista de Rotas no <select>
@@ -530,14 +543,14 @@ const formDataModal = ref({});
  * No seu caso com Vue 3 <script setup>:
  * Como você está trabalhando com Vue 3 + Composition API, o ideal e mais limpo é:
  */
-// const btnFormModal = async () => {
+// const loadDataFormModal = async () => {
 //    formDataModal.value = { ...((await getInscricao(1)) || {}) };
 //    formModalVisivel.value = true;
 // };
 
 /**
  * MELHOR para Vue 3 + Composition API
- * versão const btnFormModal()
+ * versão const loadDataFormModal()
  * sem await usando Promise.then
  * Aqui usamos .finally() para garantir que o modal será exibido mesmo se os dados vierem vazios
  *
@@ -545,15 +558,15 @@ const formDataModal = ref({});
  * No seu caso com Vue 3 <script setup>:
  * Como você está trabalhando com Vue 3 + Composition API, o ideal e mais limpo é:
  */
-const btnFormModal = (inscricaoId) =>
+const loadDataFormModal = (inscricaoId) =>
    getInscricao(inscricaoId)
       .then((data) => (formDataModal.value = { ...(data || {}) }))
       .finally(() => {
-         formModalVisivel.value = true;
+         showEditModal.value = true;
       });
 
 /**
- * versão function btnFormModal()
+ * versão function loadDataFormModal()
  * sem await usando Promise.then
  * Aqui usamos .finally() para garantir que o modal será exibido mesmo se os dados vierem vazios
  *
@@ -561,7 +574,7 @@ const btnFormModal = (inscricaoId) =>
  * É elevada (hoisted): pode ser chamada antes mesmo da sua definição no código.
  *
  */
-// function btnFormModal(inscricaoId) {
+// function loadDataFormModal(inscricaoId) {
 //    getInscricao(inscricaoId)
 //       .then((data) => (formDataModal.value = { ...(data || {}) }))
 //       .finally(() => {
@@ -569,14 +582,37 @@ const btnFormModal = (inscricaoId) =>
 //       });
 // }
 
-function salvarDados(dados) {
-   console.log('Dados salvos:', dados);
-   formModalVisivel.value = false;
-}
+/**
+ * CRUD Base local
+ * TODO passar este Edit para o Base Modal
+ * Talves usando SLOT para montar o Form aqui e enviar para o Base Modal com SLOT - ver no GenericCrudView.vue
+ * Editar Entidade atual - arrow function (Function Expression)
+ */
+const saveEditModal = async (formData) => {
+   console.log('saveEditModal:', formData);
+
+   try {
+      await api.put(`inscricao/${formData.id}`, formData);
+
+      showToast({
+         title: 'Sucesso',
+         message: `Inscrição ID ${formData.id} atualizada com sucesso.`,
+      });
+      showEditModal.value = false;
+      atualizarTabela();
+   } catch (error) {
+      if (error.response?.status === 422) {
+         // console.log('Erro 422 - Há erros de validação no formError');
+         formError.value = error.response.data.errors || {};
+      }
+   } finally {
+      // loading.value = false;
+   }
+};
 
 function destroyDados(dados) {
    console.log('destroyDados:', dados);
-   formModalVisivel.value = false;
+   showEditModal.value = false;
 }
 
 function atualizarTabela() {
@@ -588,10 +624,29 @@ const onDelete = (row) => {
    showDeleteModal.value = true;
 };
 
-const onEdit = (row) => {
-   console.log('Editar', row);
+const onEdit = async (row, getData) => {
+   console.log('onEdit', row, getData);
+   formError.value = {}; // limpa os erros do formulário
+   formDataModal.value = {}; // limpa campos do formulário
+   formDataModal.value = await loadDataFormModal(row.id); // carrega os dados para edição
+   // formDataModal.value = getData;
+   // formDataModal.value = { ...(getData || {}) }; // carrega os dados para edição
+
+   showEditModal.value = true; // mostra o modal de edição
+
+   // TODO Carrega os dados do Banco de Dados para o formulário de edição
+   // const inscricaoId = row.value?.id;
+   // api.get('/inscricao/${inscricaoId}')...
+};
+
+/**
+ * CRUD especializado local
+ * Editar Chegada - arrow function (Function Expression)
+ */
+const editarChegada = (row, dataset) => {
+   console.log('editarChegada(row, dataset): ', row, dataset);
    formError.value = {};
-   showEditModal.value = true;
+   showEditarChegadaModal.value = true;
 
    /**
     * Carrega os dados da linha DataTables para o formulário de edição - Uma a um
@@ -618,24 +673,27 @@ const onEdit = (row) => {
    // api.get('/inscricao/${inscricaoId}')...
 };
 
-// NOVO
-const saveEditModal = async () => {
-   // console.log('Salvar Edit Modal', formData.value);
+/**
+ * CRUD especializado local
+ * Salvar Chegada - arrow function (Function Expression)
+ */
+const salvarChegada = async () => {
+   // console.log('salvarChegada: ', formData.value);
 
    try {
       // if (this.modalModo === 'edit') {
-      //    await api.put(`veiculo/${this.form.id}`, this.form); // atualiza o registro
+      //    await api.put(`veiculo/${this.form.id}`, this.form);
       // } else {
       //    await api.post('veiculo', this.form); // insere um novo registro
       // }
 
-      await api.put(`inscricao/${formData.value.id}`, formData.value); // atualiza o registro
+      await api.put(`inscricao/${formData.value.id}`, formData.value);
 
       showToast({
          title: 'Sucesso',
          message: `Inscrição ID ${formData.value.id} atualizada com sucesso.`,
       });
-      showEditModal.value = false;
+      showEditarChegadaModal.value = false;
       atualizarTabela();
    } catch (error) {
       if (error.response?.status === 422) {
