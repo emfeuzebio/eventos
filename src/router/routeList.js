@@ -238,6 +238,27 @@ const routes = [
           ],
         },
   
+        // Inscricoes
+        {
+          path: '/inscricoes',
+          name: 'Inscrições',
+          component: {
+            render() {
+              return h(resolveComponent('router-view'))
+            },
+          },
+          redirect: '/cadastros/entidades',
+          children: [
+            {
+              path: '/inscricoes/inscricoes-pessoa',
+              name: 'Inscrições Pessoas',
+              component: () => import('@/views/inscricoes/InscricoesDatatablesGeneric.vue'),
+              // component: () => import('@/views/cadastros/EstadosDatatablesGeneric.vue'),
+              // meta: { requiresAuth: true }, // Protege esta rota
+            },
+          ],
+        },
+
         // Transportes
         {
           path: '/transportes',
@@ -316,14 +337,14 @@ const routes = [
             },
             {
               path: '/cadastros/inscricoes',
-              name: 'Inscrições',
+              name: 'Inscrições Velha',
               component: () => import('@/views/cadastros/InscricaosDatatablesGeneric.vue'),
               // meta: { requiresAuth: true }, // Protege esta rota
             },
             {
-              path: '/inscricoes/inscricoes',
-              name: 'Inscrições Nova',
-              component: () => import('@/views/inscricoes/ChegadaDTview.vue'),
+              path: '/transportes/inscricoes',
+              name: 'Inscrições Transp',
+              component: () => import('@/views/transportes/ChegadaDTview.vue'),
               // component: () => import('@/views/pages/Page404.vue'),
               // meta: { requiresAuth: true }, // Protege esta rota
             },

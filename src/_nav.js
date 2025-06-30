@@ -285,7 +285,7 @@ export default [
   //   component: 'CNavItem',
   //   name: 'Charts',
   //   to: '/charts',
-  //   icon: 'cil-chart-pie',
+  //   icon: 'cil-chart-pie',inscri
   // },
   // {
   //   component: 'CNavGroup',
@@ -324,18 +324,18 @@ export default [
   {
     component: 'CNavGroup',
     name: 'Inscrições',
-    to: '/Inscrições',
+    to: '/inscricoes',
     icon: 'cil-envelope-open',
     items: [
       {
         component: 'CNavItem',
-        name: 'Inscrições Generic Old',
-        to: '/cadastros/inscricoes',
+        name: 'Inscrições New Gv2',
+        to: '/inscricoes/inscricoes-pessoa',
       },
       {
         component: 'CNavItem',
-        name: 'Chegadas TD Crud',
-        to: '/inscricoes/inscricoes',
+        name: 'Inscrições Generic Old',
+        to: '/cadastros/inscricoes',
       },
     ],
   },  
@@ -371,6 +371,11 @@ export default [
         component: 'CNavItem',
         name: 'Gestão Chegadas OLD',
         to: '/transportes/chegadas',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Chegadas Euz Crud',
+        to: '/transportes/inscricoes',
       },
     ],
   },
