@@ -54,22 +54,6 @@
                   </div>
                </div>
 
-               <!-- Coluna 2: Alerta -->
-               <!-- <div class="col-md-4 text-center">
-                  <div
-                     v-if="alert.message"
-                     :class="`alert alert-${alert.type || 'info'} alert-dismissible fade show py-1 px-2 mb-0`" role="alert"
-                  >
-                     {{ alert.message }}
-                     <button
-                     type="button"
-                     class="btn btn-sm btn-close"
-                     @click="closeAlert"
-                     aria-label="Fechar"
-                     ></button>
-                  </div>
-               </div> -->
-
                <!-- Coluna 3: Botões -->
                <div class="col-md-4 text-end">
                   <CButton
@@ -111,7 +95,7 @@
       >
          <CModalHeader>
             <CModalTitle>{{
-               form.isEditing.value ? 'Editar ' : 'Inserir ' + endpoint
+               ( form.isEditing.value ? 'Editar ' : 'Inserir ' ) + endpoint.charAt(0).toUpperCase() + endpoint.slice(1)
             }}</CModalTitle>
          </CModalHeader>
          <CModalBody>
@@ -181,28 +165,45 @@ const { fetchRegioes, regioes } = useEventos();
 const { showToast } = useToast();
 
 // Props configuráveis
-const props = defineProps({
+const props = defineProps({   
    title: String,
    description: String,
    endpoint: String,
    columns: Array,
    defaultValues: Object,
    abilities: Array,
+   buttons: {
+      type: Object,
+      default: () => ({
+         update: true,
+         delete: true,
+         show: false
+      })
+   },
+   filters: {
+      type: Object,
+      default: () => ([{}])
+   },
    extraColumnRender: Function,
-   filters: Array,
-   default: () => [],
-   canInsert: Boolean,
-   canUpdate: Boolean,
-   canDelete: Boolean,
-   canPrint: Boolean,
+   // canInsert: Boolean,
+   // canUpdate: Boolean,
+   // canDelete: Boolean, 
+   // canPrint: Boolean,
 });
+
+// controle CAN() de botões adicionais da página
+const canInsert = props.abilities.includes(props.endpoint+'.store');
+const canPrint = props.abilities.includes(props.endpoint+'.print');
+const canCalcula = props.abilities.includes(props.endpoint+'.calcular');
+
+
 
 // controe os filtros
 const filtros = ref({});
 // console.log(props.filters);
 
 props.filters.forEach((filtro) => {
-   filtros.value[filtro.field] = null; // inicia vazio
+   filtros.value[filtro.field] = ''; // inicia vazio
 });
 // console.log(filtros);
 
@@ -210,17 +211,8 @@ props.filters.forEach((filtro) => {
 const alert = ref({ type: '', message: '' });
 const tableId = `datatable-${props.endpoint}`;
 
-// function showAlert(type, message) {
-//    alert.value = { type, message };
-//    setTimeout(() => (alert.value.message = ''), 5000);
-// }
-
-// function closeAlert() {
-//    alert.value.message = '';
-// }
 
 function btnImprimir() {
-   // showAlert('danger', 'Imprimir não implementado.');
    showToast({
       title: 'Erro',
       message: 'Imprimir não implementado!',
@@ -229,6 +221,8 @@ function btnImprimir() {
 }
 
 const emit = defineEmits(['edit', 'delete', 'custom', 'extraAction']);
+
+console.log(`Abilities:`, props.abilities);  
 
 // Tabela de Dados
 const { init, refreshTable } = useDataTable(
@@ -244,15 +238,27 @@ const { init, refreshTable } = useDataTable(
             data: null,
             sortable: false,
             className: 'text-center',
-            width: '240px',
+            width: '220px',
             render(data, type, row) {
-               let html =
-                  `<button class="btnEdit btn btn-xs btn-outline-primary me-1" data-id="${row.id}" data-v-tooltip="Editar o registro atual" ` +
-                  (props.canUpdate ? '' : 'disabled') +
-                  ` >Editar</button>
-                  <button class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" data-v-tooltip="Excluir o registro atual"` +
-                  (props.canDelete ? '' : 'disabled') +
-                  ` >Excluir</button>`;
+
+               let html = '';
+               let btnEditar = '';
+               let btnExcluir = '';
+               let btnVer = '';
+
+               if (props.buttons.update) {
+                  btnEditar = `<button ` + (props.abilities.includes(props.endpoint+'.update') ? '' : 'disabled') + ` class="btnEdit btn btn-xs btn-outline-primary me-1" data-id="${row.id}" data-v-tooltip="Editar o registro atual">Editar</button>`;
+               } 
+
+               if (props.buttons.delete) {
+                  btnExcluir = `<button ` + (props.abilities.includes(props.endpoint+'.delete') ? '' : 'disabled') + ` class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" data-v-tooltip="Excluir o registro atual">Excluir</button>`;
+               } 
+
+               if (props.buttons.show) {
+                  btnVer = `<button ` + (props.abilities.includes(props.endpoint+'.show') ? '' : 'disabled') + ` class="btnVer btn btn-xs btn-outline-info  me-1" data-id="${row.id}" data-v-tooltip="Ver o registro atual">Ver</button>`;
+               } 
+
+               html += btnEditar + btnExcluir + btnVer
 
                if (props.extraColumnRender) {
                   html += props.extraColumnRender(row);

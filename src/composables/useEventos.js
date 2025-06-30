@@ -11,6 +11,7 @@ export function useEventos(ativo = true) {
    const viagens = ref([]);
    const inscricoes = ref([]);
    const inscricao = ref([]);
+   const entidades = ref([]);
    const viagensDaRota = ref([]);
    const error = ref(null);
 
@@ -105,6 +106,21 @@ export function useEventos(ativo = true) {
       }
    };
 
+   const fetchEntidades = async () => {
+      try {
+         error.value = null;
+           const res = await api.get('/entidade', {
+            params: {
+               ativo: 'SIM',
+            },
+         });
+         entidades.value = res.data;
+      } catch (err) {
+         console.error(`Erro ao carregar a lista de Entidades Ativas:`, err)
+         error.value = err;
+      }
+   };
+
    const getInscricao = async (inscricaoId) => {
       try {
          error.value = null;
@@ -142,7 +158,8 @@ export function useEventos(ativo = true) {
       estados,
       regioes,
       viagens,
-      inscricoes,      
+      inscricoes,
+      entidades,
       viagensDaRota,
 
       inscricao,
@@ -155,6 +172,7 @@ export function useEventos(ativo = true) {
       fetchViagens,  // caso queira recarregar manualmente
       fetchViagensDaRota,  // caso queira recarregar manualmente
       fetchInscricoes,  // caso queira recarregar manualmente
+      fetchEntidades,  // caso queira recarregar manualmente
 
       getInscricao,     // caso queira recarregar manualmente uma inscrição específica
 

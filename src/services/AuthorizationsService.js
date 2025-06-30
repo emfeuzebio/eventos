@@ -4,7 +4,8 @@ import { useUserStore } from '@/stores/userStore';
 
 export function getAbilities() {
    const userStore = useUserStore();
-   return userStore.abilities || [];
+   // return userStore.abilities || [];            // devolve um proxy
+   return Array.from(userStore.abilities || []);   // devolve um array
 }
 
 export function getRoles() {

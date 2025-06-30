@@ -87,6 +87,7 @@ export function useDataTable({
 
       table.on('click', '.btnEdit', (e) => {
          const id = $(e.currentTarget).data('id');
+         // console.log('Editar Endpoint :', endpoint);
          if (onClickEdit) onClickEdit(id);
       });
 
