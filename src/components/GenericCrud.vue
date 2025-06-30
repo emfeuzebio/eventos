@@ -169,8 +169,14 @@ const props = defineProps({
    title: String,
    description: String,
    endpoint: String,
-   defaultValues: Object,
-   abilities: Array,
+   defaultValues: {
+      type: Object,
+      default: () => ({})
+   },
+   abilities: {
+      type: Array,
+      default: () => ([])
+   },
    buttons: {
       type: Object,
       default: () => ({
