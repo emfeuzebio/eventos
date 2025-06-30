@@ -169,7 +169,6 @@ const props = defineProps({
    title: String,
    description: String,
    endpoint: String,
-   columns: Array,
    defaultValues: Object,
    abilities: Array,
    buttons: {
@@ -179,6 +178,13 @@ const props = defineProps({
          delete: true,
          show: false
       })
+   },
+   columns: {
+      type: Array,
+      default: () => ([
+         { title: 'Coluna 1', data: null, class: 'dt-left' },
+         { title: 'Coluna 2', data: null, class: 'dt-left' },
+      ])
    },
    filters: {
       type: Object,
