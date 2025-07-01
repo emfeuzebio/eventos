@@ -255,11 +255,9 @@ const routes = [
               component: () => import('@/views/inscricoes/PessoasDatatablesGeneric.vue'),
             },
             {
-              path: '/inscricoes/inscricoes-pessoa',
+              path: '/inscricoes/inscricoes',
               name: 'Inscrições Pessoas',
               component: () => import('@/views/inscricoes/InscricoesDatatablesGeneric.vue'),
-              // component: () => import('@/views/cadastros/EstadosDatatablesGeneric.vue'),
-              // meta: { requiresAuth: true }, // Protege esta rota
             },
           ],
         },
@@ -338,12 +336,6 @@ const routes = [
               path: '/cadastros/regioes',
               name: 'Regiões',
               component: () => import('@/views/cadastros/RegioesDatatablesGeneric.vue'),
-              // meta: { requiresAuth: true }, // Protege esta rota
-            },
-            {
-              path: '/cadastros/inscricoes',
-              name: 'Inscrições Velha',
-              component: () => import('@/views/cadastros/InscricaosDatatablesGeneric.vue'),
               // meta: { requiresAuth: true }, // Protege esta rota
             },
             {

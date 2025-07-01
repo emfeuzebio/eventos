@@ -89,17 +89,21 @@
       <!-- Edit Form Modal -->
       <CModal
          :visible="form.editModalVisible"
+         :size="modalSize"
+         :fullscreen="modalFullscreen"
          @close="form.closeModal"
          backdrop="static"
          keyboard="true"
       >
          <CModalHeader>
             <CModalTitle>{{
-               ( form.isEditing.value ? 'Editar ' : 'Inserir ' ) + endpoint.charAt(0).toUpperCase() + endpoint.slice(1)
+               (form.isEditing.value ? 'Editar ' : 'Inserir ') +
+               endpoint.charAt(0).toUpperCase() +
+               endpoint.slice(1)
             }}</CModalTitle>
          </CModalHeader>
          <CModalBody>
-            <CForm>
+            <CForm class="form-horizontal">
                <slot name="form" :form="form.form" :errors="form.fieldErrors" />
             </CForm>
             <div class="text-danger small mt-2" v-if="form.formError">
@@ -165,50 +169,50 @@ const { fetchRegioes, regioes } = useEventos();
 const { showToast } = useToast();
 
 // Props configuráveis
-const props = defineProps({   
+const props = defineProps({
    title: String,
+   modalSize: String,
+   modalFullscreen: String,
    description: String,
    endpoint: String,
    defaultValues: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
    },
    abilities: {
       type: Array,
-      default: () => ([])
+      default: () => [],
    },
    buttons: {
       type: Object,
       default: () => ({
          update: true,
          delete: true,
-         show: false
-      })
+         show: false,
+      }),
    },
    columns: {
       type: Array,
-      default: () => ([
+      default: () => [
          { title: 'Coluna 1', data: null, class: 'dt-left' },
          { title: 'Coluna 2', data: null, class: 'dt-left' },
-      ])
+      ],
    },
    filters: {
       type: Object,
-      default: () => ([{}])
+      default: () => [{}],
    },
    extraColumnRender: Function,
    // canInsert: Boolean,
    // canUpdate: Boolean,
-   // canDelete: Boolean, 
+   // canDelete: Boolean,
    // canPrint: Boolean,
 });
 
 // controle CAN() de botões adicionais da página
-const canInsert = props.abilities.includes(props.endpoint+'.store');
-const canPrint = props.abilities.includes(props.endpoint+'.print');
-const canCalcula = props.abilities.includes(props.endpoint+'.calcular');
-
-
+const canInsert = props.abilities.includes(props.endpoint + '.store');
+const canPrint = props.abilities.includes(props.endpoint + '.print');
+const canCalcula = props.abilities.includes(props.endpoint + '.calcular');
 
 // controe os filtros
 const filtros = ref({});
@@ -223,7 +227,6 @@ props.filters.forEach((filtro) => {
 const alert = ref({ type: '', message: '' });
 const tableId = `datatable-${props.endpoint}`;
 
-
 function btnImprimir() {
    showToast({
       title: 'Erro',
@@ -234,7 +237,7 @@ function btnImprimir() {
 
 const emit = defineEmits(['edit', 'delete', 'custom', 'extraAction']);
 
-console.log(`Abilities:`, props.abilities);  
+console.log(`Abilities:`, props.abilities);
 
 // Tabela de Dados
 const { init, refreshTable } = useDataTable(
@@ -252,25 +255,39 @@ const { init, refreshTable } = useDataTable(
             className: 'text-center',
             width: '220px',
             render(data, type, row) {
-
                let html = '';
                let btnEditar = '';
                let btnExcluir = '';
                let btnVer = '';
 
                if (props.buttons.update) {
-                  btnEditar = `<button ` + (props.abilities.includes(props.endpoint+'.update') ? '' : 'disabled') + ` class="btnEdit btn btn-xs btn-outline-primary me-1" data-id="${row.id}" data-v-tooltip="Editar o registro atual">Editar</button>`;
-               } 
+                  btnEditar =
+                     `<button ` +
+                     (props.abilities.includes(props.endpoint + '.update')
+                        ? ''
+                        : 'disabled') +
+                     ` class="btnEdit btn btn-xs btn-outline-primary me-1" data-id="${row.id}" tooltip="Editar o registro atual">Editar</button>`;
+               }
 
                if (props.buttons.delete) {
-                  btnExcluir = `<button ` + (props.abilities.includes(props.endpoint+'.delete') ? '' : 'disabled') + ` class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" data-v-tooltip="Excluir o registro atual">Excluir</button>`;
-               } 
+                  btnExcluir =
+                     `<button ` +
+                     (props.abilities.includes(props.endpoint + '.delete')
+                        ? ''
+                        : 'disabled') +
+                     ` class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" tooltip="Excluir o registro atual">Excluir</button>`;
+               }
 
                if (props.buttons.show) {
-                  btnVer = `<button ` + (props.abilities.includes(props.endpoint+'.show') ? '' : 'disabled') + ` class="btnVer btn btn-xs btn-outline-info  me-1" data-id="${row.id}" data-v-tooltip="Ver o registro atual">Ver</button>`;
-               } 
+                  btnVer =
+                     `<button ` +
+                     (props.abilities.includes(props.endpoint + '.show')
+                        ? ''
+                        : 'disabled') +
+                     ` class="btnVer btn btn-xs btn-outline-info  me-1" data-id="${row.id}" tooltip="Ver o registro atual">Ver</button>`;
+               }
 
-               html += btnEditar + btnExcluir + btnVer
+               html += btnEditar + btnExcluir + btnVer;
 
                if (props.extraColumnRender) {
                   html += props.extraColumnRender(row);

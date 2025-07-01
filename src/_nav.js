@@ -334,13 +334,8 @@ export default [
       },
       {
         component: 'CNavItem',
-        name: 'Inscrições New Gv2',
-        to: '/inscricoes/inscricoes-pessoa',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Inscrições Generic Old',
-        to: '/cadastros/inscricoes',
+        name: 'Inscrições',
+        to: '/inscricoes/inscricoes',
       },
     ],
   },  

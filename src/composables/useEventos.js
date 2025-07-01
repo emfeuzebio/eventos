@@ -12,6 +12,8 @@ export function useEventos(ativo = true) {
    const inscricoes = ref([]);
    const inscricao = ref([]);
    const entidades = ref([]);
+   const funcoes = ref([]);
+   const pessoas = ref([]);
    const viagensDaRota = ref([]);
    const error = ref(null);
 
@@ -121,6 +123,36 @@ export function useEventos(ativo = true) {
       }
    };
 
+   const fetchFuncoes = async () => {
+      try {
+         error.value = null;
+           const res = await api.get('/funcao', {
+            params: {
+               ativo: 'SIM',
+            },
+         });
+         funcoes.value = res.data;
+      } catch (err) {
+         console.error(`Erro ao carregar a lista de Funções/Papeis Ativos:`, err)
+         error.value = err;
+      }
+   };
+
+   const fetchPessoas = async () => {
+      try {
+         error.value = null;
+           const res = await api.get('/pessoa', {
+            params: {
+               ativo: 'SIM',
+            },
+         });
+         pessoas.value = res.data;
+      } catch (err) {
+         console.error(`Erro ao carregar a lista de Pessoas Ativos:`, err)
+         error.value = err;
+      }
+   };
+
    const getInscricao = async (inscricaoId) => {
       try {
          error.value = null;
@@ -160,6 +192,8 @@ export function useEventos(ativo = true) {
       viagens,
       inscricoes,
       entidades,
+      funcoes,
+      pessoas,
       viagensDaRota,
 
       inscricao,
@@ -173,6 +207,8 @@ export function useEventos(ativo = true) {
       fetchViagensDaRota,  // caso queira recarregar manualmente
       fetchInscricoes,  // caso queira recarregar manualmente
       fetchEntidades,  // caso queira recarregar manualmente
+      fetchFuncoes,  // caso queira recarregar manualmente
+      fetchPessoas,  // caso queira recarregar manualmente
 
       getInscricao,     // caso queira recarregar manualmente uma inscrição específica
 

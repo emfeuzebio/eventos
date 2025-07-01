@@ -16,7 +16,6 @@ const { showToast } = useToast(); // Toasts de Alerta
 const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
-
 // Permissões específicas para a entidade "veiculo"
 const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
 const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
@@ -27,7 +26,7 @@ var canPrint = can(`${entity}.print`);
 var canPrint = false;
 
 // DEBUG de todas abilities do User Logado
-// console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);  
+// console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);
 // console.log('canList:', canList); // Isso deve ser true ou false
 // console.log('canShow:', canShow); // Isso deve ser true ou false
 // console.log('canInsert:', canInsert); // Isso deve ser true ou false
@@ -46,15 +45,26 @@ function chamarRefresh() {
  */
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Entidade', data: 'entidade.sigla', width: '120px' },
-   { title: 'Nome Completo', data: 'nome_completo', class: 'fw-bold', width: '320px' },
+   { title: 'Entidade', data: 'entidade.sigla', width: '110px' },
+   {
+      title: 'Nome Completo',
+      data: 'nome_completo',
+      class: 'fw-bold',
+      width: '330px',
+   },
    { title: 'E-mail', data: 'email' },
-   { title: 'Tel. Celular', data: 'telefone' },
-   { title: 'Ativo', data: 'ativo', class: 'dt-center small', width: '60px', 
-        render: function (data, type, row) {
-          return `<span class="${row.ativo === 'SIM' ? 'text-primary' : 'text-danger'}">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
-        },
+   { title: 'Tel. Celular', data: 'telefone', width: '140px' },
+   {
+      title: 'Ativo',
+      data: 'ativo',
+      class: 'dt-center small',
+      width: '40px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
       },
+   },
 ];
 
 /**
@@ -80,9 +90,9 @@ const extraColumnRender = (row) => {
 
    return '';
 
-//    return `
-//     <button class="btn btn-xs btn-outline-info" ${canEditarRegiao} data-custom-action="editarRegiao" data-param1="${row.regiao.id}" data-param2="${row.regiao.sigla}" >Editar Região</button>
-//   `;
+   //    return `
+   //     <button class="btn btn-xs btn-outline-info" ${canEditarRegiao} data-custom-action="editarRegiao" data-param1="${row.regiao.id}" data-param2="${row.regiao.sigla}" >Editar Região</button>
+   //   `;
    //       <button class="btn btn-xs btn-outline-info" ${canEditarRegiao} data-custom-action="editarCarro" data-param1="${row.regiao.id}" data-param2="${row.regiao.sigla}" >Editar Carro</button>
 };
 
@@ -105,11 +115,10 @@ const { fetchEntidades, entidades } = useEventos();
 fetchEntidades();
 
 /**
- * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD. 
+ * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.
  * Default: true para todos
  */
-const buttons = {'update': true, 'delete': true, 'show': false,}; 
-
+const buttons = { update: true, delete: true, show: false };
 
 /**
  * BASE Crud - Filtros da tabela de dados
@@ -315,7 +324,6 @@ const salvarRegiao = async () => {
          <div class="form-error" v-if="errors.value.ativo">
             {{ errors.value.ativo[0] }}
          </div>
-
       </template>
    </GenericCrud>
 
