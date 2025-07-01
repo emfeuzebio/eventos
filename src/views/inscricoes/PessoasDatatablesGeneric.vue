@@ -124,17 +124,29 @@ const buttons = { update: true, delete: true, show: false };
  * BASE Crud - Filtros da tabela de dados
  * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
  */
-// const filters = computed(() => [
-//    {
-//       label: 'Ativo',
-//       field: 'ativo',
-//       type: 'select',
-//       options: [
-//          { value: 'SIM', label: 'SIM' },
-//          { value: 'NÃO', label: 'NÃO' },
-//       ],
-//    },
-// ]);
+//  const filters = [{}]; // nessse caso sem filtros
+
+const filters = computed(() => [
+{
+      label: 'Ativo',
+      field: 'ativo',
+      type: 'select',
+      options: [
+         { value: 'SIM', label: 'SIM' },
+         { value: 'NÃO', label: 'NÃO' },
+      ],
+   },
+   {
+      label: 'Entidade',
+      field: 'entidade_id',
+      type: 'select',
+      options: entidades.value.map((entidade) => ({
+         value: entidade.id,
+         label: entidade.sigla,
+      })),
+   },
+]);
+
 
 // const filters = computed(() => [
 //    {

@@ -162,7 +162,10 @@ const {
    funcoes,
    fetchPessoas,
    pessoas,
+   fetchEventos,
+   eventos
 } = useEventos();
+fetchEventos();
 fetchEntidades();
 fetchFuncoes();
 fetchPessoas();
@@ -176,17 +179,47 @@ const buttons = { update: true, delete: true, show: false };
  * BASE Crud - Filtros da tabela de dados
  * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
  */
-// const filters = computed(() => [
-//    {
-//       label: 'Ativo',
-//       field: 'ativo',
-//       type: 'select',
-//       options: [
-//          { value: 'SIM', label: 'SIM' },
-//          { value: 'NÃO', label: 'NÃO' },
-//       ],
-//    },
-// ]);
+//  const filters = [{}]; // nessse caso sem filtros
+ 
+const filters = computed(() => [
+   {
+      label: 'Evento',
+      field: 'evento_id',
+      type: 'select',
+      options: eventos.value.map((evento) => ({
+         value: evento.id,
+         label: evento.sigla,
+      })),
+   },
+   {
+      label: 'Ativa',
+      field: 'ativo',
+      type: 'select',
+      options: [
+         { value: 'SIM', label: 'SIM' },
+         { value: 'NÃO', label: 'NÃO' },
+      ],
+   },
+   {
+      label: 'Entidade',
+      field: 'pessoa.entidade_id',
+      type: 'select',
+      options: entidades.value.map((entidade) => ({
+         value: entidade.id,
+         label: entidade.sigla,
+      })),
+   },
+   {
+      label: 'Modalidade',
+      field: 'modalidade',
+      type: 'select',
+      options: [
+         { value: 'Presencial', label: 'Presencial' },
+         { value: 'Virtual', label: 'Virtual' },
+      ],
+   },
+
+]);
 
 // const filters = computed(() => [
 //    {
