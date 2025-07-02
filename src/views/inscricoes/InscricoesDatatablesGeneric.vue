@@ -163,7 +163,7 @@ const {
    fetchPessoas,
    pessoas,
    fetchEventos,
-   eventos
+   eventos,
 } = useEventos();
 fetchEventos();
 fetchEntidades();
@@ -180,7 +180,7 @@ const buttons = { update: true, delete: true, show: false };
  * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
  */
 //  const filters = [{}]; // nessse caso sem filtros
- 
+
 const filters = computed(() => [
    {
       label: 'Evento',
@@ -202,7 +202,7 @@ const filters = computed(() => [
    },
    {
       label: 'Entidade',
-      field: 'pessoa.entidade_id',
+      field: 'pessoa__entidade_id', // '__' duplo para enganar o PHP que converte o . para _ nas URL
       type: 'select',
       options: entidades.value.map((entidade) => ({
          value: entidade.id,
@@ -218,7 +218,6 @@ const filters = computed(() => [
          { value: 'Virtual', label: 'Virtual' },
       ],
    },
-
 ]);
 
 // const filters = computed(() => [
