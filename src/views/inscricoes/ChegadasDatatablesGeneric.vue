@@ -54,7 +54,7 @@ const columns = [
          const meio = row.chegada_meio_transp || 'Meio';
          const cia = row.chegada_cia_transp || 'Cia';
          const dh = row.chegada_data_hora
-            ? formatToBrDateTime(`${row.chegada_data_hora}`)
+            ? formatToBrDateTime(row.chegada_data_hora)
             : 'Data/Hora';
          return `<span class="">${dh}</span> <br/> <small class="text-muted">${meio} - ${cia}</small>`;
       },
@@ -82,7 +82,17 @@ const columns = [
       data: null,
       width: 'auto',
       render: function (data, type, row) {
-         return '';
+
+         // TODO - API row não está trazndo a Viagem filha da Inscrição para obter os dados para por na Coluna Translado Chegada
+         // const text = `<b>Viagem</b>: ${row.viagem}`;
+         // <b>Viagem</b>: ${viagem.data.data_hora_br} - ${
+         //    viagem.data.descricao
+         //    } - <br/><br/>
+         //       <b>Rota</b>:       ${viagem.data.nome || '?'}<br/>
+         //       <b>Veículo</b>:    ${viagem.data.descricao || '?'} <br/>
+
+
+         return text + ' ' + row.traslado_chegada_viagem_id || 'Sem viagem marcada';
       },
    },
    {
@@ -123,10 +133,6 @@ const defaultValues = {
  */
 const extraColumnRender = (row) => {
    // controle de acesso - recupera as abilities do usuário logado na ação
-   const canEditarRegiao = abilities.includes('inscricao.marcarchegada')
-      ? ''
-      : 'disabled';
-
    const canMarcarcheg = abilities.includes('inscricao.marcarchegada')
       ? ''
       : 'disabled';
@@ -137,18 +143,28 @@ const extraColumnRender = (row) => {
    // return '';
 
    return `
-    <div class="form-check form-switch">
-      <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-inscricao-id="${row.id}" ${isChecked} >
-    </div>
-  `;
+      <button class="btn btn-xs btn-outline-info" ${canMarcarcheg} data-custom-action="marcarViagem" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Marcar Viagem</button>
+
+      <div class="form-check form-switch">
+         <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-inscricao-id="${row.id}" ${isChecked} >
+      </div>
+   `;
 };
 
 /**
  * ESPECIALIZAÇÃO CRUD: define a variável reativa
  */
-const pessoaShowModal = ref(false);
-const pessoaFormDados = ref({});
-const pessoaFormErros = ref({});
+const viagemChegadaShowModal = ref(false);
+const viagemChegadaFormDados = ref({});
+const viagemChegadaFormErros = ref({});
+const viagemChegadaEscolhida = ref('');
+const viagemChegadaInscricao = ref('');
+const inscricaoDados = ref('');
+
+const rotaSelecionada = ref('');    // ID da rota selecionada
+const viagemSelecionada = ref('');  // ID da viagem selecionada
+const viagensDaRota = ref([]);      // array das viagens da Rota
+
 
 /**
  * ESPECIALIZAÇÃO CRUD: recupera da API listas de dados necessários para o CRUD
@@ -168,6 +184,9 @@ const {
    fetchEventos,
    eventos,
    marcarTrasladoChegada,
+   fetchRotas,
+   fetchViagensDaRota,
+   rotas,
 } = useEventos();
 fetchEventos();
 fetchEntidades();
@@ -178,7 +197,8 @@ fetchEntidades();
  * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.
  * Default: true para todos
  */
-const buttons = { update: true, delete: true, show: false };
+// const buttons = { update: true, delete: true, show: false };
+const buttons = { update: false, delete: false, show: false };
 
 /**
  * BASE Crud - Filtros da tabela de dados
@@ -266,49 +286,124 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       // mas poderiamos também apenas passar o id da região para a função editarRegiao(id) e carregar os dados da API novamente com os dados atualizados
    }
 
-   if (action == 'editarCarro') {
-      // console.log('editarCarro: ', row, action, dataset, target);
-      // criar as refs(), ex: pessoaFormDados.value (ver acima)
-      // carregar os dados: usar o mesmos da row DataTables recebidos ou carregar via
-      // chamar função editEntidade()
-      // depois chamar a função para persistir os dados ex. salvarRegiao() ver abaixo como foi usado
+   if (action == 'marcarViagem') {
+      // console.log('marcarViagem: ', row, action, dataset, target);
+      console.log('marcarViagem: ', row.pessoa.nome_completo);
+      // criar as refs(), ex: viagemChegadaFormDados.value (ver acima)
+      // carregar os dados: pode usar o mesmos da row DataTables recebidos ou carregar via get
+
+      inscricaoDados.value = `<b>${row?.pessoa.nome_completo||"Sem Nome"}</b> <br/>${row.funcao?.sigla||'Papel não definido'} - ${row.pessoa.entidade?.sigla || 'Entidade Não definida'}`;
+
+      // viagemChegadaInscricao.value = `<b>${row.pessoa.nome_completo}</b><br/>${row.funcao?.sigla||'Papel não definido'} - ${row.pessoa.entidade?.sigla || 'Entidade Não definida' }<br/><b>CHEGADA</b>: ${formatToBrDateTime(row?.chegada_data_hora ||"")} ${row?.chegada_meio_transp || ""} ${row?.chegada_cia_transp||""}`;
+      viagemChegadaInscricao.value = inscricaoDados.value + `<br/><b>CHEGADA</b>: ${formatToBrDateTime(row?.chegada_data_hora ||"")} ${row?.chegada_meio_transp || ""} ${row?.chegada_cia_transp||""}`;
+
+      if (dataset.viagemId) {
+         const viagem = await api.get(
+            `/inscricao/viagemmarcada/${dataset.viagemId}`
+         );
+
+         viagemChegadaEscolhida.value = `
+            <b>Evento</b>: ${
+                  viagem.data.evento_nome || 'Não Informado'
+               } <br/>
+               <b>Rota</b>:   ${viagem.data.nome || 'Não Informada'} <br/>
+               <b>Viagem</b>: ${viagem.data.data_hora_br} - ${
+            viagem.data.descricao
+            } - <br/><br/>
+               <b>Rota</b>:       ${viagem.data.nome || '?'}<br/>
+               <b>Veículo</b>:    ${viagem.data.descricao || '?'} <br/>
+               <b>Observação</b>: ${viagem.data.observacao || '?'} <br/>
+               <b>Capacidade</b>: ${viagem.data.capacidade || '?'} <br/>
+               <b>Lotado com</b>: ${viagem.data.lotacao || '?'} <br/>
+               <b>Vagas</b>:      ${viagem.data.vagas || '?'} <br/>
+         `;
+      }
+
+
+      viagemChegadaFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
+      editarViagemChegada();
    }
 };
 
-const editarRegiao = async () => {
-   // Aqui você pode implementar a lógica para editar a região
+const fetchViagensPorRota = async (rotaId) => {
+   try {
+      viagensDaRota.value = []; // limpa anterior
+      const res = await api.get(`/viagem`, { params: { rota_id: rotaId } });
+      viagensDaRota.value = res.data;
+   } catch (err) {
+      console.error('Erro ao buscar viagens:', err);
+   }
+};
+
+
+const editarViagemChegada = async () => {
+   // Aqui você pode implementar a lógica para editar
    // ou já usamos os dados do formulário preenchidos
-   // console.log('Editar Região:', pessoaFormDados.value);
-   pessoaShowModal.value = true;
+   // console.log('Editar:', viagemChegadaFormDados.value);
    // ou aqui poderia chamar uma API para buscar os dados da região pelo ID
-   // pessoaShowModal.value = false; // Fecha o modal após salvar
+   fetchRotas();
+   rotaSelecionada.value = false;
+   viagemSelecionada.value = false;
+   viagemChegadaShowModal.value = true;
 };
 
 /**
  * ESPECIALIZAÇÃO CRUD: função para atualizar a entidade especializada
  */
-const salvarRegiao = async () => {
-   // console.log('Salvar Região:', pessoaFormDados.value.regiao);
+const salvarViagemChegada = async (viagemId) => {
+   const inscricaoId = viagemChegadaFormDados.value?.id;
+   // console.log('Salvar salvarViagemChegada:', inscricaoId,viagemId );
+
+   if (!inscricaoId || !viagemId) {
+      showToast({
+         title: 'Alerta',
+         message: `O código da Inscrição ${inscricaoId} e o da Viagem ${viagemId} são obrigatórios!`,
+         color: 'danger',
+      });
+      return;
+   }   
 
    try {
-      // console.log('Try Salvar Região:', pessoaFormDados.value.regiao);
-      console.log('Try Salvar Região:', toRaw(pessoaFormDados.value.regiao));
-
-      await api.put(
-         `regiao/${pessoaFormDados.value.regiao.id}`,
-         toRaw(pessoaFormDados.value.regiao)
-      );
-
-      showToast({
-         title: 'Sucesso',
-         message: `Região ID ${pessoaFormDados.value.regiao.id} atualizada com sucesso.`,
+      const res = await api.put(`/inscricao/alternarchegada/${inscricaoId}`, {
+         viagem_id: viagemId,
       });
-      pessoaShowModal.value = false;
-      chamarRefresh(); // chama refreshTable() do composable via expose
-   } catch (error) {
-      if (error.response?.status === 422) {
-         pessoaFormErros.value = error.response.data.errors || {};
+
+      if (viagemId == 'remove') {
+         showToast({
+            title: 'Alerta',
+            message: res.data.message,
+            // message: `Removeu a Viagem ID ${inscricaoId} do Traslado de Chegada com sucesso!`,
+         });
+         viagemChegadaEscolhida.value = `Viagem de Traslado de Chegada não selecionada.`;
+      } else {
+         showToast({
+            title: 'Alerta',
+            message: res.data.message,
+            // message: `Inseriu a Viagem ID ${inscricaoId} do Traslado de Chegada com sucesso!`,
+         });
+
+         const viagem = await api.get(`/inscricao/viagemmarcada/${viagemId}`);
+         // console.log('Resposta do servidor:', viagem.data.message);
+
+         viagemChegadaEscolhida.value = `
+            <b>Evento</b>: ${viagem.data.evento_nome || 'Não Informado'} <br/>
+            <b>Rota</b>:   ${viagem.data.nome || 'Não Informada'} <br/>
+            <b>Viagem</b>: ${viagem.data.data_hora_br} - ${
+            viagem.data.descricao
+         } - <br/><br/>
+
+            <b>Rota</b>:       ${viagem.data.nome || '?'}<br/>
+            <b>Veículo</b>:    ${viagem.data.descricao || '?'} <br/>
+            <b>Observação</b>: ${viagem.data.observacao || '?'} <br/>
+            <b>Capacidade</b>: ${viagem.data.capacidade || '?'} <br/>
+            <b>Lotado com</b>: ${viagem.data.lotacao || '?'} <br/>
+            <b>Vagas</b>:      ${viagem.data.vagas || '?'} <br/>
+         `;
       }
+
+      chamarRefresh();
+   } catch (error) {
+      
    }
 };
 </script>
@@ -323,7 +418,7 @@ const salvarRegiao = async () => {
       title="Gestão de Chegadas "
       description="Gestão dos Traslados de Chegadas de Pessoas inscritas em Evento"
       endpoint="inscricao"
-      columnActionsWidth="160px"
+      columnActionsWidth="200px"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
@@ -662,41 +757,84 @@ const salvarRegiao = async () => {
       </template>
    </GenericCrud>
 
-   <!-- Extra Modal Especializado -->
+   <!-- Editar Viagem Chegada Modal | Extra Modal Especializado -->
    <CModal
-      :visible="pessoaShowModal"
-      @close="pessoaShowModal = false"
-      backdrop="static"
+      :visible="viagemChegadaShowModal"
+      @close="viagemChegadaShowModal = false"
    >
+   
       <CModalHeader>
-         <strong>Editar Região</strong>
+         <strong>Editar Viagem de Chegada</strong>
       </CModalHeader>
       <CModalBody>
-         <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label>
+         <label class="form-label fw-bold mb-1 mt-0">Dados da Inscrição</label>
+         <CAlert color="primary" v-html="inscricaoDados"></CAlert>
+
+         <label class="form-label fw-bold">Selecione a Rota</label>
+         <CFormSelect
+            v-model="rotaSelecionada"
+            :options="[
+               { value: '', label: 'Selecione' },
+               ...rotas.map((rota) => ({
+                  value: rota.id,
+                  label: rota.nome,
+               })),
+            ]"
+            @change="fetchViagensPorRota(rotaSelecionada)"
+         />
+
+         <label class="form-label fw-bold">Selecione a Viagem</label>
+         <CFormSelect
+            v-model="viagemSelecionada"
+            :options="[
+               { value: '', label: 'Selecione' },
+               { value: 'remove', label: 'Remover a Viagem Atual' },
+               ...viagensDaRota.map((viagem) => ({
+                  value: viagem.id,
+                  label:
+                     'Id: ' +
+                     viagem.id +
+                     ' - ' +
+                     formatToBrDateTime(`${viagem.data_hora}`) +
+                     ' - ' +
+                     viagem.veiculo.descricao,
+               })),
+            ]"
+         />
+
+         <label class="form-label fw-bold mb-1 mt-2"
+            >Dados da Viagem de Traslado de Chegada escolhida</label
+         >
+         <!-- <CAlert color="dark" v-html="viagemChegadaInscricao"></CAlert> -->
+         <CAlert color="dark" v-html="viagemChegadaEscolhida"></CAlert>
+
+
+
+         <!-- <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label> -->
          <!-- <div class="form-text">
-            {{ pessoaFormDados.regiao.descricao }}
+            {{ viagemChegadaFormDados.regiao.descricao }}
          </div> -->
 
-         <CFormInput
-            v-model="pessoaFormDados.regiao.descricao"
-            :class="{ 'is-invalid': pessoaFormErros.descricao }"
-         />
+         <!-- <CFormInput
+            v-model="viagemChegadaFormDados.regiao.descricao"
+            :class="{ 'is-invalid': viagemChegadaFormErros.descricao }"
+         /> -->
 
-         <label class="form-label fw-bold mb-1 mt-0">Sigla</label>
-         <CFormInput
-            v-model="pessoaFormDados.regiao.sigla"
-            :class="{ 'is-invalid': pessoaFormErros.sigla }"
-         />
+         <!-- <CFormInput
+            v-model="viagemChegadaFormDados.regiao.sigla"
+            :class="{ 'is-invalid': viagemChegadaFormErros.sigla }"
+         /> -->
       </CModalBody>
       <CModalFooter>
          <CButton
             color="btn btn-secondary btn-sm me-1"
-            @click="pessoaShowModal = false"
+            @click="viagemChegadaShowModal = false"
             >Fechar</CButton
          >
-         <CButton color="btn btn-primary btn-sm me-1" @click="salvarRegiao"
+         <CButton color="btn btn-primary btn-sm me-1" @click="salvarViagemChegada(viagemSelecionada)"
             >Salvar</CButton
          >
       </CModalFooter>
    </CModal>
+
 </template>
