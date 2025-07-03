@@ -175,6 +175,7 @@ const props = defineProps({
    modalFullscreen: String,
    description: String,
    endpoint: String,
+   columnActionsWidth: String,
    defaultValues: {
       type: Object,
       default: () => ({}),
@@ -252,8 +253,8 @@ const { init, refreshTable } = useDataTable(
             title: 'Ações',
             data: null,
             sortable: false,
-            className: 'text-center',
-            width: '220px',
+            className: 'text-left',
+            width: props.columnActionsWidth ?? '120px',
             render(data, type, row) {
                let html = '';
                let btnEditar = '';
@@ -301,9 +302,8 @@ const { init, refreshTable } = useDataTable(
       onClickSelectViagem: () => abrirModal(),
       onClickEdit: (id) => form.load(id),
       onClickDelete: (rowData) => form.confirmDeleteModal(rowData),
-      onClickExtraAction: (id, action, row, dataset) => {
-         emit('extraAction', { id, action, row, dataset });
-         // console.log('onClickExtraAction', id, action, row, dataset);
+      onClickExtraAction: (id, action, row, dataset, target) => {
+         emit('extraAction', { id, action, row, dataset, target });
       },
    },
    emit

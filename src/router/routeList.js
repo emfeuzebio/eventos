@@ -259,6 +259,11 @@ const routes = [
               name: 'Inscrições Pessoas',
               component: () => import('@/views/inscricoes/InscricoesDatatablesGeneric.vue'),
             },
+            {
+              path: '/inscricoes/chegadas',
+              name: 'Inscrições Chegadas',
+              component: () => import('@/views/inscricoes/ChegadasDatatablesGeneric.vue'),
+            },
           ],
         },
 

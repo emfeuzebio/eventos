@@ -153,10 +153,10 @@ const columns = [
       className: 'text-left',
       render: function (data, type, row) {
          const nome = row.pessoa?.nome_social || 'Sem Nome';
-         const entidade = row.pessoa.entidade?.sigla || 'Sem Entidade';
+         // const entidade = row.pessoa.entidade?.sigla || 'Sem Entidade';
          const papel = row.funcao?.descricao || 'Sem Papel';
          const modalidade = row.modalidade || 'Sem Modalidade';
-         return `<span class="fw-bold">${nome}</span> <br/> <small class="text-muted">${entidade}</small> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
+         return `<span class="fw-bold">${nome}</span> <br/> <small class="text-muted">entidade</small> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
       },
    },
    {

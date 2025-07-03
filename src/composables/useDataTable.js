@@ -103,6 +103,7 @@ export function useDataTable({
          if (onClickShow) onClickShow(id);
       });
 
+      table.off('click', '[data-custom-action]'); 
       table.on('click', '[data-custom-action]', function (e) {
          e.preventDefault(); // Evita o comportamento padrão do link ou botão
 
@@ -110,9 +111,10 @@ export function useDataTable({
          const row = dataTable.value.row(`#${id}`).data();
          const action = $(e.currentTarget).data('custom-action');
          const dataset = $(e.currentTarget).data();
+         const target = $(e.currentTarget); // passa o elemento DOM que disparou o evento
          // console.log(`Base Crud Action [${action}]`, id, dataset, row);
 
-         if (onClickExtraAction) onClickExtraAction(id, action, row, dataset);
+         if (onClickExtraAction) onClickExtraAction(id, action, row, dataset, target);
       });
 
       // Eventos adicionais para view especializada

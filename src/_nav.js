@@ -337,6 +337,11 @@ export default [
         name: 'Inscrições',
         to: '/inscricoes/inscricoes',
       },
+      {
+        component: 'CNavItem',
+        name: 'Gestão Chegadas',
+        to: '/inscricoes/chegadas',
+      },
     ],
   },  
 
