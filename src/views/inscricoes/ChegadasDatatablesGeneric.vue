@@ -69,7 +69,7 @@ const columns = [
          // const papel = row.funcao?.sigla || '';
          const papel = row.funcao?.descricao || '';
          const modalidade = row.modalidade || 'Não informada';
-         const entidade_sigla = row.pessoa?.ativo || 'Sem Entidade';
+         // const entidade_sigla = row.pessoa?.ativo || 'Sem Entidade';
          return `<span class="fw-bold">${nome}</span> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
       },
       className: 'text-left',
@@ -81,18 +81,37 @@ const columns = [
       title: 'Traslado de Chegada',
       data: null,
       width: 'auto',
+      className: 'text-center',
       render: function (data, type, row) {
-
          // TODO - API row não está trazndo a Viagem filha da Inscrição para obter os dados para por na Coluna Translado Chegada
-         // const text = `<b>Viagem</b>: ${row.viagem}`;
-         // <b>Viagem</b>: ${viagem.data.data_hora_br} - ${
-         //    viagem.data.descricao
-         //    } - <br/><br/>
-         //       <b>Rota</b>:       ${viagem.data.nome || '?'}<br/>
-         //       <b>Veículo</b>:    ${viagem.data.descricao || '?'} <br/>
+         let text = '';
+         if (row.viagem_chegada) {
+            text += `${
+               row.viagem_chegada?.rota.nome || 'Rota Não definida'
+            } <br/>`;
+            text += `${formatToBrDateTime(
+               row.viagem_chegada?.data_hora || 'Data/Hora Não definida'
+            )} <br/>`;
+            // text += `<b>Tipo</b>: ${
+            //    row.viagem_chegada?.rota.tipo || 'Tipo Rota Não definido'
+            // } <br/>`;
+            // text += `<b>Veículo</b>: ${
+            // text += `Veículo: <b>${
+            text += `<b>${
+               row.viagem_chegada?.veiculo.descricao || 'Veículo Não definido'
+            } </b><br/>`;
+            // text += `<b>Tipo</b>: ${
+            //    row.viagem_chegada?.veiculo.tipo || 'Tipo Veículo Não definido'
+            // } <br/>`;
+            // text += `<b>Motorista</b>: ${
+            //    row.viagem_chegada?.veiculo.motorista || 'Motorista Não definido'
+            // } <br/>`;
+            // text += `<b>Fone</b>: ${
+            //    row.viagem_chegada?.veiculo.telefone || 'Telefone não informado'
+            // } <br/>`;
+         }
 
-
-         return text + ' ' + row.traslado_chegada_viagem_id || 'Sem viagem marcada';
+         return text;
       },
    },
    {
@@ -145,6 +164,10 @@ const extraColumnRender = (row) => {
    return `
       <button class="btn btn-xs btn-outline-info" ${canMarcarcheg} data-custom-action="marcarViagem" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Marcar Viagem</button>
 
+      <button class="btn btn-xs btn-outline-success" ${canMarcarcheg} data-custom-action="notificarPessoa" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Msg Pessoa</button>
+
+      <button class="btn btn-xs btn-outline-warning" ${canMarcarcheg} data-custom-action="notificarMotorista" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Msg Motorista</button>
+
       <div class="form-check form-switch">
          <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-inscricao-id="${row.id}" ${isChecked} >
       </div>
@@ -161,10 +184,9 @@ const viagemChegadaEscolhida = ref('');
 const viagemChegadaInscricao = ref('');
 const inscricaoDados = ref('');
 
-const rotaSelecionada = ref('');    // ID da rota selecionada
-const viagemSelecionada = ref('');  // ID da viagem selecionada
-const viagensDaRota = ref([]);      // array das viagens da Rota
-
+const rotaSelecionada = ref(''); // ID da rota selecionada
+const viagemSelecionada = ref(''); // ID da viagem selecionada
+const viagensDaRota = ref([]); // array das viagens da Rota
 
 /**
  * ESPECIALIZAÇÃO CRUD: recupera da API listas de dados necessários para o CRUD
@@ -286,16 +308,45 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       // mas poderiamos também apenas passar o id da região para a função editarRegiao(id) e carregar os dados da API novamente com os dados atualizados
    }
 
+   if (action == 'notificarMotorista') {
+      const inscricaoId = row.id;
+      const viagemId = dataset.viagemId;
+      console.log('notificarMotorista', inscricaoId);
+
+      const sucesso = true;
+      // const sucesso = await marcarTrasladoChegada(inscricaoId, {
+      //    traslado_chegada_executou: isChecked,
+      // });
+
+      if (sucesso) {
+         showToast({
+            title: 'Sucesso',
+            message: `Notificou o Motorista da Viagem ${viagemId} de Traslado Chegada da Inscrição ${inscricaoId} com sucesso!`,
+         });
+      }
+      // chamarRefresh(); // chama refreshTable() do composable via expose
+      // console.log('trasladou viagem', inscricaoId, isChecked);
+      // mas poderiamos também apenas passar o id da região para a função editarRegiao(id) e carregar os dados da API novamente com os dados atualizados
+   }
+
    if (action == 'marcarViagem') {
       // console.log('marcarViagem: ', row, action, dataset, target);
       console.log('marcarViagem: ', row.pessoa.nome_completo);
       // criar as refs(), ex: viagemChegadaFormDados.value (ver acima)
       // carregar os dados: pode usar o mesmos da row DataTables recebidos ou carregar via get
 
-      inscricaoDados.value = `<b>${row?.pessoa.nome_completo||"Sem Nome"}</b> <br/>${row.funcao?.sigla||'Papel não definido'} - ${row.pessoa.entidade?.sigla || 'Entidade Não definida'}`;
+      inscricaoDados.value = `<b>${
+         row?.pessoa.nome_completo || 'Sem Nome'
+      }</b> <br/>${row.funcao?.sigla || 'Papel não definido'} - ${
+         row.pessoa.entidade?.sigla || 'Entidade Não definida'
+      }`;
 
       // viagemChegadaInscricao.value = `<b>${row.pessoa.nome_completo}</b><br/>${row.funcao?.sigla||'Papel não definido'} - ${row.pessoa.entidade?.sigla || 'Entidade Não definida' }<br/><b>CHEGADA</b>: ${formatToBrDateTime(row?.chegada_data_hora ||"")} ${row?.chegada_meio_transp || ""} ${row?.chegada_cia_transp||""}`;
-      viagemChegadaInscricao.value = inscricaoDados.value + `<br/><b>CHEGADA</b>: ${formatToBrDateTime(row?.chegada_data_hora ||"")} ${row?.chegada_meio_transp || ""} ${row?.chegada_cia_transp||""}`;
+      viagemChegadaInscricao.value =
+         inscricaoDados.value +
+         `<br/><b>CHEGADA</b>: ${formatToBrDateTime(
+            row?.chegada_data_hora || ''
+         )} ${row?.chegada_meio_transp || ''} ${row?.chegada_cia_transp || ''}`;
 
       if (dataset.viagemId) {
          const viagem = await api.get(
@@ -303,13 +354,11 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
          );
 
          viagemChegadaEscolhida.value = `
-            <b>Evento</b>: ${
-                  viagem.data.evento_nome || 'Não Informado'
-               } <br/>
+            <b>Evento</b>: ${viagem.data.evento_nome || 'Não Informado'} <br/>
                <b>Rota</b>:   ${viagem.data.nome || 'Não Informada'} <br/>
                <b>Viagem</b>: ${viagem.data.data_hora_br} - ${
             viagem.data.descricao
-            } - <br/><br/>
+         } - <br/><br/>
                <b>Rota</b>:       ${viagem.data.nome || '?'}<br/>
                <b>Veículo</b>:    ${viagem.data.descricao || '?'} <br/>
                <b>Observação</b>: ${viagem.data.observacao || '?'} <br/>
@@ -318,7 +367,6 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
                <b>Vagas</b>:      ${viagem.data.vagas || '?'} <br/>
          `;
       }
-
 
       viagemChegadaFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
       editarViagemChegada();
@@ -334,7 +382,6 @@ const fetchViagensPorRota = async (rotaId) => {
       console.error('Erro ao buscar viagens:', err);
    }
 };
-
 
 const editarViagemChegada = async () => {
    // Aqui você pode implementar a lógica para editar
@@ -361,7 +408,7 @@ const salvarViagemChegada = async (viagemId) => {
          color: 'danger',
       });
       return;
-   }   
+   }
 
    try {
       const res = await api.put(`/inscricao/alternarchegada/${inscricaoId}`, {
@@ -402,9 +449,7 @@ const salvarViagemChegada = async (viagemId) => {
       }
 
       chamarRefresh();
-   } catch (error) {
-      
-   }
+   } catch (error) {}
 };
 </script>
 
@@ -762,7 +807,6 @@ const salvarViagemChegada = async (viagemId) => {
       :visible="viagemChegadaShowModal"
       @close="viagemChegadaShowModal = false"
    >
-   
       <CModalHeader>
          <strong>Editar Viagem de Chegada</strong>
       </CModalHeader>
@@ -808,8 +852,6 @@ const salvarViagemChegada = async (viagemId) => {
          <!-- <CAlert color="dark" v-html="viagemChegadaInscricao"></CAlert> -->
          <CAlert color="dark" v-html="viagemChegadaEscolhida"></CAlert>
 
-
-
          <!-- <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label> -->
          <!-- <div class="form-text">
             {{ viagemChegadaFormDados.regiao.descricao }}
@@ -831,10 +873,11 @@ const salvarViagemChegada = async (viagemId) => {
             @click="viagemChegadaShowModal = false"
             >Fechar</CButton
          >
-         <CButton color="btn btn-primary btn-sm me-1" @click="salvarViagemChegada(viagemSelecionada)"
+         <CButton
+            color="btn btn-primary btn-sm me-1"
+            @click="salvarViagemChegada(viagemSelecionada)"
             >Salvar</CButton
          >
       </CModalFooter>
    </CModal>
-
 </template>
