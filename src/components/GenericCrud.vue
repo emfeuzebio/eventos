@@ -17,7 +17,7 @@
                         :key="filter.field"
                         class="me-2"
                      >
-                        Filtrar por:
+                        <!-- Filtrar por: -->
                         <label class="form-label fw-bold">
                            {{ filter.label }}</label
                         >

@@ -250,6 +250,11 @@ const routes = [
           redirect: '/cadastros/entidades',
           children: [
             {
+              path: '/inscricoes/eventos',
+              name: 'Eventos',
+              component: () => import('@/views/inscricoes/EventosDatatablesGeneric.vue'),
+            },
+            {
               path: '/inscricoes/pessoa',
               name: 'Pessoas',
               component: () => import('@/views/inscricoes/PessoasDatatablesGeneric.vue'),

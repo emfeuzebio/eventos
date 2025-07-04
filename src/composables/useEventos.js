@@ -20,10 +20,9 @@ export function useEventos(ativo = true) {
    const fetchEventos = async () => {
       try {
          error.value = null;
-         const res = await api.get('/evento', {
+         eventos.value = (await api.get('/evento', {
             params: ativo ? { ativo: 'SIM' } : {},
-         });
-         eventos.value = res.data;
+         })).data;
       } catch (err) {
          error.value = err;
       }

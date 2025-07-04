@@ -48,17 +48,18 @@ const columns = [
    { title: 'ID', data: 'id' },
    { title: 'Evento', data: 'evento.sigla', width: '100px' },
    {
-      title: 'Pessoa / Papel / Modalidade',
+      title: 'Pessoa | Entidade | Papel | Modalidade',
       data: null, // importante usar null quando o render vai acessar múltiplos campos
       render: function (data, type, row) {
          const nome = row.pessoa?.nome_social || '';
          // const papel = row.funcao?.sigla || '';
          const papel = row.funcao?.descricao || '';
          const modalidade = row.modalidade || 'Não informada';
-         return `<span class="fw-bold">${nome}</span> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
+         const entidade_sigla = row.pessoa?.entidade?.sigla ?? 'Sem Entidade';
+         return `<span class="fw-bold">${nome}</span> <small class="text-muted">${entidade_sigla}</small> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
       },
       className: 'text-left',
-      width: '380px',
+      width: '320px',
    },
    { title: 'Entidade', data: 'pessoa.entidade.sigla', width: '100px' },
    {
@@ -73,7 +74,7 @@ const columns = [
          return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>`;
       },
       className: 'text-left',
-      width: '160px',
+      width: '180px',
    },
    {
       title: 'Partida',
@@ -87,7 +88,7 @@ const columns = [
          return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>`;
       },
       className: 'text-left',
-      width: '160px',
+      width: '180px',
    },
    // { title: 'Partida', data: 'partida_meio_transp', width: '140px' },
    {

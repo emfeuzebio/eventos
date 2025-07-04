@@ -45,7 +45,7 @@ function chamarRefresh() {
  * BASE Crud - colunas da tabela de dados
  */
 const columns = [
-   // { title: 'ID', data: 'id', width: '10px' },
+   { title: 'ID', data: 'id', width: '10px' },
    // { title: 'Evento', data: 'evento.sigla', width: '100px' },
    {
       title: 'Chegada',
@@ -59,18 +59,17 @@ const columns = [
          return `<span class="">${dh}</span> <br/> <small class="text-muted">${meio} - ${cia}</small>`;
       },
       className: 'text-left',
-      width: '160px',
+      width: '180px',
    },
    {
-      title: 'Pessoa / Papel / Modalidade',
+      title: 'Pessoa | Entidade | Papel | Modalidade',
       data: null, // importante usar null quando o render vai acessar múltiplos campos
       render: function (data, type, row) {
          const nome = row.pessoa?.nome_social || '';
-         // const papel = row.funcao?.sigla || '';
          const papel = row.funcao?.descricao || '';
          const modalidade = row.modalidade || 'Não informada';
-         // const entidade_sigla = row.pessoa?.ativo || 'Sem Entidade';
-         return `<span class="fw-bold">${nome}</span> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
+         const entidade_sigla = row.pessoa?.entidade?.sigla ?? 'Sem Entidade';
+         return `<span class="fw-bold">${nome}</span> <small class="text-muted">${entidade_sigla}</small> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
       },
       className: 'text-left',
       width: '320px',
@@ -115,7 +114,7 @@ const columns = [
       },
    },
    {
-      title: 'Hotel | Quarto',
+      title: 'Hospedagem',
       data: null,
       width: '160px',
       render: function (data, type, row) {
