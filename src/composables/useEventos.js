@@ -23,6 +23,12 @@ export function useEventos(ativo = true) {
          eventos.value = (await api.get('/evento', {
             params: ativo ? { ativo: 'SIM' } : {},
          })).data;
+
+         // ordenando após o response
+         // eventos.value.sort((a, b) => a.nomeEvento.localeCompare(b.nomeEvento));
+         // eventos.value.sort((a, b) => new Date(a.inscricao_data_ini) - new Date(b.inscricao_data_ini));  // Date Crescente (a,b)
+         eventos.value.sort((a, b) => new Date(b.inscricao_data_ini) - new Date(a.inscricao_data_ini));  // Date DeCrescente (b,a)
+         
       } catch (err) {
          error.value = err;
       }

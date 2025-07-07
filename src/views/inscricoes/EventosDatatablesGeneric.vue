@@ -1,6 +1,8 @@
 <script setup>
 import { ref, toRaw, computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
+import DateInputWrapper from '@/components/DateInputWrapper.vue';
+import DateTimeInputWrapper from '@/components/DateTimeInputWrapper.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { useToast } from '@/composables/useToast';
 import { formatToBrDateTime } from '@/utils/dateFormat';
@@ -45,17 +47,23 @@ function chamarRefresh() {
  * BASE Crud - colunas da tabela de dados
  */
 const columns = [
-   { title: 'ID', data: 'id' },
+   { title: 'ID', data: 'id', width: '10px' },
    // { title: 'Organização', data: 'organizacao_id', width: '100px' },
-   { title: 'Sigla do Evento', data: 'sigla', width: '160px' },
-   { title: 'Nome do Evento', data: 'nome', width: 'auto' },
-   // { title: 'Descricao', data: 'descricao', width: 'auto' },
-   { title: 'Periodo', data: 'periodo', width: '260px' },
+   {
+      title: 'Sigla',
+      data: 'sigla',
+      width: '140px',
+      class: 'fw-bold',
+   },
+   { title: 'Nome do Evento', data: 'nome', width: '260px' },
+   { title: 'Periodo', data: 'periodo', width: 'auto' },
    {
       title: 'Dt Início',
       data: null,
       render: function (data, type, row) {
-         const dt_inicio = row.inscricao_data_ini?.trim() ? formatToBrDate(row.inscricao_data_ini) : 'Não informado';
+         const dt_inicio = row.inscricao_data_ini?.trim()
+            ? formatToBrDate(row.inscricao_data_ini)
+            : 'Não informado';
          return `<span class="">${dt_inicio}</span>`;
       },
       className: 'text-center',
@@ -65,11 +73,24 @@ const columns = [
       title: 'Dt Fim',
       data: null,
       render: function (data, type, row) {
-         const dt_inicio = row.inscricao_data_fim?.trim() ? formatToBrDate(row.inscricao_data_ini) : 'Não informado';
-         return `<span class="">${dt_inicio}</span>`;
+         const dt_fim = row.inscricao_data_fim?.trim()
+            ? formatToBrDate(row.inscricao_data_fim)
+            : 'Não informado';
+         return `<span class="">${dt_fim}</span>`;
       },
       className: 'text-center',
       width: '100px',
+   },
+   {
+      title: 'Ativo',
+      data: 'ativo',
+      class: 'dt-center small',
+      width: '60px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
+      },
    },
    // { title: 'Tema', data: 'tema', width: 'auto' },
 
@@ -86,17 +107,6 @@ const columns = [
    //    },
    //    className: 'text-left',
    //    width: '320px',
-   {
-      title: 'Ativo',
-      data: 'ativo',
-      class: 'dt-center small',
-      width: '60px',
-      render: function (data, type, row) {
-         return `<span class="${
-            row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
-         }">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
-      },
-   },
 ];
 
 /**
@@ -242,7 +252,7 @@ const salvarRegiao = async () => {
 
    try {
       // console.log('Try Salvar Região:', pessoaFormDados.value.regiao);
-      console.log('Try Salvar Região:', toRaw(pessoaFormDados.value.regiao));
+      // console.log('Try Salvar Região:', toRaw(pessoaFormDados.value.regiao));
 
       await api.put(
          `regiao/${pessoaFormDados.value.regiao.id}`,
@@ -290,45 +300,41 @@ const salvarRegiao = async () => {
                ><CCardTitle>Editar Evento</CCardTitle></CCardHeader
             > -->
             <CCardBody>
-
                <!-- Nome do Evento -->
                <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel
-                     class="col-sm-3 form-label fw-bold text-end"
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
                      >Nome</CFormLabel
                   >
                   <CCol sm="8">
-                     <CFormInput 
-                           v-model="form.value.nome"
-                           :class="{ 'is-invalid': errors.nome }"
-                        />
-                        <div class="form-error" v-if="errors.value.nome">
-                           {{ errors.value.nome[0] }}
-                        </div>
+                     <CFormInput
+                        v-model="form.value.nome"
+                        :class="{ 'is-invalid': errors.nome }"
+                     />
+                     <div class="form-error" v-if="errors.value.nome">
+                        {{ errors.value.nome[0] }}
+                     </div>
                   </CCol>
                </CRow>
 
                <!-- Sigla do Evento -->
                <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel
-                     class="col-sm-3 form-label fw-bold text-end"
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
                      >Sigla</CFormLabel
                   >
                   <CCol sm="8">
-                     <CFormInput 
-                           v-model="form.value.sigla"
-                           :class="{ 'is-invalid': errors.sigla }"
-                        />
-                        <div class="form-error" v-if="errors.value.sigla">
-                           {{ errors.value.sigla[0] }}
-                        </div>
+                     <CFormInput
+                        v-model="form.value.sigla"
+                        :class="{ 'is-invalid': errors.sigla }"
+                     />
+                     <div class="form-error" v-if="errors.value.sigla">
+                        {{ errors.value.sigla[0] }}
+                     </div>
                   </CCol>
                </CRow>
 
                <!-- Descrição -->
                <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel
-                     class="col-sm-3 form-label fw-bold text-end"
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
                      >Observações</CFormLabel
                   >
                   <CCol sm="8">
@@ -338,10 +344,7 @@ const salvarRegiao = async () => {
                         rows="6"
                         placeholder="Descrição ..."
                      />
-                     <div
-                        class="form-error"
-                        v-if="errors.value.descricao"
-                     >
+                     <div class="form-error" v-if="errors.value.descricao">
                         {{ errors.value.descricao[0] }}
                      </div>
                   </CCol>
@@ -349,8 +352,7 @@ const salvarRegiao = async () => {
 
                <!-- Local do Evento -->
                <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel
-                     class="col-sm-3 form-label fw-bold text-end"
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
                      >Local</CFormLabel
                   >
                   <CCol sm="8">
@@ -360,45 +362,41 @@ const salvarRegiao = async () => {
                         rows="2"
                         placeholder="Local..."
                      />
-                     <div
-                        class="form-error"
-                        v-if="errors.value.local"
-                     >
+                     <div class="form-error" v-if="errors.value.local">
                         {{ errors.value.local[0] }}
                      </div>
-                  </CCol>               </CRow>
+                  </CCol>
+               </CRow>
 
                <!-- Período do Evento -->
                <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel
-                     class="col-sm-3 form-label fw-bold text-end"
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
                      >Período</CFormLabel
                   >
                   <CCol sm="8">
-                     <CFormInput 
-                           v-model="form.value.periodo"
-                           :class="{ 'is-invalid': errors.periodo }"
-                        />
-                        <div class="form-error" v-if="errors.value.periodo">
-                           {{ errors.value.periodo[0] }}
-                        </div>
+                     <CFormInput
+                        v-model="form.value.periodo"
+                        :class="{ 'is-invalid': errors.periodo }"
+                     />
+                     <div class="form-error" v-if="errors.value.periodo">
+                        {{ errors.value.periodo[0] }}
+                     </div>
                   </CCol>
                </CRow>
 
                <!-- Tema do Evento -->
                <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel
-                     class="col-sm-3 form-label fw-bold text-end"
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
                      >Tema</CFormLabel
                   >
                   <CCol sm="8">
-                     <CFormInput 
-                           v-model="form.value.tema"
-                           :class="{ 'is-invalid': errors.tema }"
-                        />
-                        <div class="form-error" v-if="errors.value.tema">
-                           {{ errors.value.tema[0] }}
-                        </div>
+                     <CFormInput
+                        v-model="form.value.tema"
+                        :class="{ 'is-invalid': errors.tema }"
+                     />
+                     <div class="form-error" v-if="errors.value.tema">
+                        {{ errors.value.tema[0] }}
+                     </div>
                   </CCol>
                </CRow>
 
@@ -410,10 +408,15 @@ const salvarRegiao = async () => {
                   <CCol sm="4">
                      <CFormInput
                         v-model="form.value.inscricao_data_ini"
-                        type="date-local"
-                        :class="{ 'is-invalid': errors.inscricao_data_ini }"
+                        type="date"
+                        :class="{
+                           'is-invalid': errors.inscricao_data_ini,
+                        }"
                      />
-                     <div class="form-error" v-if="errors.value.inscricao_data_ini">
+                     <div
+                        class="form-error"
+                        v-if="errors.value.inscricao_data_ini"
+                     >
                         {{ errors.value.inscricao_data_ini[0] }}
                      </div>
                   </CCol>
@@ -427,10 +430,15 @@ const salvarRegiao = async () => {
                   <CCol sm="4">
                      <CFormInput
                         v-model="form.value.inscricao_data_fim"
-                        type="date-local"
-                        :class="{ 'is-invalid': errors.inscricao_data_fim }"
+                        type="date"
+                        :class="{
+                           'is-invalid': errors.inscricao_data_fim,
+                        }"
                      />
-                     <div class="form-error" v-if="errors.value.inscricao_data_fim">
+                     <div
+                        class="form-error"
+                        v-if="errors.value.inscricao_data_fim"
+                     >
                         {{ errors.value.inscricao_data_fim[0] }}
                      </div>
                   </CCol>
@@ -438,8 +446,7 @@ const salvarRegiao = async () => {
 
                <!-- Ativo -->
                <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel
-                     class="col-sm-3 form-label fw-bold text-end"
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
                      >Ativo?</CFormLabel
                   >
                   <CCol sm="4">
@@ -451,55 +458,13 @@ const salvarRegiao = async () => {
                            { value: 'NÃO', label: 'NÃO' },
                         ]"
                      />
-                     <div
-                        class="form-error"
-                        v-if="errors.value.ativo"
-                     >
+                     <div class="form-error" v-if="errors.value.ativo">
                         {{ errors.value.ativo[0] }}
                      </div>
                   </CCol>
                </CRow>
-
             </CCardBody>
          </CCard>
       </template>
    </GenericCrud>
-
-   <!-- Extra Modal Especializado -->
-   <CModal
-      :visible="pessoaShowModal"
-      @close="pessoaShowModal = false"
-      backdrop="static"
-   >
-      <CModalHeader>
-         <strong>Editar Região</strong>
-      </CModalHeader>
-      <CModalBody>
-         <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label>
-         <!-- <div class="form-text">
-            {{ pessoaFormDados.regiao.descricao }}
-         </div> -->
-
-         <CFormInput
-            v-model="pessoaFormDados.regiao.descricao"
-            :class="{ 'is-invalid': pessoaFormErros.descricao }"
-         />
-
-         <label class="form-label fw-bold mb-1 mt-0">Sigla</label>
-         <CFormInput
-            v-model="pessoaFormDados.regiao.sigla"
-            :class="{ 'is-invalid': pessoaFormErros.sigla }"
-         />
-      </CModalBody>
-      <CModalFooter>
-         <CButton
-            color="btn btn-secondary btn-sm me-1"
-            @click="pessoaShowModal = false"
-            >Fechar</CButton
-         >
-         <CButton color="btn btn-primary btn-sm me-1" @click="salvarRegiao"
-            >Salvar</CButton
-         >
-      </CModalFooter>
-   </CModal>
 </template>

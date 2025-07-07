@@ -42,14 +42,23 @@ export function formatToBrDateTime(dateStr) {
   return `${capitalizedWeekday} ${dateTime} h.`  
 }
 
-/**
- * 
- * @param esperado String  com T {'2023-11-10T22:50:00'} ou com espaço {'2023-11-10 22:50:00'}
- * @returns String no formato '10/11/2023'
- */
+
 export function formatToBrDate(dateStr) {
   if (!dateStr) return ''
 
+  // Se for só "YYYY-MM-DD", parse manual
+  const parts = dateStr.split('-')
+  if (parts.length === 3) {
+    const [year, month, day] = parts
+    const localDate = new Date(+year, +month - 1, +day) // mês começa em 0
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(localDate)
+  }
+
+  // Se vier com hora, usar normalmente
   const fixedDateStr = dateStr.replace(' ', 'T')
   const date = new Date(fixedDateStr)
 
@@ -62,3 +71,29 @@ export function formatToBrDate(dateStr) {
     timeZone: 'America/Sao_Paulo',
   }).format(date)
 }
+
+
+
+/**
+ * USAR quando as data armazenadas estiverem padrão ISO 8601 ou seja armazenadas com Fuso UTC-0
+ * Ex Data-Hora padrão ISO 8601: 2025-07-05T02:54:24.000000Z ou Z indica Fuso UTC-0
+ * @param esperado String  com T {'2023-11-10T22:50:00'} ou com espaço {'2023-11-10 22:50:00'}
+ * @returns String no formato '10/11/2023'
+ */
+// export function formatToBrDate(dateStr) {
+//   if (!dateStr) return ''
+
+//   const fixedDateStr = dateStr.replace(' ', 'T')
+//   const date = new Date(fixedDateStr)
+
+//   console.log('formatToBrDate', date);
+
+//   if (isNaN(date)) return dateStr
+
+//   return new Intl.DateTimeFormat('pt-BR', {
+//     day: '2-digit',
+//     month: '2-digit',
+//     year: 'numeric',
+//     timeZone: 'America/Sao_Paulo',
+//   }).format(date)
+// }

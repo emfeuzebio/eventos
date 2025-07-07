@@ -359,11 +359,24 @@ const salvarRegiao = async () => {
                               class="col-sm-3 form-label fw-bold text-end"
                               >Nome do Evento</CFormLabel
                            >
-                           <CCol sm="4"
-                              ><CFormLabel class="form-label fw-bold"
-                                 >Nome do Evento</CFormLabel
-                              ></CCol
-                           >
+                           <CCol sm="4">
+                              <CFormSelect
+                                 v-model="form.value.evento_id"
+                                 :options="[
+                                    { value: '', label: 'Selecione' },
+                                    ...eventos.map((evento) => ({
+                                       value: evento.id,
+                                       label: evento.sigla,
+                                    })),
+                                 ]"
+                              />
+                              <div
+                                 class="form-error"
+                                 v-if="errors.value.pessoa_id"
+                              >
+                                 {{ errors.value.pessoa_id[0] }}
+                              </div>
+                           </CCol>
                         </CRow>
 
                         <!-- Pessoa -->
@@ -495,60 +508,6 @@ const salvarRegiao = async () => {
                </CAccordion>
 
                <!-- Chegada Meio Transporte -->
-               <!--          
-         <hr />
-
-         <CRow class="form-group" style="margin-top: 16px">
-            <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-               >Chegada Meio Transporte</CFormLabel
-            >
-            <CCol sm="4">
-               <CFormSelect
-                  v-model="form.value.credenciou"
-                  :options="[
-                     { value: '', label: 'Selecione' },
-                     { value: 'Aéreo', label: 'Aéreo' },
-                     { value: 'Rodoviário', label: 'Rodoviário' },
-                     { value: 'Rodo Particular', label: 'Rodo Particular' },
-                     { value: 'Não Informado', label: 'Não Informado' },
-                  ]"
-               />
-               <div class="form-error" v-if="errors.value.credenciou">
-                  {{ errors.value.credenciou[0] }}
-               </div>
-            </CCol>
-         </CRow>
-
-         <CRow class="form-group" style="margin-top: 16px">
-            <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-               >Chegada Companhia + Nº</CFormLabel
-            >
-            <CCol sm="4">
-               <CFormInput
-                  v-model="form.value.chegada_cia_transp"
-                  :class="{ 'is-invalid': errors.chegada_cia_transp }"
-               />
-               <div class="form-error" v-if="errors.value.chegada_cia_transp">
-                  {{ errors.value.chegada_cia_transp[0] }}
-               </div>
-            </CCol>
-         </CRow>
-
-         <CRow class="form-group" style="margin-top: 16px">
-            <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-               >Chegada Data/Hora</CFormLabel
-            >
-            <CCol sm="4">
-               <CFormInput
-                  v-model="form.value.chegada_data_hora"
-                  type="datetime-local"
-                  :class="{ 'is-invalid': errors.chegada_data_hora }"
-               />
-               <div class="form-error" v-if="errors.value.chegada_data_hora">
-                  {{ errors.value.chegada_data_hora[0] }}
-               </div>
-            </CCol>
-         </CRow> -->
 
                <!-- Dados da Chegada em uma linha -->
                <CAccordion
@@ -650,6 +609,26 @@ const salvarRegiao = async () => {
                      </CAccordionBody>
                   </CAccordionItem>
                </CAccordion>
+
+               <!-- Ativo -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Ativo?</CFormLabel
+                  >
+                  <CCol sm="4">
+                     <CFormSelect
+                        v-model="form.value.ativo"
+                        :options="[
+                           { value: '', label: 'Selecione' },
+                           { value: 'SIM', label: 'SIM' },
+                           { value: 'NÃO', label: 'NÃO' },
+                        ]"
+                     />
+                     <div class="form-error" v-if="errors.value.ativo">
+                        {{ errors.value.ativo[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
             </CCardBody>
          </CCard>
       </template>

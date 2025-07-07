@@ -273,7 +273,7 @@ const { init, refreshTable } = useDataTable(
                if (props.buttons.delete) {
                   btnExcluir =
                      `<button ` +
-                     (props.abilities.includes(props.endpoint + '.delete')
+                     (props.abilities.includes(props.endpoint + '.destroy')
                         ? ''
                         : 'disabled') +
                      ` class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" tooltip="Excluir o registro atual">Excluir</button>`;
