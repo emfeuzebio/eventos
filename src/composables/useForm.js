@@ -88,6 +88,10 @@ export function useForm({
 
          deleteModalVisible.value = false;
          afterDelete?.();
+      } catch (error) {
+         // if (error.response?.status === 400) {
+         //    console.log(error.response.data.message);
+         // }
       } finally {
          loading.value = false;
       }

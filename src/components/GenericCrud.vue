@@ -199,10 +199,11 @@ const props = defineProps({
          { title: 'Coluna 2', data: null, class: 'dt-left' },
       ],
    },
-   filters: {
-      type: Object,
-      default: () => [{}],
-   },
+   filters: Array,
+   // filters: {
+   //    type: Object,
+   //    default: () => [{}],
+   // },
    extraColumnRender: Function,
    // canInsert: Boolean,
    // canUpdate: Boolean,
