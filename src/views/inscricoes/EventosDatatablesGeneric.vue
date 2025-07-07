@@ -11,6 +11,7 @@ import 'datatables.net-dt';
 import api from '@/services/api';
 
 // define a Entidade Principal da View
+// define a Entidade Principal da View
 const entity = 'evento';
 
 const { showToast } = useToast(); // Toasts de Alerta
