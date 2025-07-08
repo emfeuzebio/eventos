@@ -254,7 +254,7 @@ const { init, refreshTable } = useDataTable(
             title: 'Ações',
             data: null,
             sortable: false,
-            className: 'text-left',
+            className: 'text-center',
             width: props.columnActionsWidth ?? '120px',
             render(data, type, row) {
                let html = '';

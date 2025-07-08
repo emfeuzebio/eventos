@@ -399,6 +399,11 @@ export default [
     items: [
       {
         component: 'CNavItem',
+        name: 'Minha Organização',
+        to: '/cadastros/organizacoes',
+      },
+      {
+        component: 'CNavItem',
         name: 'Entidades Espíritas',
         to: '/cadastros/entidades',
       },
