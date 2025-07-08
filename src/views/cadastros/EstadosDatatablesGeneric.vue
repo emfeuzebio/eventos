@@ -195,6 +195,7 @@ const salvarRegiao = async () => {
       :columns="columns"
       :defaultValues="defaultValues"
       :extra-column-render="extraColumnRender"
+      :columnActionsWidth="220"
       :abilities="abilities"
       :canList="canList"
       :canShow="canShow"

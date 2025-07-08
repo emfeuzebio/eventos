@@ -116,6 +116,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       :columns="columns"
       :defaultValues="defaultValues"
       :extra-column-render="extraColumnRender"
+      :columnActionsWidth="200"
       :abilities="abilities"
       :canList="canList"
       :canShow="canShow"

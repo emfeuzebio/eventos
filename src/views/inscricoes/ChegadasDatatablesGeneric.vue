@@ -347,6 +347,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
             row?.chegada_data_hora || ''
          )} ${row?.chegada_meio_transp || ''} ${row?.chegada_cia_transp || ''}`;
 
+      viagemChegadaEscolhida.value = 'A viagem não está marcada';
       if (dataset.viagemId) {
          const viagem = await api.get(
             `/inscricao/viagemmarcada/${dataset.viagemId}`
@@ -846,7 +847,7 @@ const salvarViagemChegada = async (viagemId) => {
          />
 
          <label class="form-label fw-bold mb-1 mt-2"
-            >Dados da Viagem de Traslado de Chegada escolhida</label
+            >Dados da Viagem de Traslado de Chegada marcada</label
          >
          <!-- <CAlert color="dark" v-html="viagemChegadaInscricao"></CAlert> -->
          <CAlert color="dark" v-html="viagemChegadaEscolhida"></CAlert>
