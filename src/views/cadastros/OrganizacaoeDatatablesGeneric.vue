@@ -9,7 +9,7 @@ import 'datatables.net-dt';
 import api from '@/services/api';
 
 // define a Entidade Principal da View
-const entity = 'evento';
+const entity = 'organizacao';
 
 const { showToast } = useToast(); // Toasts de Alerta
 
@@ -54,6 +54,8 @@ const columns = [
       width: '180px',
       class: 'fw-bold',
    },
+   // { title: 'Razão Social', data: 'razao_social', width: '300px' },
+   { title: 'Lema', data: 'lema', width: '300px' },
    {
       title: 'Ativa',
       data: 'ativo',
@@ -77,11 +79,7 @@ const defaultValues = {
    nome: 'Nome do Evento',
    sigla: 'Sigla do Evento',
    descricao: 'Descrição completa do Evento',
-   local: 'FEB',
-   periodo: 'De 10 a 12 de Outubro de 20xx',
    tema: 'Você e a paz',
-   inscricao_data_ini: '',
-   inscricao_data_fim: '',
    ativo: 'SIM',
    // valor_cafe: '0.00',
    // valor_lanche: '0.00',
@@ -128,10 +126,7 @@ const {
    fetchEventos,
    eventos,
 } = useEventos();
-fetchEventos();
-fetchEntidades();
-fetchFuncoes();
-fetchPessoas();
+
 /**
  * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.
  * Default: true para todos
@@ -183,15 +178,6 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
    }
 };
 
-const editarRegiao = async () => {
-   // Aqui você pode implementar a lógica para editar a região
-   // ou já usamos os dados do formulário preenchidos
-   // console.log('Editar Região:', pessoaFormDados.value);
-   pessoaShowModal.value = true;
-   // ou aqui poderia chamar uma API para buscar os dados da região pelo ID
-   // pessoaShowModal.value = false; // Fecha o modal após salvar
-};
-
 /**
  * ESPECIALIZAÇÃO CRUD: função para atualizar a entidade especializada
  */
@@ -230,7 +216,7 @@ const salvarRegiao = async () => {
       modalSize="lg"
       title="Cadastro de Organizações "
       description="Gerenciamento do cadastro de Organizações"
-      endpoint="evento"
+      endpoint="organizacao"
       columnActionsWidth="120px"
       :filters="filters"
       :columns="columns"
@@ -249,7 +235,8 @@ const salvarRegiao = async () => {
                ><CCardTitle>Editar Evento</CCardTitle></CCardHeader
             > -->
             <CCardBody>
-               <!-- Nome do Evento -->
+
+               <!-- Nome da Organização -->
                <CRow class="form-group" style="margin-top: 16px">
                   <CFormLabel class="col-sm-3 form-label fw-bold text-end"
                      >Nome</CFormLabel
@@ -265,7 +252,7 @@ const salvarRegiao = async () => {
                   </CCol>
                </CRow>
 
-               <!-- Sigla do Evento -->
+               <!-- Sigla da Organização -->
                <CRow class="form-group" style="margin-top: 16px">
                   <CFormLabel class="col-sm-3 form-label fw-bold text-end"
                      >Sigla</CFormLabel
@@ -281,10 +268,26 @@ const salvarRegiao = async () => {
                   </CCol>
                </CRow>
 
+               <!-- Razão Social da Organização -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Razão Social</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <CFormInput
+                        v-model="form.value.razao_social"
+                        :class="{ 'is-invalid': errors.razao_social }"
+                     />
+                     <div class="form-error" v-if="errors.value.razao_social">
+                        {{ errors.value.razao_social[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
                <!-- Descrição -->
                <CRow class="form-group" style="margin-top: 16px">
                   <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-                     >Observações</CFormLabel
+                     >Descrição</CFormLabel
                   >
                   <CCol sm="8">
                      <CFormTextarea
@@ -299,96 +302,18 @@ const salvarRegiao = async () => {
                   </CCol>
                </CRow>
 
-               <!-- Local do Evento -->
+               <!-- Lema do Organização -->
                <CRow class="form-group" style="margin-top: 16px">
                   <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-                     >Local</CFormLabel
-                  >
-                  <CCol sm="8">
-                     <CFormTextarea
-                        v-model="form.value.local"
-                        :class="{ 'is-invalid': errors.local }"
-                        rows="2"
-                        placeholder="Local..."
-                     />
-                     <div class="form-error" v-if="errors.value.local">
-                        {{ errors.value.local[0] }}
-                     </div>
-                  </CCol>
-               </CRow>
-
-               <!-- Período do Evento -->
-               <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-                     >Período</CFormLabel
+                     >Lema / Slogan</CFormLabel
                   >
                   <CCol sm="8">
                      <CFormInput
-                        v-model="form.value.periodo"
-                        :class="{ 'is-invalid': errors.periodo }"
+                        v-model="form.value.lema"
+                        :class="{ 'is-invalid': errors.lema }"
                      />
-                     <div class="form-error" v-if="errors.value.periodo">
-                        {{ errors.value.periodo[0] }}
-                     </div>
-                  </CCol>
-               </CRow>
-
-               <!-- Tema do Evento -->
-               <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-                     >Tema</CFormLabel
-                  >
-                  <CCol sm="8">
-                     <CFormInput
-                        v-model="form.value.tema"
-                        :class="{ 'is-invalid': errors.tema }"
-                     />
-                     <div class="form-error" v-if="errors.value.tema">
-                        {{ errors.value.tema[0] }}
-                     </div>
-                  </CCol>
-               </CRow>
-
-               <!-- Data Início do Evento -->
-               <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-                     >Data Início</CFormLabel
-                  >
-                  <CCol sm="4">
-                     <CFormInput
-                        v-model="form.value.inscricao_data_ini"
-                        type="date"
-                        :class="{
-                           'is-invalid': errors.inscricao_data_ini,
-                        }"
-                     />
-                     <div
-                        class="form-error"
-                        v-if="errors.value.inscricao_data_ini"
-                     >
-                        {{ errors.value.inscricao_data_ini[0] }}
-                     </div>
-                  </CCol>
-               </CRow>
-
-               <!-- Data Término do Evento -->
-               <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-                     >Data Fim</CFormLabel
-                  >
-                  <CCol sm="4">
-                     <CFormInput
-                        v-model="form.value.inscricao_data_fim"
-                        type="date"
-                        :class="{
-                           'is-invalid': errors.inscricao_data_fim,
-                        }"
-                     />
-                     <div
-                        class="form-error"
-                        v-if="errors.value.inscricao_data_fim"
-                     >
-                        {{ errors.value.inscricao_data_fim[0] }}
+                     <div class="form-error" v-if="errors.value.lema">
+                        {{ errors.value.lema[0] }}
                      </div>
                   </CCol>
                </CRow>

@@ -62,7 +62,9 @@ api.interceptors.response.use(
          // Não propaga o erro para evitar stack trace no console
          return new Promise(() => {}); // retorna uma promessa pendente (sem erro)
       } else if (error.response?.status == 400) {
-         showError(error.response?.data?.error + "\n" + error.response?.data?.message || '419 - Erro inesperado.');
+         showError(error.response?.data?.error + "\n" + error.response?.data?.message || '400 - Erro inesperado.');
+      } else if (error.response?.status == 404) {
+         showError(error.response?.data?.error + "\n" + error.response?.data?.message || '404 - Erro ao acessar o Recurso.');
       } else if (error.response?.status == 409) {
          // Use 409 Conflict para erros de restrição de integridade (MySQL 23000)
          showError(error.response?.data?.error + "\n" + error.response?.data?.message || '409 - Erro de onflito de estado/regras.');
