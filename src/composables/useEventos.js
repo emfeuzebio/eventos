@@ -9,6 +9,7 @@ export function useEventos(ativo = true) {
    const estados = ref([]);
    const regioes = ref([]);
    const viagens = ref([]);
+   const organizacoes = ref([]);
    const inscricoes = ref([]);
    const inscricao = ref([]);
    const entidades = ref([]);
@@ -87,11 +88,22 @@ export function useEventos(ativo = true) {
    };
 
    const fetchViagensDaRota = async (rotaId) => {
-      console.log('fetchViagensDaRota:', rotaId);
+      // console.log('fetchViagensDaRota:', rotaId);
       
       try {
          error.value = null;
-         viagensDaRota.value = (await api.get('/viagem'), { params: { rotaId: rotaId } }).data;
+         insviagensDaRota.value = (await api.get('/viagem'), { params: { rotaId: rotaId } }).data;
+      } catch (err) {
+         error.value = err;
+      }
+    }   
+
+   const fetchOrganizacoes = async () => {
+      try {
+         error.value = null;
+         organizacoes.value = (await api.get('/organizacao', {
+            params: ativo ? { ativo: 'SIM' } : {}
+         })).data;
       } catch (err) {
          error.value = err;
       }
@@ -196,6 +208,7 @@ export function useEventos(ativo = true) {
       regioes,
       viagens,
       inscricoes,
+      organizacoes,
       entidades,
       funcoes,
       pessoas,
@@ -203,21 +216,22 @@ export function useEventos(ativo = true) {
 
       inscricao,
       
-      fetchEventos,  // caso queira recarregar manualmente
-      fetchVeiculos, // caso queira recarregar manualmente
-      fetchRotas,    // caso queira recarregar manualmente
-      fetchEstados,  // caso queira recarregar manualmente
-      fetchRegioes,  // caso queira recarregar manualmente
-      fetchViagens,  // caso queira recarregar manualmente
-      fetchViagensDaRota,  // caso queira recarregar manualmente
-      fetchInscricoes,  // caso queira recarregar manualmente
-      fetchEntidades,  // caso queira recarregar manualmente
-      fetchFuncoes,  // caso queira recarregar manualmente
-      fetchPessoas,  // caso queira recarregar manualmente
+      fetchOrganizacoes,   
+      fetchEventos,        
+      fetchVeiculos,       
+      fetchRotas,    
+      fetchEstados,  
+      fetchRegioes,  
+      fetchViagens,  
+      fetchViagensDaRota,  
+      fetchInscricoes,  
+      fetchEntidades,  
+      fetchFuncoes,  
+      fetchPessoas,  
 
-      getInscricao,     // caso queira recarregar manualmente uma inscrição específica
+      getInscricao,           // recupera uma Inscrição 
 
-      marcarTrasladoChegada, // 
+      marcarTrasladoChegada,  // marca a Viagem
       error,
    };
 }

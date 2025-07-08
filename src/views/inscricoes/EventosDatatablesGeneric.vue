@@ -20,23 +20,8 @@ const { showToast } = useToast(); // Toasts de Alerta
 const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
-// Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
-var canPrint = can(`${entity}.print`);
-var canPrint = false;
-
 // DEBUG de todas abilities do User Logado
 // console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);
-// console.log('canList:', canList); // Isso deve ser true ou false
-// console.log('canShow:', canShow); // Isso deve ser true ou false
-// console.log('canInsert:', canInsert); // Isso deve ser true ou false
-// console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
-// console.log('canDelete:', canDelete); // Isso deve ser true ou false
-// console.log('canPrint:', canPrint); // Isso deve ser true ou false
 
 const crudRef = ref(null);
 
@@ -131,6 +116,11 @@ const defaultValues = {
 };
 
 /**
+ * ESPECIALIZAÇÃO CRUD: recupera da API autorizações específicas/adicionais
+ */
+var canPrint = can(`${entity}.print`);
+
+/**
  * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
  */
 const extraColumnRender = (row) => {
@@ -150,6 +140,7 @@ const extraColumnRender = (row) => {
 const pessoaShowModal = ref(false);
 const pessoaFormDados = ref({});
 const pessoaFormErros = ref({});
+// const organizacoes = ref({});
 
 /**
  * ESPECIALIZAÇÃO CRUD: recupera da API listas de dados necessários para o CRUD
@@ -168,11 +159,15 @@ const {
    pessoas,
    fetchEventos,
    eventos,
+   fetchOrganizacoes,
+   organizacoes,
 } = useEventos();
-fetchEventos();
-fetchEntidades();
-fetchFuncoes();
-fetchPessoas();
+fetchOrganizacoes();
+// fetchEventos();
+// fetchEntidades();
+// fetchFuncoes();
+// fetchPessoas();
+
 /**
  * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.
  * Default: true para todos
@@ -301,6 +296,28 @@ const salvarRegiao = async () => {
                ><CCardTitle>Editar Evento</CCardTitle></CCardHeader
             > -->
             <CCardBody>
+               <!-- Organização a que pertence o Evento -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Organização do Evento</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <CFormSelect
+                        v-model="form.value.organizacao_id"
+                        :options="[
+                           { value: '', label: 'Selecione' },
+                           ...organizacoes.map((organizacao) => ({
+                              value: organizacao.id,
+                              label: organizacao.nome,
+                           })),
+                        ]"
+                     />
+                     <div class="form-error" v-if="errors.value.organizacao_id">
+                        {{ errors.value.organizacao_id[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
                <!-- Nome do Evento -->
                <CRow class="form-group" style="margin-top: 16px">
                   <CFormLabel class="col-sm-3 form-label fw-bold text-end"

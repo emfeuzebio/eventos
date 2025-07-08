@@ -18,11 +18,6 @@ const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
 // Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
 var canPrint = can(`${entity}.print`);
 var canPrint = false;
 
@@ -235,7 +230,6 @@ const salvarRegiao = async () => {
                ><CCardTitle>Editar Evento</CCardTitle></CCardHeader
             > -->
             <CCardBody>
-
                <!-- Nome da Organização -->
                <CRow class="form-group" style="margin-top: 16px">
                   <CFormLabel class="col-sm-3 form-label fw-bold text-end"
