@@ -42,7 +42,7 @@ export async function logout() {
     removeToken()
     userStore.clear()
   } catch (e) {
-    console.error('Erro ao revogar o token:', e)
+    // console.error('Erro ao revogar o token:', e)
     return null
   }
 }

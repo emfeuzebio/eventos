@@ -132,8 +132,13 @@ import {
    CButton,
 } from '@coreui/vue';
 import $ from 'jquery';
-import 'datatables.net-dt';
+
+// import 'datatables.net-dt';
 // import 'datatables.net-bs5';
+// import DataTable from 'datatables.net-vue3';
+// import DataTablesLib from 'datatables.net-bs5';
+// DataTable.use(DataTablesLib);
+
 import api from '@/services/api';
 import { useToast } from '@/composables/useToast';
 import { color } from 'chart.js/helpers';
@@ -343,7 +348,10 @@ defineExpose({
 </script>
 
 <style>
-@import 'datatables.net-dt/css/dataTables.dataTables.min.css';
+/* @import 'datatables.net-dt/css/dataTables.dataTables.min.css'; */
+
+/* @import 'bootstrap'; */
+/* @import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css'; */
 
 .btn-xs {
    padding: 0.15rem 0.4rem;
@@ -356,12 +364,7 @@ defineExpose({
    color: #dc3545;
    font-size: 0.875rem;
    margin-top: 0.25rem;
-}
-
-.dataTable tbody td {
-   font-size: 15px;
-   /* font-weight: bold; */
-   /* font-size: medium; */
+   font-weight: bold !important;
 }
 
 .form-label {

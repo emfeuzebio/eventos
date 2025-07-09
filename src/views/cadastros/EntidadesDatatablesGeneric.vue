@@ -2,7 +2,9 @@
 import { computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
-import 'datatables.net-dt';
+
+import DataTable from 'datatables.net-vue3';
+import DataTablesLib from 'datatables.net-bs5';
 
 import { useEventos } from '@/composables/useEventos';
 const {

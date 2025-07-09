@@ -356,7 +356,8 @@ onMounted(init);
 </script>
 
 <style>
-@import 'datatables.net-dt/css/dataTables.dataTables.min.css';
+/* @import 'datatables.net-dt/css/dataTables.dataTables.min.css'; */
+@import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 
 .btn-xs {
    padding: 0.15rem 0.4rem;
@@ -369,6 +370,7 @@ onMounted(init);
    color: #dc3545;
    font-size: 0.875rem;
    margin-top: 0.25rem;
+   font-weight: bold !important;
 }
 
 .dataTable tbody td {
