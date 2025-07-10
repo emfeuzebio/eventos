@@ -45,7 +45,24 @@ export function useDataTable({
          dataSrc: function (response) {
             return response.data;
          }, // Ajuste para o formato esperado pelo DataTables
-         language: { url: '/assets/DataTables.pt_BR.json' },
+         // language: { url: '/assets/DataTables.pt_BR.json' },
+         language: {
+            url: '/assets/DataTables.pt_BR.json', // continua usando tradução geral
+               paginate: {
+                     first: `
+                     <span class="d-none d-sm-inline">Primeiro</span>
+                     <i class="fa fa-fast-backward d-inline d-sm-none"></i>`,   // ícone para "Primeiro"
+                     previous: `
+                     <span class="d-none d-sm-inline">Anterior</span>
+                     <i class="fa fa-chevron-left d-inline d-sm-none"></i>`,   // ícone para "Anterior"
+                     next: `
+                     <span class="d-none d-sm-inline">Próximo</span>
+                     <i class="fa fa-chevron-right d-inline d-sm-none"></i>`,  // ícone para "Próximo"
+                     last: `
+                     <span class="d-none d-sm-inline">Último</span>
+                     <i class="fa fa-fast-forward d-inline d-sm-none"></i>`,   // ícone para "Último"
+                  },
+         },         
          lengthMenu: [
             [5, 10, 25, 50, 100, -1],
             [5, 10, 25, 50, 100, 'Todos'],

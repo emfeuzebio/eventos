@@ -127,7 +127,7 @@ const buttons = { update: true, delete: true, show: false };
 //  const filters = [{}]; // nessse caso sem filtros
 
 const filters = computed(() => [
-{
+   {
       label: 'Ativo',
       field: 'ativo',
       type: 'select',
@@ -146,7 +146,6 @@ const filters = computed(() => [
       })),
    },
 ]);
-
 
 // const filters = computed(() => [
 //    {
@@ -247,6 +246,7 @@ const salvarRegiao = async () => {
       :defaultValues="defaultValues"
       :buttons="buttons"
       :extra-column-render="extraColumnRender"
+      :columnActionsWidth="240"
       :abilities="abilities"
       :canList="canList"
       :canShow="canShow"

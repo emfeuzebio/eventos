@@ -182,7 +182,6 @@
       :visible="deleteConfirmVisible"
       @close="cancelDelete"
       backdrop="static"
-      keyboard="true"
    >
       <CModalHeader>
          <CModalTitle>Confirmar Exclusão</CModalTitle>

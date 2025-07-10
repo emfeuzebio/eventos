@@ -171,7 +171,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
          <CButton
             color="btn btn-secondary btn-sm me-1"
             @click="showZapModal = false"
-            >Fechar</CButton
+            ><i class="fa fa-times"></i> Fechar</CButton
          >
          <!-- <CButton color="btn btn-primary btn-sm me-1">Salvar</CButton> -->
       </CModalFooter>

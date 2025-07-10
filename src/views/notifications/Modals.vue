@@ -39,7 +39,6 @@ const fullscreenXxlDemo = ref(false)
             <CModal
               class="show d-block position-static"
               :backdrop="false"
-              :keyboard="false"
               visible
             >
               <CModalHeader dismiss>

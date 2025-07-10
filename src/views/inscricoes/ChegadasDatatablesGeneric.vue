@@ -4,8 +4,9 @@ import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { useToast } from '@/composables/useToast';
 import { formatToBrDateTime } from '@/utils/dateFormat';
-import 'datatables.net-dt';
 import api from '@/services/api';
+
+import DataTablesLib from 'datatables.net-bs5';
 
 // define a Entidade Principal da View
 const entity = 'inscricao';
@@ -113,14 +114,16 @@ const columns = [
          return text;
       },
    },
-   {
-      title: 'Hospedagem',
-      data: null,
-      width: '160px',
-      render: function (data, type, row) {
-         return '';
-      },
-   },
+
+   // {
+   //    title: 'Hospedagem',
+   //    data: null,
+   //    width: '160px',
+   //    render: function (data, type, row) {
+   //       return '';
+   //    },
+   // },
+
    // {
    //    title: 'Ativa',
    //    data: 'ativo',
@@ -165,7 +168,7 @@ const extraColumnRender = (row) => {
 
       <button class="btn btn-xs btn-outline-success" ${canMarcarcheg} data-custom-action="notificarPessoa" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Msg Pessoa</button>
 
-      <button class="btn btn-xs btn-outline-warning" ${canMarcarcheg} data-custom-action="notificarMotorista" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Msg Motorista</button>
+      <button class="btn btn-xs btn-outline-warning" ${canMarcarcheg} data-custom-action="notificarMotorista" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Notif Motorista</button>
 
       <div class="form-check form-switch">
          <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-inscricao-id="${row.id}" ${isChecked} >
@@ -310,22 +313,23 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
    if (action == 'notificarMotorista') {
       const inscricaoId = row.id;
       const viagemId = dataset.viagemId;
-      console.log('notificarMotorista', inscricaoId);
 
-      const sucesso = true;
-      // const sucesso = await marcarTrasladoChegada(inscricaoId, {
-      //    traslado_chegada_executou: isChecked,
-      // });
+      try {
+         console.log(
+            'Envia E-mail ao Motorista. Está enviando fixo para meu gmail. Precisa terminar o texto do email',
+            inscricaoId
+         );
+         await api.post(`viagem/ntfMotorista`);
 
-      if (sucesso) {
          showToast({
             title: 'Sucesso',
             message: `Notificou o Motorista da Viagem ${viagemId} de Traslado Chegada da Inscrição ${inscricaoId} com sucesso!`,
          });
+      } catch (error) {
+         if (error.response?.status === 422) {
+            regiaoFormErros.value = error.response.data.errors || {};
+         }
       }
-      // chamarRefresh(); // chama refreshTable() do composable via expose
-      // console.log('trasladou viagem', inscricaoId, isChecked);
-      // mas poderiamos também apenas passar o id da região para a função editarRegiao(id) e carregar os dados da API novamente com os dados atualizados
    }
 
    if (action == 'marcarViagem') {
@@ -470,12 +474,6 @@ const salvarViagemChegada = async (viagemId) => {
       :buttons="buttons"
       :extra-column-render="extraColumnRender"
       :abilities="abilities"
-      :canList="canList"
-      :canShow="canShow"
-      :canInsert="canInsert"
-      :canUpdate="canUpdate"
-      :canDelete="canDelete"
-      :canPrint="canPrint"
       @extraAction="onExtraAction"
    >
       <template #form="{ form, errors }">
@@ -871,7 +869,7 @@ const salvarViagemChegada = async (viagemId) => {
          <CButton
             color="btn btn-secondary btn-sm me-1"
             @click="viagemChegadaShowModal = false"
-            >Fechar</CButton
+            ><i class="fa fa-times"></i> Fechar</CButton
          >
          <CButton
             color="btn btn-primary btn-sm me-1"

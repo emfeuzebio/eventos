@@ -242,7 +242,7 @@ const filters = [{}]; // nessse caso sem filtros
    </div>
 
    <!-- Modal Selecionar Viagem de Traslado Chegada -->
-   <CModal :visible="mostrarModal" backdrop="static" keyboard="true">
+   <CModal :visible="mostrarModal" backdrop="static">
       <CModalHeader>
          <strong>Titulo</strong>
       </CModalHeader>

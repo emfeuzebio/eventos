@@ -664,7 +664,7 @@ const salvarRegiao = async () => {
          <CButton
             color="btn btn-secondary btn-sm me-1"
             @click="pessoaShowModal = false"
-            >Fechar</CButton
+            ><i class="fa fa-times"></i> Fechar</CButton
          >
          <CButton color="btn btn-primary btn-sm me-1" @click="salvarRegiao"
             >Salvar</CButton

@@ -9,6 +9,8 @@ import GlobalToast from '@/components/GlobalToast.vue';
 import { useGlobalLoading } from '@/stores/loading';
 import { CSpinner } from '@coreui/vue';
 
+import 'font-awesome/css/font-awesome.min.css';
+
 const { globalLoading } = useGlobalLoading();
 // const { toasts, removeToast } = useToast()
 

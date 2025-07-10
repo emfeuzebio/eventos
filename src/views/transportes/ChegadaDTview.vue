@@ -99,7 +99,6 @@
       :visible="showEditarChegadaModal"
       @close="showEditarChegadaModal = false"
       backdrop="static"
-      keyboard="true"
    >
       <CModalHeader>
          <strong>Editar Chegada</strong>

@@ -12,18 +12,18 @@ const entity = 'estado';
 const { showToast } = useToast(); // Toasts de Alerta
 
 // recuperas as Autorizações (abilities) do JWT
-const { can } = useAbilities();
+// const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
 // Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
+// const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
+// const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
+// const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
+// const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
+// const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
 
-var canPrint = can(`${entity}.print`);
-var canPrint = false;
+// var canPrint = can(`${entity}.print`);
+// var canPrint = false;
 
 const crudRef = ref(null);
 
@@ -195,14 +195,8 @@ const salvarRegiao = async () => {
       :columns="columns"
       :defaultValues="defaultValues"
       :extra-column-render="extraColumnRender"
-      :columnActionsWidth="220"
+      :columnActionsWidth="240"
       :abilities="abilities"
-      :canList="canList"
-      :canShow="canShow"
-      :canInsert="canInsert"
-      :canUpdate="canUpdate"
-      :canDelete="canDelete"
-      :canPrint="canPrint"
       @extraAction="onExtraAction"
    >
       <template #form="{ form, errors }">
@@ -250,9 +244,11 @@ const salvarRegiao = async () => {
       @close="showRegiaoModal = false"
       backdrop="static"
    >
-      <CModalHeader>
+      <!-- <CModalHeader class="bg-primary text-white border-bottom shadow-sm">
          <strong>Editar Região</strong>
-      </CModalHeader>
+      </CModalHeader> -->
+      <CModalHeader class="bg-primary text-white">Editar Região</CModalHeader>
+      <!-- <CModalHeader class="bg-light p-3">Editar Região</CModalHeader> -->
       <CModalBody>
          <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label>
          <!-- <div class="form-text">
@@ -274,10 +270,10 @@ const salvarRegiao = async () => {
          <CButton
             color="btn btn-secondary btn-sm me-1"
             @click="showRegiaoModal = false"
-            >Fechar</CButton
+            ><i class="fa fa-times"></i> Fechar</CButton
          >
          <CButton color="btn btn-primary btn-sm me-1" @click="salvarRegiao"
-            >Salvar</CButton
+            ><i class="fa fa-save"></i> Salvar</CButton
          >
       </CModalFooter>
    </CModal>

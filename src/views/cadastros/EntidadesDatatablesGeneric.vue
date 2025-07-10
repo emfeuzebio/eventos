@@ -2,11 +2,11 @@
 import { computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
+import { useEventos } from '@/composables/useEventos';
 
-import DataTable from 'datatables.net-vue3';
+// import DataTable from 'datatables.net-vue3';
 import DataTablesLib from 'datatables.net-bs5';
 
-import { useEventos } from '@/composables/useEventos';
 const {
    eventos,
    fetchEventos,
@@ -36,13 +36,13 @@ var canPrint = can(`${entity}.print`);
 var canPrint = true;
 
 // DEBUG de todas abilities do User Logado
-console.log('Abilities carregadas:', abilities.value);
-console.log('canList:', canList); // Isso deve ser true ou false
-console.log('canShow:', canShow); // Isso deve ser true ou false
-console.log('canInsert:', canInsert); // Isso deve ser true ou false
-console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
-console.log('canDelete:', canDelete); // Isso deve ser true ou false
-console.log('canPrint:', canPrint); // Isso deve ser true ou false
+// console.log('Abilities carregadas:', abilities.value);
+// console.log('canList:', canList); // Isso deve ser true ou false
+// console.log('canShow:', canShow); // Isso deve ser true ou false
+// console.log('canInsert:', canInsert); // Isso deve ser true ou false
+// console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
+// console.log('canDelete:', canDelete); // Isso deve ser true ou false
+// console.log('canPrint:', canPrint); // Isso deve ser true ou false
 
 // define parâmetros das tabela de dados
 const columns = [
@@ -125,12 +125,6 @@ const filters = computed(() => [
       :columns="columns"
       :defaultValues="defaultValues"
       :abilities="abilities"
-      :canList="canList"
-      :canShow="canShow"
-      :canInsert="canInsert"
-      :canUpdate="canUpdate"
-      :canDelete="canDelete"
-      :canPrint="canPrint"
    >
       <template #form="{ form, errors }">
          <!-- {{ form.value.estados }} -->

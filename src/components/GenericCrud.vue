@@ -66,12 +66,12 @@
                      class="btn btn-sm btn-outline-success me-1"
                      v-if="canInsert"
                      @click="form.insertNewModal"
-                     >Inserir Novo</CButton
+                     ><i class="fa fa-plus"></i> Inserir Novo</CButton
                   >
                   <CButton
                      class="btn btn-sm btn-outline-secondary"
                      @click="refreshTable"
-                     >Recarregar
+                     ><i class="fa fa-refresh"></i> Recarregar
                   </CButton>
                </div>
             </div>
@@ -93,9 +93,8 @@
          :fullscreen="modalFullscreen"
          @close="form.closeModal"
          backdrop="static"
-         keyboard="true"
       >
-         <CModalHeader>
+         <CModalHeader class="bg-primary text-white">
             <CModalTitle>{{
                (form.isEditing.value ? 'Editar ' : 'Inserir ') +
                endpoint.charAt(0).toUpperCase() +
@@ -112,11 +111,12 @@
          </CModalBody>
          <CModalFooter>
             <CButton color="secondary" size="sm" @click="form.closeModal"
-               >Cancelar</CButton
+               ><i class="fa fa-times"></i> Cancelar</CButton
             >
-            <CButton color="primary" size="sm" @click="form.confirmSave">{{
-               form.isEditing.value ? 'Salvar' : 'Criar'
-            }}</CButton>
+            <CButton color="primary" size="sm" @click="form.confirmSave"
+               ><i class="fa fa-save"></i>
+               {{ form.isEditing.value ? 'Salvar' : 'Criar' }}</CButton
+            >
          </CModalFooter>
       </CModal>
 
@@ -125,7 +125,6 @@
          :visible="form.deleteModalVisible"
          @close="form.closeModal"
          backdrop="static"
-         keyboard="true"
       >
          <CModalHeader>
             <strong>Confirmar Exclusão</strong>
@@ -239,7 +238,7 @@ function btnImprimir() {
 
 const emit = defineEmits(['edit', 'delete', 'custom', 'extraAction']);
 
-console.log(`Abilities:`, props.abilities);
+// console.log(`Abilities:`, props.abilities);
 
 // Tabela de Dados
 const { init, refreshTable } = useDataTable(
@@ -255,7 +254,7 @@ const { init, refreshTable } = useDataTable(
             data: null,
             sortable: false,
             className: 'text-center',
-            width: props.columnActionsWidth ?? '120px',
+            width: props.columnActionsWidth ?? '160px',
             render(data, type, row) {
                let html = '';
                let btnEditar = '';
@@ -268,7 +267,7 @@ const { init, refreshTable } = useDataTable(
                      (props.abilities.includes(props.endpoint + '.update')
                         ? ''
                         : 'disabled') +
-                     ` class="btnEdit btn btn-xs btn-outline-primary me-1" data-id="${row.id}" tooltip="Editar o registro atual">Editar</button>`;
+                     ` class="btnEdit btn btn-xs btn-outline-primary me-1" data-id="${row.id}" tooltip="Editar o registro atual"><i class="fa fa-edit"></i> Editar</button>`;
                }
 
                if (props.buttons.delete) {
@@ -277,7 +276,7 @@ const { init, refreshTable } = useDataTable(
                      (props.abilities.includes(props.endpoint + '.destroy')
                         ? ''
                         : 'disabled') +
-                     ` class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" tooltip="Excluir o registro atual">Excluir</button>`;
+                     ` class="btnDelete btn btn-xs btn-outline-danger  me-1" data-id="${row.id}" tooltip="Excluir o registro atual"><i class="fa fa-trash"></i> Excluir</button>`;
                }
 
                if (props.buttons.show) {
@@ -377,5 +376,10 @@ onMounted(init);
    font-size: 15px;
    /* font-weight: bold; */
    /* font-size: medium; */
+}
+
+/* Fonte dos botões Primeiro/Anterior/... */
+.d-none.d-sm-inline {
+   font-size: 13px;
 }
 </style>

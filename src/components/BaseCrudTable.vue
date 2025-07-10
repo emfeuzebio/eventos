@@ -91,12 +91,7 @@
    </CCol>
 
    <!-- Modal Confirma Excluir -->
-   <CModal
-      :visible="showConfirmDelete"
-      @close="cancelDelete"
-      backdrop="static"
-      keyboard="false"
-   >
+   <CModal :visible="showConfirmDelete" @close="cancelDelete" backdrop="static">
       <CModalHeader>
          <strong>Confirmar Exclusão</strong>
       </CModalHeader>

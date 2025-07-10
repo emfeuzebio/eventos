@@ -5,8 +5,10 @@ import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { useToast } from '@/composables/useToast';
 import { formatToBrDateTime } from '@/utils/dateFormat';
 import { formatToBrDate } from '@/utils/dateFormat';
-import 'datatables.net-dt';
 import api from '@/services/api';
+
+// import 'datatables.net-dt';
+import DataTablesLib from 'datatables.net-bs5';
 
 // define a Entidade Principal da View
 const entity = 'organizacao';
@@ -50,7 +52,7 @@ const columns = [
       class: 'fw-bold',
    },
    // { title: 'Razão Social', data: 'razao_social', width: '300px' },
-   { title: 'Lema', data: 'lema', width: '300px' },
+   { title: 'Lema', data: 'lema', width: '260px' },
    {
       title: 'Ativa',
       data: 'ativo',
@@ -209,10 +211,11 @@ const salvarRegiao = async () => {
    <GenericCrud
       ref="crudRef"
       modalSize="lg"
+      visible
       title="Cadastro de Organizações "
       description="Gerenciamento do cadastro de Organizações"
       endpoint="organizacao"
-      columnActionsWidth="120px"
+      columnActionsWidth="160px"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
