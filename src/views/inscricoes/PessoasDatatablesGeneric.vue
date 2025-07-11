@@ -3,8 +3,9 @@ import { ref, toRaw, computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { useToast } from '@/composables/useToast';
-import 'datatables.net-dt';
 import api from '@/services/api';
+
+import DataTablesLib from 'datatables.net-bs5';
 
 // define a Entidade Principal da View
 const entity = 'pessoa';

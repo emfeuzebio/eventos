@@ -284,11 +284,6 @@ const routes = [
           redirect: '/transportes/veiculos',
           children: [
             {
-              path: '/transportes/veiculos',
-              name: 'Veiculos',
-              component: () => import('@/views/transportes/VeiculoDatatableApi.vue'),
-            },
-            {
               path: '/transportes/rotas',
               name: 'Rotas',
               component: () => import('@/views/transportes/RotasDatatablesGeneric.vue'),
@@ -303,12 +298,6 @@ const routes = [
               name: 'Viagens',
               component: () => import('@/views/transportes/ViagensDatatablesGeneric.vue'),
               meta: { requiresAuth: true }, // Protege esta rota
-            },
-            {
-              path: '/transportes/chegadas',
-              name: 'Chegadas',
-              component: () => import('@/views/transportes/GestaoChegadasDatatablesGeneric.vue'),
-              // meta: { requiresAuth: true }, // Protege esta rota
             },
           ],
         },
@@ -351,14 +340,6 @@ const routes = [
               path: '/cadastros/regioes',
               name: 'Regiões',
               component: () => import('@/views/cadastros/RegioesDatatablesGeneric.vue'),
-              // meta: { requiresAuth: true }, // Protege esta rota
-            },
-            {
-              path: '/transportes/inscricoes',
-              name: 'Inscrições Transp',
-              component: () => import('@/views/transportes/ChegadaDTview.vue'),
-              // component: () => import('@/views/pages/Page404.vue'),
-              // meta: { requiresAuth: true }, // Protege esta rota
             },
           ],
         },

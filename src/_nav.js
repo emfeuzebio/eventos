@@ -359,33 +359,18 @@ export default [
     items: [
       {
         component: 'CNavItem',
-        name: 'Veículos',
-        to: '/transportes/veiculos',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Veículos Generic DTables',
+        name: 'Veículos e Motoristas',
         to: '/transportes/rotasG',
       },
       {
         component: 'CNavItem',
-        name: 'Rotas Generic DTables',
+        name: 'Rotas',
         to: '/transportes/rotas',
       },
       {
         component: 'CNavItem',
-        name: 'Viagens Generic DTables',
+        name: 'Viagens',
         to: '/transportes/viagens',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Gestão Chegadas OLD',
-        to: '/transportes/chegadas',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Chegadas Euz Crud',
-        to: '/transportes/inscricoes',
       },
     ],
   },

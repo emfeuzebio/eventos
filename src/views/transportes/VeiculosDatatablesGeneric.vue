@@ -2,7 +2,10 @@
 import { computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
-import 'datatables.net-dt';
+
+// import 'datatables.net-dt';
+// import DataTable from 'datatables.net-vue3';
+import DataTablesLib from 'datatables.net-bs5';
 
 // define a Entidade Principal da View
 const entity = 'veiculo';
@@ -12,23 +15,22 @@ const { can } = useAbilities();
 const { abilities } = useAbilities();
 
 // Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
-
-var canPrint = can(`${entity}.print`);
-var canPrint = true;
+// const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
+// const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
+// const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
+// const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
+// const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
+// var canPrint = can(`${entity}.print`);
+// var canPrint = true;
 
 // DEBUG de todas abilities do User Logado
-console.log('Abilities carregadas:', abilities.value);
-console.log('canList:', canList); // Isso deve ser true ou false
-console.log('canShow:', canShow); // Isso deve ser true ou false
-console.log('canInsert:', canInsert); // Isso deve ser true ou false
-console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
-console.log('canDelete:', canDelete); // Isso deve ser true ou false
-console.log('canPrint:', canPrint); // Isso deve ser true ou false
+// console.log('Abilities carregadas:', abilities.value);
+// console.log('canList:', canList); // Isso deve ser true ou false
+// console.log('canShow:', canShow); // Isso deve ser true ou false
+// console.log('canInsert:', canInsert); // Isso deve ser true ou false
+// console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
+// console.log('canDelete:', canDelete); // Isso deve ser true ou false
+// console.log('canPrint:', canPrint); // Isso deve ser true ou false
 
 // define parâmetros das tabela de dados
 const columns = [
@@ -61,6 +63,7 @@ const defaultValues = {
    marca_modelo: 'Deconhecido',
    capacidade: '3',
    motorista: 'Sem Nome',
+   email: 'nome@mail',
    telefone: '(61) 90000-0000',
    ativo: 'Y',
 };
@@ -94,18 +97,12 @@ const filters = computed(() => [
 <template>
    <GenericCrud
       title="Cadastro de Veículos"
-      description="Gerenciamento da frota de Veículos"
+      description="Gerenciamento da frota de Veículos ssss"
       endpoint="veiculo"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
       :abilities="abilities"
-      :canList="canList"
-      :canShow="canShow"
-      :canInsert="canInsert"
-      :canUpdate="canUpdate"
-      :canDelete="canDelete"
-      :canPrint="canPrint"
    >
       <template #form="{ form, errors }">
          <CFormInput
@@ -151,6 +148,15 @@ const filters = computed(() => [
          />
          <div class="form-error" v-if="errors.value.motorista">
             {{ errors.value.motorista[0] }}
+         </div>
+
+         <CFormInput
+            v-model="form.value.email"
+            label="E-mail"
+            :class="{ 'is-invalid': errors.email }"
+         />
+         <div class="form-error" v-if="errors.value.email">
+            {{ errors.value.email[0] }}
          </div>
 
          <CFormInput

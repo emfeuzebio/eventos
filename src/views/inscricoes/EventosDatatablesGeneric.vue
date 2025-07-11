@@ -9,10 +9,10 @@ import { formatToBrDateTime } from '@/utils/dateFormat';
 import { formatToBrDate } from '@/utils/dateFormat';
 import api from '@/services/api';
 
-// import DataTable from 'datatables.net-vue3';
-// import DataTablesLib from 'datatables.net-bs5';
-
 // import 'datatables.net-dt';
+// import DataTable from 'datatables.net-vue3';
+import DataTablesLib from 'datatables.net-bs5';
+
 // define a Entidade Principal da View
 // define a Entidade Principal da View
 const entity = 'evento';
