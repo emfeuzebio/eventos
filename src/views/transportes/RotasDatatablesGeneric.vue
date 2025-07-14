@@ -49,7 +49,9 @@ const columns = [
    {
       title: 'Qtd Viagens',
       data: null,
-      render: (data) => `?`,
+      render: function(data, type, row) {
+         return row.viagens ? row.viagens.length : 0;
+      },
       className: 'text-center',
    },
    {

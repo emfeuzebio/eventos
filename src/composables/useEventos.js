@@ -57,7 +57,7 @@ export function useEventos(ativo = true) {
       try {
          error.value = null;
          const res = await api.get('/rota', {
-            params: ativo ? { ativo: 'Y' } : {},
+            params: ativo ? { ativo: 'SIM' } : {},
          });
          rotas.value = res.data;
       } catch (err) {

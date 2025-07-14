@@ -47,7 +47,6 @@ console.log('canPrint:', canPrint); // Isso deve ser true ou false
 // DATATABLES - define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id' },
-   { title: 'Nome da Rota', data: 'rota.nome', class: 'fw-bold' },
    {
       title: 'Data da Viagem',
       data: 'data_hora',
@@ -58,6 +57,11 @@ const columns = [
       title: 'Qts Pessoas',
       data: null,
       render: (data) => `?`,
+      // inscricoes_com_viagem_chegada_count	1
+      render: function(data, type, row) {
+         return (row.inscricoes_com_viagem_chegada_count || 0) +
+                (row.inscricoes_com_viagem_partida_count || 0);
+         },
       className: 'text-center',
    },
    {
@@ -66,6 +70,7 @@ const columns = [
       render: (data) => `${data} `,
       className: 'text-left',
    },
+   { title: 'Nome da Rota', data: 'rota.nome', class: 'fw-bold'},
 ];
 
 // FORM - define os valores padrão dos campos do formulário de dados da entidade

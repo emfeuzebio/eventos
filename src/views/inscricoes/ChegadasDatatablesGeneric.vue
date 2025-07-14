@@ -379,6 +379,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
 
 const fetchViagensPorRota = async (rotaId) => {
    try {
+      console.log(rotaId);
       viagensDaRota.value = []; // limpa anterior
       const res = await api.get(`/viagem`, { params: { rota_id: rotaId } });
       viagensDaRota.value = res.data;
@@ -822,7 +823,7 @@ const salvarViagemChegada = async (viagemId) => {
                   label: rota.nome,
                })),
             ]"
-            @change="fetchViagensPorRota(rotaSelecionada)"
+            @change="fetchViagensPorRota($event.target.value)"
          />
 
          <label class="form-label fw-bold">Selecione a Viagem</label>
