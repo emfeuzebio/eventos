@@ -26,13 +26,13 @@ var canPrint = can(`${entity}.print`);
 var canPrint = true;
 
 // DEBUG de todas abilities do User Logado
-console.log('Abilities carregadas:', abilities.value);
-console.log('canList:', canList); // Isso deve ser true ou false
-console.log('canShow:', canShow); // Isso deve ser true ou false
-console.log('canInsert:', canInsert); // Isso deve ser true ou false
-console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
-console.log('canDelete:', canDelete); // Isso deve ser true ou false
-console.log('canPrint:', canPrint); // Isso deve ser true ou false
+// console.log('Abilities carregadas:', abilities.value);
+// console.log('canList:', canList); // Isso deve ser true ou false
+// console.log('canShow:', canShow); // Isso deve ser true ou false
+// console.log('canInsert:', canInsert); // Isso deve ser true ou false
+// console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
+// console.log('canDelete:', canDelete); // Isso deve ser true ou false
+// console.log('canPrint:', canPrint); // Isso deve ser true ou false
 
 // define parâmetros das tabela de dados
 const columns = [

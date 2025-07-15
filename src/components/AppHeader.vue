@@ -5,6 +5,23 @@ import { useColorModes } from '@coreui/vue';
 import AppBreadcrumb from '@/components/AppBreadcrumb.vue';
 import AppHeaderDropdownAccnt from '@/components/AppHeaderDropdownAccnt.vue';
 import { useSidebarStore } from '@/stores/sidebar.js';
+import { useCurrentEventStore } from '@/stores/currentEvent'
+import { useEventos } from '@/composables/useEventos';
+
+const store = useCurrentEventStore()
+const selectedId = ref('')
+const activeEvents = ref([])
+
+const { eventos, fetchEventos} = useEventos();
+fetchEventos();
+
+const setSelectedEvent = (eventoId) => {
+   // console.log('Evento selecionado no Select:' + eventoId);
+   if (eventoId) {
+      store.setEvent(eventoId)
+   }
+   console.log('Evento atual gravado no Pinia (localStorage):', store.getEvent)
+}
 
 const headerClassNames = ref('mb-4 p-0');
 const { colorMode, setColorMode } = useColorModes(
@@ -36,10 +53,17 @@ onMounted(() => {
 
          <!-- <h1 class="h5 m-0">{{ appName }}</h1> -->
          <CCol sm="1">
-            <label class="form-label fw-bold mb-1 mt-0">Evento: </label>
+            <label class="me-2 mb-0 fw-bold">Eventos Ativos: </label>
          </CCol>
          <CCol sm="4">
-            <CFormSelect :options="[{ value: '', label: 'Selecione' }]" />
+            <CFormSelect 
+            v-model="selectedId"
+            @change="setSelectedEvent($event.target.value)"
+            :options="[
+               { value: '', label: 'Selecione um Evento de Trabalho' },
+               ...eventos.map((ev) => ({ value: ev.id, label: ev.nome })),
+            ]"
+            />
          </CCol>
 
          <CHeaderNav class="d-none d-md-flex">
