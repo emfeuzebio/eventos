@@ -1,12 +1,21 @@
 <script setup>
-import { ref, toRaw, computed } from 'vue';
+import { ref, toRaw, computed, reactive } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
+import api from '@/services/api';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { useToast } from '@/composables/useToast';
 import { formatToBrDateTime } from '@/utils/dateFormat';
-import api from '@/services/api';
-
 import DataTablesLib from 'datatables.net-bs5';
+
+import { useCurrentEventStore } from '@/stores/currentEvent'
+
+
+
+// vamos pegar o Evento Selecionado
+const eventStore = useCurrentEventStore()
+const currentEvent = computed(() => eventStore.getEvent)
+// console.log('Inscrição currentEvent:', currentEvent.value);
+
 
 // define a Entidade Principal da View
 const entity = 'inscricao';
@@ -19,13 +28,13 @@ const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
 // Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
-var canPrint = can(`${entity}.print`);
-var canPrint = false;
+// const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
+// const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
+// const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
+// const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
+// const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
+// var canPrint = can(`${entity}.print`);
+// var canPrint = false;
 
 // DEBUG de todas abilities do User Logado
 // console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);
@@ -188,6 +197,7 @@ const filters = computed(() => [
       label: 'Evento',
       field: 'evento_id',
       type: 'select',
+      selected: currentEvent.value?.id ?? null,    // define o selected com valor do Pinia
       options: eventos.value.map((evento) => ({
          value: evento.id,
          label: evento.sigla,

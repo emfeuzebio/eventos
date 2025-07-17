@@ -3,6 +3,8 @@ import $ from 'jquery';
 import 'datatables.net-dt';
 import api from '@/services/api';
 import { createTooltip } from 'floating-vue';
+import { useCurrentEventStore } from '@/stores/currentEvent'
+const eventStore = useCurrentEventStore()
 
 export function useDataTable({
    tableId,
@@ -23,12 +25,22 @@ export function useDataTable({
          $(`#${tableId}`).empty();
       }
 
+      const selectedId = ref(eventStore.currentEvent?.id || '');
+      // const selectedId = 2;
+
       dataTable.value = $(`#${tableId}`).DataTable({
          ajax: function (_data, callback, _settings) {
+
+            const filters = {
+               ...externalFilters.value,
+               evento_id: selectedId.value, // adiciona ou sobrescreve 'evento'
+             };
+
             api.get(endpoint, {
-               params: {
-                  ...externalFilters.value,
-               },
+               params: filters,
+               // params: {
+               //    ...externalFilters.value,
+               // },
             })
                .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
                .catch((error) => {

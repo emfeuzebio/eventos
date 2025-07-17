@@ -2,8 +2,12 @@
 import { ref, onMounted } from 'vue';
 import api from '@/services/api';
 
+import { useEventosStore } from '@/stores/useEventosStore'
+import { storeToRefs } from 'pinia'
+
 export function useEventos(ativo = true) {
    const eventos = ref([]);
+   const eventosStore = useEventosStore()
    const rotas = ref([]);
    const veiculos = ref([]);
    const estados = ref([]);
@@ -198,10 +202,9 @@ export function useEventos(ativo = true) {
       }
    };
 
-   // onMounted(fetchEventos)
-
    return {
       eventos,
+      eventosStore,
       veiculos,
       rotas,
       estados,
@@ -217,7 +220,8 @@ export function useEventos(ativo = true) {
       inscricao,
       
       fetchOrganizacoes,   
-      fetchEventos,        
+      // fetchEventos,        
+      fetchEventos: eventosStore.carregarEventos,
       fetchVeiculos,       
       fetchRotas,    
       fetchEstados,  

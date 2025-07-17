@@ -1,5 +1,9 @@
 import { defineStore } from 'pinia';
 import { jwtDecode } from 'jwt-decode';
+import { useEventosStore } from './useEventosStore'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 export const useAuthStore = defineStore('auth', {
    state: () => ({
@@ -25,12 +29,12 @@ export const useAuthStore = defineStore('auth', {
 
          const data = await res.json();
          this.token = data.token;
-         localStorage.setItem('token', this.token);
+         localStorage.setItem('token', this.token);   // Armazena o token na sessionStorage
          this.user = jwtDecode(data.token);
 
-         // Armazena o token na sessionStorage
-         // this.isAuthenticated = true
-         // sessionStorage.setItem('token', this.token)
+         // Carrega eventos no storage após login
+         const eventosStore = useEventosStore()
+         await eventosStore.carregarEventos()
       },
       async logout() {
          this.token = null;
@@ -39,8 +43,13 @@ export const useAuthStore = defineStore('auth', {
             'https://acl4.fazcomphp.com.br/api/auth/logout'
          );
          localStorage.removeItem('token');
+         localStorage.removeItem('user')
+         localStorage.removeItem('currentEvent')
+         localStorage.removeItem('eventos')
+
          // sessionStorage.removeItem('token')
          // this.isAuthenticated = false
+
       },
       loadSession() {
          const token = sessionStorage.getItem('token');

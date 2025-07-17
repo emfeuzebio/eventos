@@ -1,27 +1,34 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import { useColorModes } from '@coreui/vue';
-
 import AppBreadcrumb from '@/components/AppBreadcrumb.vue';
 import AppHeaderDropdownAccnt from '@/components/AppHeaderDropdownAccnt.vue';
 import { useSidebarStore } from '@/stores/sidebar.js';
-import { useCurrentEventStore } from '@/stores/currentEvent'
 import { useEventos } from '@/composables/useEventos';
 
-const store = useCurrentEventStore()
-const selectedId = ref('')
-const activeEvents = ref([])
+import { useEventosStore } from '@/stores/useEventosStore'
+import { useCurrentEventStore } from '@/stores/currentEvent'
 
-const { eventos, fetchEventos} = useEventos();
-fetchEventos();
+const eventosStore = useEventosStore()
+const eventStore = useCurrentEventStore()
 
-const setSelectedEvent = (eventoId) => {
-   // console.log('Evento selecionado no Select:' + eventoId);
-   if (eventoId) {
-      store.setEvent(eventoId)
-   }
-   console.log('Evento atual gravado no Pinia (localStorage):', store.getEvent)
-}
+// v-model vinculado ao select
+const selectedId = ref(eventStore.currentEvent?.id || '')
+
+
+
+// const selectedId = ref('')
+// const activeEvents = computed(() => eventosStore.ativos)
+// console.log('activeEvents',activeEvents);
+
+watch(selectedId, (newId) => {
+  const selected = eventosStore.ativos.find(e => e.id === parseInt(newId))
+  if (selected) {
+    eventStore.setEvent(selected)
+    console.log('Evento selecionado:', selected)
+  }
+})
+
 
 const headerClassNames = ref('mb-4 p-0');
 const { colorMode, setColorMode } = useColorModes(
@@ -30,7 +37,7 @@ const { colorMode, setColorMode } = useColorModes(
 const sidebar = useSidebarStore();
 const appName = import.meta.env.VITE_APP_NAME;
 
-onMounted(() => {
+onMounted(async () => {
    document.addEventListener('scroll', () => {
       if (document.documentElement.scrollTop > 0) {
          headerClassNames.value = 'mb-4 p-0 shadow-sm';
@@ -38,6 +45,16 @@ onMounted(() => {
          headerClassNames.value = 'mb-4 p-0';
       }
    });
+
+   if (!eventosStore.ativos.length) {
+    await eventosStore.carregarEventos()
+  }
+
+  // Define o ID selecionado com base no que estiver no Pinia
+  const current = eventStore.getEvent
+  if (current?.id) {
+    selectedId.value = current.id
+  }
 });
 </script>
 
@@ -58,10 +75,9 @@ onMounted(() => {
          <CCol sm="4">
             <CFormSelect 
             v-model="selectedId"
-            @change="setSelectedEvent($event.target.value)"
             :options="[
                { value: '', label: 'Selecione um Evento de Trabalho' },
-               ...eventos.map((ev) => ({ value: ev.id, label: ev.nome })),
+               ...eventosStore.ativos.map((ev) => ({ value: ev.id, label: ev.nome })),
             ]"
             />
          </CCol>

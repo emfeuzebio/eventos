@@ -2,11 +2,19 @@
 import { computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
-import 'datatables.net-dt';
+import DataTablesLib from 'datatables.net-bs5';
 
 import { useEventos } from '@/composables/useEventos';
 const { eventos, fetchEventos, fetchRotas, rotas, loading, error } =
    useEventos();
+
+import { useCurrentEventStore } from '@/stores/currentEvent'
+
+// Obter o evento ativo no setup
+const currentEventStore = useCurrentEventStore()
+const currentEvent = computed(() => currentEventStore.currentEvent)
+
+
 
 // define a Entidade Principal da View
 const entity = 'rota';
@@ -16,14 +24,14 @@ const { can } = useAbilities();
 const { abilities } = useAbilities();
 
 // Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
+// const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
+// const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
+// const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
+// const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
+// const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
 
-var canPrint = can(`${entity}.print`);
-var canPrint = true;
+// var canPrint = can(`${entity}.print`);
+// var canPrint = true;
 
 // DEBUG de todas abilities do User Logado
 // console.log('Abilities carregadas:', abilities.value);
@@ -76,34 +84,44 @@ const defaultValues = {
    ativo: 'SIM',
 };
 
-// carrega listas de estidades da API para popular listas: <selects> os filtros
-fetchEventos();
-// fetchRotas();
+// carrega listas de entidades da API para popular listas: <selects> os filtros
+// Agora a Lista de Eventos Ativos sõa carregado única vez após o login e ficam na Store
+import { useEventosStore } from '@/stores/useEventosStore'
+const eventosStore = useEventosStore()
+
+// ANTES carregava a lista de Eventos junto com a página
+// fetchEventos();
+
 
 // filtro da página - usar quando não há filtros
 // const filters = [{}]; // nessse caso sem filtros
 
 // Filtros da Página com valores fixos - filtro reativo aos dados carregados
-const filters = computed(() => [
-   {
-      label: 'Evento',
-      field: 'evento_id',
-      type: 'select',
-      options: eventos.value.map((evento) => ({
-         value: evento.id,
-         label: evento.sigla,
-      })),
-   },
-   {
-      label: 'Tipo de Rota',
-      field: 'tipo',
-      type: 'select',
-      options: [
-         { value: 'Chegada', label: 'Chegada' },
-         { value: 'Partida', label: 'Partida' },
-      ],
-   },
-]);
+const filters = computed(() => {
+   const ativos = eventosStore.ativos || []
+   const defaultEventId = currentEvent.value?.id || ''
+
+   return [
+      {
+         label: 'Evento',
+         field: 'evento_id',
+         type: 'select',
+         options: ativos.map((evento) => ({
+            value: evento.id,
+            label: evento.sigla,
+         })),
+      },
+      // selected: defaultEventId,
+      {
+         label: 'Tipo de Rota',
+         field: 'tipo',
+         type: 'select',
+         options: [
+            { value: 'Chegada', label: 'Chegada' },
+            { value: 'Partida', label: 'Partida' },
+         ],
+      }]
+});
 </script>
 
 <template>

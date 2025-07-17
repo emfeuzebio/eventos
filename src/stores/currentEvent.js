@@ -2,24 +2,18 @@ import { defineStore } from 'pinia'
 
 export const useCurrentEventStore = defineStore('currentEvent', {
   state: () => ({
-    currentEventId: null,
-    currentEventData: null
+    currentEvent: null
   }),
   getters: {
-    getEvent: (state) => state.currentEventData,
-    // ou se quiser garantir que só retorna se estiver selecionado:
-    // getEvent: (state) => state.currentEventId ? state.currentEventData : null
+    getEvent: (state) => state.currentEvent,
   },  
   actions: {
     setEvent(event) {
-      this.currentEventId = event.id
-      this.currentEventData = event
+      this.currentEvent = event
     },
     clearEvent() {
-      this.currentEventId = null
-      this.currentEventData = null
+      this.currentEvent = null
     }
   },
-  // pinia-plugin-persistedstate deve estar instalado e configurado 
-  persist: true   
+  persist: true // torna persistente mesmo após reload
 })
