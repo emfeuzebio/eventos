@@ -3,16 +3,22 @@ import { computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { formatToBrDateTime } from '@/utils/dateFormat';
-// import { useToast } from '@/composables/useToast'
 // import 'datatables.net-dt';
 import DataTablesLib from 'datatables.net-bs5';
+
+
+// Vamos carregar a lista de Eventos da Pinia Store de Eventos
+import { useEventosStore } from '@/stores/useEventosStore'
+const eventosStore = useEventosStore()
+const glbventosAtivos = computed(() => eventosStore.ativos)
+// console.log('Eventos Ativos:', glbventosAtivos);
 
 import { useEventos } from '@/composables/useEventos';
 const {
    fetchEventos,
    fetchRotas,
    fetchVeiculos,
-   eventos,
+   // eventos,
    rotas,
    veiculos,
    error,
@@ -27,14 +33,14 @@ const { abilities } = useAbilities();
 // const { showToast } = useToast()
 
 // Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
+// const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
+// const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
+// const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
+// const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
+// const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
 
-var canPrint = can(`${entity}.print`);
-var canPrint = true;
+// var canPrint = can(`${entity}.print`);
+// var canPrint = true;
 
 // DEBUG de todas abilities do User Logado
 // console.log('Abilities carregadas:', abilities.value);
@@ -88,23 +94,23 @@ const defaultValues = {
 // carrega listas de estidades da API para popular listas: <selects> os filtros
 fetchRotas();
 fetchVeiculos();
-fetchEventos();
+// fetchEventos();
 
 // filtro da página - usar quando não há filtros
 // const filters = [{}]; // nessse caso sem filtros
 
 const filters = computed(() => [
+   // {
+   //    label: 'Evento',
+   //    field: 'evento_id',
+   //    type: 'select',
+   //    options: eventos.value.map((evento) => ({
+   //       value: evento.id,
+   //       label: evento.sigla,
+   //    })),
+   // },
    {
-      label: 'Evento',
-      field: 'evento_id',
-      type: 'select',
-      options: eventos.value.map((evento) => ({
-         value: evento.id,
-         label: evento.sigla,
-      })),
-   },
-   {
-      label: 'Rota',
+      label: 'Filtrar pela Rota',
       field: 'rota_id',
       type: 'select',
       options: rotas.value.map((rota) => ({
@@ -147,30 +153,30 @@ const filters = computed(() => [
       :columns="columns"
       :defaultValues="defaultValues"
       :abilities="abilities"
-      :canList="canList"
-      :canShow="canShow"
-      :canInsert="canInsert"
-      :canUpdate="canUpdate"
-      :canDelete="canDelete"
-      :canPrint="canPrint"
+      :afterSave="afterSaveEvento"
    >
       <!-- Form Dados do Edit/New MOdal -->
       <template #form="{ form, errors }">
+         <!-- {{ eventos }} -->
          <!-- {{ form.value }} -->
          <!-- <pre> {{ form.value }} </pre> -->
 
          <div id="formModal" v-if="form.value">
             <label class="form-label fw-bold">Evento</label>
 
-            <!-- <CFormSelect
-               v-model="form.value.evento_id"
-               :options="
-                  eventos.map((ev) => ({ value: ev.id, label: ev.nome }))
-               "
-               :disabled="eventos.length === 0"
-            /> -->
-
+            <!-- A lista de Eventos abaixo é carregada do Store de Eventos. -->
             <CFormSelect
+               v-model="form.value.evento_id"
+               :options="[
+                  { value: '', label: 'Selecione' },
+                  ...(glbventosAtivos || []).map((ev) => ({
+                     value: ev.id,
+                     label: ev.nome,
+                  })),
+               ]"
+               :disabled="glbventosAtivos.length === 0"
+            />
+            <!-- <CFormSelect
                v-model="form.value.evento_id"
                :options="[
                   { value: '', label: 'Selecione' },
@@ -180,7 +186,7 @@ const filters = computed(() => [
                   })),
                ]"
                :disabled="form.value.eventos.length === 0"
-            />
+            /> -->
             <div class="form-error" v-if="errors.value.evento_id">
                {{ errors.value.evento_id[0] }}
             </div>

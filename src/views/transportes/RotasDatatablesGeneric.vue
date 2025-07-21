@@ -8,12 +8,12 @@ import { useEventos } from '@/composables/useEventos';
 const { eventos, fetchEventos, fetchRotas, rotas, loading, error } =
    useEventos();
 
+// Vamos obter a lista de Eventos Ativo e o Corrente do store
 import { useCurrentEventStore } from '@/stores/currentEvent'
-
-// Obter o evento ativo no setup
 const currentEventStore = useCurrentEventStore()
 const currentEvent = computed(() => currentEventStore.currentEvent)
-
+const glbventosAtivos = computed(() => eventosStore.ativos)
+// console.log('Eventos Ativos:', glbventosAtivos);
 
 
 // define a Entidade Principal da View
@@ -102,16 +102,15 @@ const filters = computed(() => {
    const defaultEventId = currentEvent.value?.id || ''
 
    return [
-      {
-         label: 'Evento',
-         field: 'evento_id',
-         type: 'select',
-         options: ativos.map((evento) => ({
-            value: evento.id,
-            label: evento.sigla,
-         })),
-      },
-      // selected: defaultEventId,
+      // {
+      //    label: 'Evento',
+      //    field: 'evento_id',
+      //    type: 'select',
+      //    options: ativos.map((evento) => ({
+      //       value: evento.id,
+      //       label: evento.sigla,
+      //    })),
+      // },
       {
          label: 'Tipo de Rota',
          field: 'tipo',
@@ -126,7 +125,6 @@ const filters = computed(() => {
 
 <template>
    <!-- {{ rotas }} -->
-   <!-- {{ eventos }} -->
 
    <GenericCrud
       title="Lista de Rotas de Viagens "
@@ -136,17 +134,11 @@ const filters = computed(() => {
       :columns="columns"
       :defaultValues="defaultValues"
       :abilities="abilities"
-      :canList="canList"
-      :canShow="canShow"
-      :canInsert="canInsert"
-      :canUpdate="canUpdate"
-      :canDelete="canDelete"
-      :canPrint="canPrint"
    >
       <template #form="{ form, errors }">
-         <!-- {{ eventos }} -->
          <!-- {{ rotas }} -->
          <!-- {{ form.value }} -->
+         <!-- ...(form.value.eventos || []).map((ev) => ({ -->
 
          <label class="form-label fw-bold">Evento</label>
 
@@ -154,7 +146,10 @@ const filters = computed(() => {
             v-model="form.value.evento_id"
             :options="[
                { value: '', label: 'Selecione' },
-               ...eventos.map((ev) => ({ value: ev.id, label: ev.nome })),
+               ...(glbventosAtivos || []).map((ev) => ({                  
+                     value: ev.id,
+                     label: ev.nome,
+                  })),
             ]"
          />
          <div class="form-error" v-if="errors.value.evento_id">

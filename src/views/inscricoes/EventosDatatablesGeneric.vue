@@ -13,7 +13,7 @@ import api from '@/services/api';
 // import DataTable from 'datatables.net-vue3';
 import DataTablesLib from 'datatables.net-bs5';
 
-// define a Entidade Principal da View
+
 // define a Entidade Principal da View
 const entity = 'evento';
 
@@ -31,6 +31,19 @@ const crudRef = ref(null);
 function chamarRefresh() {
    crudRef.value?.refreshTable();
 }
+
+// Vamos obter a lista de Eventos Ativo e o Corrente do store
+import { useEventosStore } from '@/stores/useEventosStore'
+const eventosStore = useEventosStore()
+
+// async function onAfterSave() {
+async function onAfterSave({ saved, data }) {
+   console.log('onAfterSave executado', saved);
+   if (saved) {
+      await eventosStore.fetchEventosAtivos()
+   }
+}
+
 
 /**
  * BASE Crud - colunas da tabela de dados
@@ -289,6 +302,7 @@ const salvarRegiao = async () => {
       :extra-column-render="extraColumnRender"
       :abilities="abilities"
       @extraAction="onExtraAction"
+      @afterSave="onAfterSave"
    >
       <template #form="{ form, errors }">
          <!-- {{ form.value.estados }} -->

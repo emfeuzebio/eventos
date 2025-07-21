@@ -12,23 +12,16 @@ import { useCurrentEventStore } from '@/stores/currentEvent'
 const eventosStore = useEventosStore()
 const eventStore = useCurrentEventStore()
 
-// v-model vinculado ao select
-const selectedId = ref(eventStore.currentEvent?.id || '')
+// v-model vinculado ao select EventoID
+const globalEventoId = ref(eventStore.currentEvent?.id || '')
 
-
-
-// const selectedId = ref('')
-// const activeEvents = computed(() => eventosStore.ativos)
-// console.log('activeEvents',activeEvents);
-
-watch(selectedId, (newId) => {
+watch(globalEventoId, (newId) => {
   const selected = eventosStore.ativos.find(e => e.id === parseInt(newId))
   if (selected) {
-    eventStore.setEvent(selected)
-    console.log('Evento selecionado:', selected)
+      eventStore.setEvent(selected)
+      // console.log('Evento selecionado:', selected)
   }
 })
-
 
 const headerClassNames = ref('mb-4 p-0');
 const { colorMode, setColorMode } = useColorModes(
@@ -47,13 +40,13 @@ onMounted(async () => {
    });
 
    if (!eventosStore.ativos.length) {
-    await eventosStore.carregarEventos()
+    await eventosStore.fetchEventosAtivos()
   }
 
   // Define o ID selecionado com base no que estiver no Pinia
   const current = eventStore.getEvent
   if (current?.id) {
-    selectedId.value = current.id
+    globalEventoId.value = current.id
   }
 });
 </script>
@@ -74,7 +67,7 @@ onMounted(async () => {
          </CCol>
          <CCol sm="4">
             <CFormSelect 
-            v-model="selectedId"
+            v-model="globalEventoId"
             :options="[
                { value: '', label: 'Selecione um Evento de Trabalho' },
                ...eventosStore.ativos.map((ev) => ({ value: ev.id, label: ev.nome })),

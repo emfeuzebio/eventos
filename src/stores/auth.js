@@ -34,7 +34,7 @@ export const useAuthStore = defineStore('auth', {
 
          // Carrega eventos no storage após login
          const eventosStore = useEventosStore()
-         await eventosStore.carregarEventos()
+         await eventosStore.fetchEventosAtivos()
       },
       async logout() {
          this.token = null;

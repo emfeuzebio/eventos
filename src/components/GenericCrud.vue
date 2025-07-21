@@ -208,6 +208,8 @@ const props = defineProps({
    // canUpdate: Boolean,
    // canDelete: Boolean,
    // canPrint: Boolean,
+   onSaved: Function,
+   afterSave: Function,
 });
 
 // controle CAN() de botões adicionais da página
@@ -236,7 +238,7 @@ function btnImprimir() {
    });
 }
 
-const emit = defineEmits(['edit', 'delete', 'custom', 'extraAction']);
+const emit = defineEmits(['edit', 'delete', 'custom', 'extraAction','afterSave']);
 
 // console.log(`Abilities:`, props.abilities);
 
@@ -323,13 +325,19 @@ defineExpose({
 const form = useForm({
    endpoint: props.endpoint,
    defaultValues: props.defaultValues ?? {},
-   onSaved: () => {
+   onSaved: async () => {
       refreshTable();
       showToast({
          title: 'Sucesso',
          message: 'Registro salvo com sucesso!',
-         // color: 'success',
       });
+      // console.log('onSaved executado');
+
+      emit('afterSave', {
+         saved: true,
+         data: [],
+         timestamp: new Date(),
+      });      
    },
    afterDelete: () => {
       refreshTable();

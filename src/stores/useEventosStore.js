@@ -9,7 +9,7 @@ export const useEventosStore = defineStore('eventos', {
   }),
 
   actions: {
-    async carregarEventos() {
+    async fetchEventosAtivos() {
       try {
         this.error = null
         const response = await api.get('/evento', { params: { ativo: 'SIM' } })

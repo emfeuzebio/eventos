@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, computed, watch } from 'vue';
 import $ from 'jquery';
 import 'datatables.net-dt';
 import api from '@/services/api';
@@ -19,21 +19,24 @@ export function useDataTable({
 }) {
    const dataTable = ref(null);
 
+   // computed() para ser reativo com o Pinia
+   const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
+
    function init() {
       if (dataTable.value) {
          dataTable.value.destroy();
          $(`#${tableId}`).empty();
       }
 
-      const selectedId = ref(eventStore.currentEvent?.id || '');
-      // const selectedId = 2;
 
       dataTable.value = $(`#${tableId}`).DataTable({
          ajax: function (_data, callback, _settings) {
 
+            // acrescenta os filtros do CRUD na consulta
             const filters = {
                ...externalFilters.value,
-               evento_id: selectedId.value, // adiciona ou sobrescreve 'evento'
+               // acrescenta o filtro pelo evento_id, sobrescrito aqui e está sempre presente por imposaição da regra do negócio
+               evento_id: globalEventoId.value,
              };
 
             api.get(endpoint, {
@@ -99,6 +102,11 @@ export function useDataTable({
          },
       });
    }
+
+   // este faz com que a qualquer tempo, se o <select> do Evento for mudado, um reload seja disparado
+   watch(globalEventoId, () => {
+      refreshTable()
+   });
 
    function refreshTable() {
       if (!dataTable.value) {
