@@ -5,6 +5,10 @@ import api from '@/services/api';
 import { useEventosStore } from '@/stores/useEventosStore'
 import { storeToRefs } from 'pinia'
 
+// import { useCurrentEventStore } from '@/stores/currentEvent'
+// const { globalEventoId } = storeToRefs(useCurrentEventStore());
+
+
 export function useEventos(ativo = true) {
    const eventos = ref([]);
    const eventosStore = useEventosStore()
@@ -57,11 +61,12 @@ export function useEventos(ativo = true) {
       }
    };
 
-   const fetchRotas = async () => {
+   const fetchRotas = async (eventoId) => {
       try {
          error.value = null;
          const res = await api.get('/rota', {
-            params: ativo ? { ativo: 'SIM' } : {},
+            params: ativo ? { ativo: 'SIM', evento_id: eventoId } : {},
+            // params: ativo ? { ativo: 'SIM' } : {},
          });
          rotas.value = res.data;
       } catch (err) {
@@ -73,11 +78,10 @@ export function useEventos(ativo = true) {
       try {
          error.value = null;
          const res = await api.get('/veiculo', {
-            params: ativo ? { ativo: 'SIM' } : {},
+            params: ativo ? { ativo: 'Y' } : {},
          });
          veiculos.value = res.data;
       } catch (err) {
-         // console.error('Erro ao carregar a lista de Veículos ativos:', err)
          error.value = err;
       }
    };

@@ -51,7 +51,10 @@ export function useForm({
 
    function clearFieldData() {
       // console.log('Reiniciando form com defaultValues:', defaultValues);
+      // console.log('Reiniciando form com valores padrão:', defaultValues);
+
       form.value = { ...defaultValues };
+      console.log('Form após reset:', form.value);
       isEditing.value = false;
       formError.value = '';
       clearFieldErrors();
@@ -59,8 +62,12 @@ export function useForm({
 
    async function insertNewModal() {
       clearFieldData(); // limpa dos campos
+      // TODO
+      // o load()  abaixo está sobrescrevendo os valores do defaultValues
+      // porém, há Endpoints que precisam carregar dados adicionais para os selects
+      // resolver isso depois
       await load(); // carrega os dados necessárioas ao form para o novo registro (listas)
-      // editModalVisible.value = true;
+      editModalVisible.value = true;
    }
 
    function closeModal() {

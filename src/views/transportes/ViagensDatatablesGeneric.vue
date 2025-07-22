@@ -1,27 +1,29 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { formatToBrDateTime } from '@/utils/dateFormat';
 // import 'datatables.net-dt';
 import DataTablesLib from 'datatables.net-bs5';
 
-
 // Vamos carregar a lista de Eventos da Pinia Store de Eventos
-import { useEventosStore } from '@/stores/useEventosStore'
-const eventosStore = useEventosStore()
-const glbventosAtivos = computed(() => eventosStore.ativos)
+import { useEventosStore } from '@/stores/useEventosStore';
+const eventosStore = useEventosStore();
+const glbventosAtivos = computed(() => eventosStore.ativos);
 // console.log('Eventos Ativos:', glbventosAtivos);
+
+import { useCurrentEventStore } from '@/stores/currentEvent';
+const eventStore = useCurrentEventStore();
 
 import { useEventos } from '@/composables/useEventos';
 const {
    fetchEventos,
    fetchRotas,
    fetchVeiculos,
-   // eventos,
    rotas,
    veiculos,
    error,
+   // eventos,
 } = useEventos();
 
 // define a Entidade Principal da View
@@ -65,10 +67,12 @@ const columns = [
       data: null,
       render: (data) => `?`,
       // inscricoes_com_viagem_chegada_count	1
-      render: function(data, type, row) {
-         return (row.inscricoes_com_viagem_chegada_count || 0) +
-                (row.inscricoes_com_viagem_partida_count || 0);
-         },
+      render: function (data, type, row) {
+         return (
+            (row.inscricoes_com_viagem_chegada_count || 0) +
+            (row.inscricoes_com_viagem_partida_count || 0)
+         );
+      },
       className: 'text-center',
    },
    {
@@ -77,7 +81,7 @@ const columns = [
       render: (data) => `${data} `,
       className: 'text-left',
    },
-   { title: 'Nome da Rota', data: 'rota.nome', class: 'fw-bold'},
+   { title: 'Nome da Rota', data: 'rota.nome', class: 'fw-bold' },
 ];
 
 // FORM - define os valores padrão dos campos do formulário de dados da entidade
@@ -92,9 +96,22 @@ const defaultValues = {
 };
 
 // carrega listas de estidades da API para popular listas: <selects> os filtros
-fetchRotas();
-fetchVeiculos();
+// fetchRotas(eventStore.currentEvent?.id);
 // fetchEventos();
+fetchVeiculos();
+if (eventStore.currentEvent?.id) {
+   fetchRotas(eventStore.currentEvent.id); // somente carregar as rotas se o evento já estiver definido
+}
+
+// Reage à troca do evento atual atualizando a lista de rotas
+watch(
+   () => eventStore.currentEvent?.id,
+   (newEventoId) => {
+      if (newEventoId) {
+         fetchRotas(newEventoId);
+      }
+   }
+);
 
 // filtro da página - usar quando não há filtros
 // const filters = [{}]; // nessse caso sem filtros

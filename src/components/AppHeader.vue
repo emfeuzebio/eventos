@@ -6,22 +6,22 @@ import AppHeaderDropdownAccnt from '@/components/AppHeaderDropdownAccnt.vue';
 import { useSidebarStore } from '@/stores/sidebar.js';
 import { useEventos } from '@/composables/useEventos';
 
-import { useEventosStore } from '@/stores/useEventosStore'
-import { useCurrentEventStore } from '@/stores/currentEvent'
+import { useEventosStore } from '@/stores/useEventosStore';
+import { useCurrentEventStore } from '@/stores/currentEvent';
 
-const eventosStore = useEventosStore()
-const eventStore = useCurrentEventStore()
+const eventosStore = useEventosStore();
+const eventStore = useCurrentEventStore();
 
 // v-model vinculado ao select EventoID
-const globalEventoId = ref(eventStore.currentEvent?.id || '')
+const globalEventoId = ref(eventStore.currentEvent?.id || '');
 
 watch(globalEventoId, (newId) => {
-  const selected = eventosStore.ativos.find(e => e.id === parseInt(newId))
-  if (selected) {
-      eventStore.setEvent(selected)
-      // console.log('Evento selecionado:', selected)
-  }
-})
+   const selected = eventosStore.ativos.find((e) => e.id === parseInt(newId));
+   //   if (selected) {
+   eventStore.setEvent(selected);
+   // console.log('Evento selecionado:', selected)
+   //   }
+});
 
 const headerClassNames = ref('mb-4 p-0');
 const { colorMode, setColorMode } = useColorModes(
@@ -40,14 +40,14 @@ onMounted(async () => {
    });
 
    if (!eventosStore.ativos.length) {
-    await eventosStore.fetchEventosAtivos()
-  }
+      await eventosStore.fetchEventosAtivos();
+   }
 
-  // Define o ID selecionado com base no que estiver no Pinia
-  const current = eventStore.getEvent
-  if (current?.id) {
-    globalEventoId.value = current.id
-  }
+   // Define o ID selecionado com base no que estiver no Pinia
+   const current = eventStore.getEvent;
+   if (current?.id) {
+      globalEventoId.value = current.id;
+   }
 });
 </script>
 
@@ -63,15 +63,18 @@ onMounted(async () => {
 
          <!-- <h1 class="h5 m-0">{{ appName }}</h1> -->
          <CCol sm="1">
-            <label class="me-2 mb-0 fw-bold">Eventos Ativos: </label>
+            <label class="me-2 mb-0 fw-bold">Evento: </label>
          </CCol>
-         <CCol sm="4">
-            <CFormSelect 
-            v-model="globalEventoId"
-            :options="[
-               { value: '', label: 'Selecione um Evento de Trabalho' },
-               ...eventosStore.ativos.map((ev) => ({ value: ev.id, label: ev.nome })),
-            ]"
+         <CCol sm="6">
+            <CFormSelect
+               v-model="globalEventoId"
+               :options="[
+                  { value: '', label: 'Selecione um Evento de Trabalho' },
+                  ...eventosStore.ativos.map((ev) => ({
+                     value: ev.id,
+                     label: ev.nome,
+                  })),
+               ]"
             />
          </CCol>
 

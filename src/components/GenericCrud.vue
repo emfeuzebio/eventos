@@ -238,7 +238,13 @@ function btnImprimir() {
    });
 }
 
-const emit = defineEmits(['edit', 'delete', 'custom', 'extraAction','afterSave']);
+const emit = defineEmits([
+   'edit',
+   'delete',
+   'custom',
+   'extraAction',
+   'afterSave',
+]);
 
 // console.log(`Abilities:`, props.abilities);
 
@@ -337,7 +343,7 @@ const form = useForm({
          saved: true,
          data: [],
          timestamp: new Date(),
-      });      
+      });
    },
    afterDelete: () => {
       refreshTable();

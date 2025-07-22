@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import DataTablesLib from 'datatables.net-bs5';
@@ -9,12 +9,12 @@ const { eventos, fetchEventos, fetchRotas, rotas, loading, error } =
    useEventos();
 
 // Vamos obter a lista de Eventos Ativo e o Corrente do store
-import { useCurrentEventStore } from '@/stores/currentEvent'
-const currentEventStore = useCurrentEventStore()
-const currentEvent = computed(() => currentEventStore.currentEvent)
-const glbventosAtivos = computed(() => eventosStore.ativos)
+import { useCurrentEventStore } from '@/stores/currentEvent';
+const currentEventStore = useCurrentEventStore();
+const currentEvent = computed(() => currentEventStore.currentEvent);
+const glbventosAtivos = computed(() => eventosStore.ativos);
 // console.log('Eventos Ativos:', glbventosAtivos);
-
+console.log('Eventos Corrente:', currentEvent.value?.id || 'Não selecionado');
 
 // define a Entidade Principal da View
 const entity = 'rota';
@@ -57,7 +57,7 @@ const columns = [
    {
       title: 'Qtd Viagens',
       data: null,
-      render: function(data, type, row) {
+      render: function (data, type, row) {
          return row.viagens ? row.viagens.length : 0;
       },
       className: 'text-center',
@@ -74,10 +74,13 @@ const columns = [
    },
 ];
 
+const currentEventId = computed(() => currentEvent.value?.id ?? '');
+// console.log('currentEventId:', currentEventId);
+
 // define os valores padrão dos campos do formulário
 const defaultValues = {
-   evento_id: '1',
-   nome: 'De origem para destino',
+   evento_id: currentEventId,
+   nome: '',
    tipo: 'Chegada',
    origem: 'Nome do Ponto de origem',
    destino: 'Nome do Ponto de destino',
@@ -86,20 +89,19 @@ const defaultValues = {
 
 // carrega listas de entidades da API para popular listas: <selects> os filtros
 // Agora a Lista de Eventos Ativos sõa carregado única vez após o login e ficam na Store
-import { useEventosStore } from '@/stores/useEventosStore'
-const eventosStore = useEventosStore()
+import { useEventosStore } from '@/stores/useEventosStore';
+const eventosStore = useEventosStore();
 
 // ANTES carregava a lista de Eventos junto com a página
 // fetchEventos();
-
 
 // filtro da página - usar quando não há filtros
 // const filters = [{}]; // nessse caso sem filtros
 
 // Filtros da Página com valores fixos - filtro reativo aos dados carregados
 const filters = computed(() => {
-   const ativos = eventosStore.ativos || []
-   const defaultEventId = currentEvent.value?.id || ''
+   const ativos = eventosStore.ativos || [];
+   const defaultEventId = currentEvent.value?.id || '';
 
    return [
       // {
@@ -119,8 +121,11 @@ const filters = computed(() => {
             { value: 'Chegada', label: 'Chegada' },
             { value: 'Partida', label: 'Partida' },
          ],
-      }]
+      },
+   ];
 });
+
+const rotaNomeInput = ref(null);
 </script>
 
 <template>
@@ -139,14 +144,16 @@ const filters = computed(() => {
          <!-- {{ rotas }} -->
          <!-- {{ form.value }} -->
          <!-- ...(form.value.eventos || []).map((ev) => ({ -->
+         <!-- <p>Evento Atual: {{ currentEventId }}</p> -->
+         <!-- {{ currentEventId }} -->
 
          <label class="form-label fw-bold">Evento</label>
-
          <CFormSelect
             v-model="form.value.evento_id"
             :options="[
-               { value: '', label: 'Selecione' },
-               ...(glbventosAtivos || []).map((ev) => ({                  
+               ...(glbventosAtivos || [])
+                  .filter((ev) => ev.id === currentEventId)
+                  .map((ev) => ({
                      value: ev.id,
                      label: ev.nome,
                   })),
@@ -159,6 +166,7 @@ const filters = computed(() => {
          <label class="form-label fw-bold">Nome da Rota</label>
          <CFormInput
             v-model="form.value.nome"
+            ref="rotaNomeInput"
             :class="{ 'is-invalid': errors.nome }"
          />
          <div class="form-error" v-if="errors.value.nome">
