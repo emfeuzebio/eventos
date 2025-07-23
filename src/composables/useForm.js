@@ -1,6 +1,8 @@
 // src/composables/useForm.js
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import api from '@/services/api';
+import { useCurrentEventStore } from '@/stores/currentEvent'
+const eventStore = useCurrentEventStore()
 
 export function useForm({
    endpoint,
@@ -22,10 +24,20 @@ export function useForm({
    const selectedToDelete = ref({});
    const deleteModalVisible = ref(false);
 
+   // computed() para ser reativo com o Pinia
+   const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
+   
+
    async function load(id = 0) {
       try {
          loading.value = true;
-         const res = await api.get(`${endpoint}/${id}`);
+
+         const res = await api.get(`${endpoint}/${id}`,{
+            params: {
+               evento_id: globalEventoId.value,    // sempre envia o evento_id por imposição da regra do negócio
+            }
+         });
+
          form.value = { ...fields, ...res.data }; // carrega os dados do response para o form Modal
          isEditing.value = id ?? false; // controle se é edição ou novo registro
          formError.value = ''; // limpa o form errors
@@ -54,7 +66,7 @@ export function useForm({
       // console.log('Reiniciando form com valores padrão:', defaultValues);
 
       form.value = { ...defaultValues };
-      console.log('Form após reset:', form.value);
+      // console.log('Form após reset:', form.value);
       isEditing.value = false;
       formError.value = '';
       clearFieldErrors();
