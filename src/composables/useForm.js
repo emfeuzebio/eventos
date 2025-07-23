@@ -1,5 +1,5 @@
 // src/composables/useForm.js
-import { ref, computed } from 'vue';
+import { ref, computed, toRaw } from 'vue';
 import api from '@/services/api';
 import { useCurrentEventStore } from '@/stores/currentEvent'
 const eventStore = useCurrentEventStore()
@@ -38,7 +38,15 @@ export function useForm({
             }
          });
 
-         form.value = { ...fields, ...res.data }; // carrega os dados do response para o form Modal
+         // carrega os dados do load do response para o form Modal 1 para 1 nos fields substituindo todos         
+         // form.value = { ...fields, ...res.data };  
+
+         // carrega os dados do load para o form Modal substituindo apenas os fields novos do response e mantendo os demais do defaultValues
+         form.value = {
+            ...toRaw(defaultValues), // copia profunda dos padrões
+            ...res.data
+         };         
+
          isEditing.value = id ?? false; // controle se é edição ou novo registro
          formError.value = ''; // limpa o form errors
          clearFieldErrors(); // limpa o filds errors

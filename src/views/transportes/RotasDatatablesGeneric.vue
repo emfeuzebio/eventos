@@ -14,7 +14,7 @@ const currentEventStore = useCurrentEventStore();
 const currentEvent = computed(() => currentEventStore.currentEvent);
 const glbventosAtivos = computed(() => eventosStore.ativos);
 // console.log('Eventos Ativos:', glbventosAtivos);
-console.log('Eventos Corrente:', currentEvent.value?.id || 'Não selecionado');
+// console.log('Eventos Corrente:', currentEvent.value?.id || 'Não selecionado');
 
 // define a Entidade Principal da View
 const entity = 'rota';
@@ -152,11 +152,11 @@ const rotaNomeInput = ref(null);
             v-model="form.value.evento_id"
             :options="[
                ...(glbventosAtivos || [])
-                  .filter((ev) => ev.id === currentEventId)
-                  .map((ev) => ({
-                     value: ev.id,
-                     label: ev.nome,
-                  })),
+               .filter((ev) => ev.id === currentEventId)
+               .map((ev) => ({
+                  value: ev.id,
+                  label: ev.nome,
+               })),
             ]"
          />
          <div class="form-error" v-if="errors.value.evento_id">

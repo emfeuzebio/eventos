@@ -12,8 +12,13 @@ const eventosStore = useEventosStore();
 const glbventosAtivos = computed(() => eventosStore.ativos);
 // console.log('Eventos Ativos:', glbventosAtivos);
 
+
+// Vamos obter a lista de Eventos Ativo e o Corrente do store
 import { useCurrentEventStore } from '@/stores/currentEvent';
+const currentEventStore = useCurrentEventStore();
+const currentEvent = computed(() => currentEventStore.currentEvent);
 const eventStore = useCurrentEventStore();
+console.log('Eventos Corrente:', currentEvent.value?.id || 'Não selecionado');
 
 import { useEventos } from '@/composables/useEventos';
 const {
@@ -84,9 +89,11 @@ const columns = [
    { title: 'Nome da Rota', data: 'rota.nome', class: 'fw-bold' },
 ];
 
+const currentEventId = computed(() => currentEvent.value?.id ?? '');
+
 // FORM - define os valores padrão dos campos do formulário de dados da entidade
 const defaultValues = {
-   evento_id: '1',
+   evento_id: currentEventId,
    rota_id: '',
    data_hora: '',
    veiculo_id: '',
@@ -146,19 +153,6 @@ const filters = computed(() => [
    },
 ]);
 
-// Filtros da Página com valores fixos
-// const filters = [
-//    {
-//       label: 'Rota',
-//       field: 'rota_id',
-//       type: 'select',
-//       options: [
-//          { value: 1, label: 'Chegada Rodoviária > FEB' },
-//          { value: 2, label: 'Chegada: Aeroporto JK > FEB' },
-//          { value: 9, label: 'Chegada Rodoviária > Hotel Plaza' },
-//       ],
-//    },
-// ];
 </script>
 
 <template>
@@ -176,7 +170,9 @@ const filters = computed(() => [
       <template #form="{ form, errors }">
          <!-- {{ eventos }} -->
          <!-- {{ form.value }} -->
+         <!-- {{ form.value.evento_id }} -->
          <!-- <pre> {{ form.value }} </pre> -->
+         <!-- <p>Evento Atual: {{ currentEventId }}</p> -->
 
          <div id="formModal" v-if="form.value">
             <label class="form-label fw-bold">Evento</label>
@@ -186,7 +182,9 @@ const filters = computed(() => [
                v-model="form.value.evento_id"
                :options="[
                   { value: '', label: 'Selecione' },
-                  ...(glbventosAtivos || []).map((ev) => ({
+                  ...(glbventosAtivos || [])
+                  .filter((ev) => ev.id === currentEventId)
+                  .map((ev) => ({
                      value: ev.id,
                      label: ev.nome,
                   })),
