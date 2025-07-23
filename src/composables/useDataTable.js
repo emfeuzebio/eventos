@@ -55,6 +55,7 @@ export function useDataTable({
          columns,
          responsive: true,
          processing: false,
+         order: [],  // Desabilita ordenação automática, ao montar mantém a ordem original da API
          rowId: 'id',
          // dataSrc: '',
          dataSrc: function (response) {
