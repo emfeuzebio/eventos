@@ -7,15 +7,12 @@ import { useToast } from '@/composables/useToast';
 import { formatToBrDateTime } from '@/utils/dateFormat';
 import DataTablesLib from 'datatables.net-bs5';
 
-import { useCurrentEventStore } from '@/stores/currentEvent'
-
-
+import { useCurrentEventStore } from '@/stores/currentEvent';
 
 // vamos pegar o Evento Selecionado
-const eventStore = useCurrentEventStore()
-const currentEvent = computed(() => eventStore.getEvent)
+const eventStore = useCurrentEventStore();
+const currentEvent = computed(() => eventStore.getEvent);
 // console.log('Inscrição currentEvent:', currentEvent.value);
-
 
 // define a Entidade Principal da View
 const entity = 'inscricao';
@@ -193,16 +190,6 @@ const buttons = { update: true, delete: true, show: false };
 //  const filters = [{}]; // nessse caso sem filtros
 
 const filters = computed(() => [
-   {
-      label: 'Evento',
-      field: 'evento_id',
-      type: 'select',
-      selected: currentEvent.value?.id ?? null,    // define o selected com valor do Pinia
-      options: eventos.value.map((evento) => ({
-         value: evento.id,
-         label: evento.sigla,
-      })),
-   },
    {
       label: 'Ativa',
       field: 'ativo',

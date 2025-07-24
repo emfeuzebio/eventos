@@ -12,7 +12,6 @@ const eventosStore = useEventosStore();
 const glbventosAtivos = computed(() => eventosStore.ativos);
 // console.log('Eventos Ativos:', glbventosAtivos);
 
-
 // Vamos obter a lista de Eventos Ativo e o Corrente do store
 import { useCurrentEventStore } from '@/stores/currentEvent';
 const currentEventStore = useCurrentEventStore();
@@ -152,7 +151,6 @@ const filters = computed(() => [
       })),
    },
 ]);
-
 </script>
 
 <template>
@@ -183,11 +181,11 @@ const filters = computed(() => [
                :options="[
                   { value: '', label: 'Selecione' },
                   ...(glbventosAtivos || [])
-                  .filter((ev) => ev.id === currentEventId)
-                  .map((ev) => ({
-                     value: ev.id,
-                     label: ev.nome,
-                  })),
+                     .filter((ev) => ev.id === currentEventId)
+                     .map((ev) => ({
+                        value: ev.id,
+                        label: ev.nome,
+                     })),
                ]"
                :disabled="glbventosAtivos.length === 0"
             />

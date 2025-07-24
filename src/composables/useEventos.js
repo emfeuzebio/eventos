@@ -66,7 +66,6 @@ export function useEventos(ativo = true) {
          error.value = null;
          const res = await api.get('/rota', {
             params: ativo ? { ativo: 'SIM', evento_id: eventoId } : {},
-            // params: ativo ? { ativo: 'SIM' } : {},
          });
          rotas.value = res.data;
       } catch (err) {

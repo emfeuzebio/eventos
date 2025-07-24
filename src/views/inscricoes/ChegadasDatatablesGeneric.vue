@@ -8,6 +8,13 @@ import api from '@/services/api';
 
 import DataTablesLib from 'datatables.net-bs5';
 
+// Vamos obter a lista de Eventos Ativo e o Corrente do store
+import { useCurrentEventStore } from '@/stores/currentEvent';
+const currentEventStore = useCurrentEventStore();
+const currentEvent = computed(() => currentEventStore.currentEvent);
+// const currentEventId = currentEvent.value?.id ?? '';
+// console.log('currentEventId:', currentEventId);
+
 // define a Entidade Principal da View
 const entity = 'inscricao';
 // const entity = 'inscricao';
@@ -19,13 +26,13 @@ const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
 // Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
-var canPrint = can(`${entity}.print`);
-var canPrint = false;
+// const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
+// const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
+// const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
+// const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
+// const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
+// var canPrint = can(`${entity}.print`);
+// var canPrint = false;
 
 // DEBUG de todas abilities do User Logado
 // console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);
@@ -232,15 +239,6 @@ const buttons = { update: false, delete: false, show: false };
 
 const filters = computed(() => [
    {
-      label: 'Evento',
-      field: 'evento_id',
-      type: 'select',
-      options: eventos.value.map((evento) => ({
-         value: evento.id,
-         label: evento.sigla,
-      })),
-   },
-   {
       label: 'Ativa',
       field: 'ativo',
       type: 'select',
@@ -379,9 +377,11 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
 
 const fetchViagensPorRota = async (rotaId) => {
    try {
-      console.log(rotaId);
+      console.log('fetchViagensPorRota', rotaId);
       viagensDaRota.value = []; // limpa anterior
-      const res = await api.get(`/viagem`, { params: { rota_id: rotaId } });
+      const res = await api.get(`/viagem`, {
+         params: { rota_id: rotaId, evento_id: currentEvent.value?.id ?? '' },
+      });
       viagensDaRota.value = res.data;
    } catch (err) {
       console.error('Erro ao buscar viagens:', err);
@@ -393,7 +393,7 @@ const editarViagemChegada = async () => {
    // ou já usamos os dados do formulário preenchidos
    // console.log('Editar:', viagemChegadaFormDados.value);
    // ou aqui poderia chamar uma API para buscar os dados da região pelo ID
-   fetchRotas();
+   fetchRotas(currentEvent.value?.id ?? '');
    rotaSelecionada.value = false;
    viagemSelecionada.value = false;
    viagemChegadaShowModal.value = true;

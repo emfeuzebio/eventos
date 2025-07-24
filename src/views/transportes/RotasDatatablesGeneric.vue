@@ -75,7 +75,7 @@ const columns = [
 ];
 
 const currentEventId = computed(() => currentEvent.value?.id ?? '');
-// console.log('currentEventId:', currentEventId);
+console.log('currentEventId:', currentEventId);
 
 // define os valores padrão dos campos do formulário
 const defaultValues = {
@@ -152,11 +152,11 @@ const rotaNomeInput = ref(null);
             v-model="form.value.evento_id"
             :options="[
                ...(glbventosAtivos || [])
-               .filter((ev) => ev.id === currentEventId)
-               .map((ev) => ({
-                  value: ev.id,
-                  label: ev.nome,
-               })),
+                  .filter((ev) => ev.id === currentEventId)
+                  .map((ev) => ({
+                     value: ev.id,
+                     label: ev.nome,
+                  })),
             ]"
          />
          <div class="form-error" v-if="errors.value.evento_id">
