@@ -342,11 +342,6 @@ export default [
         name: 'Inscrições',
         to: '/inscricoes/inscricoes',
       },
-      {
-        component: 'CNavItem',
-        name: 'Gestão Chegadas',
-        to: '/inscricoes/chegadas',
-      },
     ],
   },  
 
@@ -357,6 +352,11 @@ export default [
     to: '/transportes',
     icon: 'cil-layers',
     items: [
+      {
+        component: 'CNavItem',
+        name: 'Gestão de Chegadas',
+        to: '/transportes/chegadas',
+      },
       {
         component: 'CNavItem',
         name: 'Veículos e Motoristas',

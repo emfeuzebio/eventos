@@ -264,11 +264,6 @@ const routes = [
               name: 'Inscrições Pessoas',
               component: () => import('@/views/inscricoes/InscricoesDatatablesGeneric.vue'),
             },
-            {
-              path: '/inscricoes/chegadas',
-              name: 'Inscrições Chegadas',
-              component: () => import('@/views/inscricoes/ChegadasDatatablesGeneric.vue'),
-            },
           ],
         },
 
@@ -283,6 +278,11 @@ const routes = [
           },
           redirect: '/transportes/veiculos',
           children: [
+            {
+              path: '/transportes/chegadas',
+              name: 'Gestão de Chegadas',
+              component: () => import('@/views/transportes/ChegadasDatatablesGeneric.vue'),
+            },
             {
               path: '/transportes/rotas',
               name: 'Rotas',

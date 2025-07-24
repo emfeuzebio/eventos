@@ -36,14 +36,9 @@ const abilities = getAbilities(); // recupera do JWR as abilities do usuário lo
 
 // DEBUG de todas abilities do User Logado
 // console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);
-// console.log('canList:', canList); // Isso deve ser true ou false
-// console.log('canShow:', canShow); // Isso deve ser true ou false
-// console.log('canInsert:', canInsert); // Isso deve ser true ou false
-// console.log('canUpdate:', canUpdate); // Isso deve ser true ou false
-// console.log('canDelete:', canDelete); // Isso deve ser true ou false
-// console.log('canPrint:', canPrint); // Isso deve ser true ou false
-
 const crudRef = ref(null);
+const confirmarEnvio = ref(null);
+const cancelarEnvio = ref(null);
 
 function chamarRefresh() {
    crudRef.value?.refreshTable();
@@ -178,7 +173,7 @@ const extraColumnRender = (row) => {
       <button class="btn btn-xs btn-outline-warning" ${canMarcarcheg} data-custom-action="notificarMotorista" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Notif Motorista</button>
 
       <div class="form-check form-switch">
-         <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-inscricao-id="${row.id}" ${isChecked} >
+         <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-viagem-id="${row.traslado_chegada_viagem_id}"data-inscricao-id="${row.id}" ${isChecked} >
       </div>
    `;
 };
@@ -196,6 +191,11 @@ const inscricaoDados = ref('');
 const rotaSelecionada = ref(''); // ID da rota selecionada
 const viagemSelecionada = ref(''); // ID da viagem selecionada
 const viagensDaRota = ref([]); // array das viagens da Rota
+
+const notificarMotoristaModal = ref(false);
+const regiaoFormDados = ref({});
+const regiaoFormErros = ref({});
+
 
 /**
  * ESPECIALIZAÇÃO CRUD: recupera da API listas de dados necessários para o CRUD
@@ -271,27 +271,35 @@ const filters = computed(() => [
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
-   console.log(
-      // 'onExtraAction ID:',
-      // id,
-      // 'row:',
-      // row,
-      'action:',
-      action,
-      'dataset:',
-      dataset,
-      'target:',
-      target
-   );
+   // console.log(
+   //    // 'onExtraAction ID:',
+   //    // id,
+   //    // 'row:',
+   //    // row,
+   //    'action:',
+   //    action,
+   //    'dataset:',
+   //    dataset,
+   //    'target:',
+   //    target
+   // );
 
    if (action == 'trasladou') {
       const inscricaoId = row.id;
-      // const isChecked = target.checked ? 'SIM' : 'NÃO';
+      const viagemId = dataset.viagemId;
       const isChecked = target[0].checked ? 'SIM' : 'NÃO';
       // const isChecked = (e.currentTarget as HTMLInputElement).checked ? 'SIM' : 'NÃO';
       // console.log('trasladou viagem', inscricaoId, isChecked);
-
       // const isChecked = 'SIM';
+
+      if(!viagemId) {
+         showToast({
+            title: 'Sucesso',
+            message: `Impossível Marcar o Traslado de Chegada! Não existe uma Viagem marcada.`,
+            color: 'danger',
+         });
+         return;
+      }
 
       const sucesso = await marcarTrasladoChegada(inscricaoId, {
          traslado_chegada_executou: isChecked,
@@ -312,6 +320,24 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       const inscricaoId = row.id;
       const viagemId = dataset.viagemId;
 
+      if(!viagemId) {
+         // alert('Impossível Notificar o Motorista! Não existe uma Viagem marcada.');
+         showToast({
+            title: 'Sucesso',
+            message: `Impossível Notificar o Motorista! Não existe uma Viagem marcada.`,
+            color: 'danger',
+         });
+         // showAlert('danger', `Erro ao buscar o registro:`);         
+         return;
+      }
+
+      const confirmacao = await abreModalNotificarMotorista(inscricaoId, viagemId);
+
+      if (!confirmacao) {
+         console.log('Usuário cancelou envio de e-mail.');
+         return;
+      }      
+   
       try {
          console.log(
             'Envia E-mail ao Motorista. Está enviando fixo para meu gmail. Precisa terminar o texto do email',
@@ -374,6 +400,23 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       editarViagemChegada();
    }
 };
+
+function abreModalNotificarMotorista(inscricaoId, viagemId) {
+   return new Promise((resolve, reject) => {
+      notificarMotoristaModal.value = true;
+
+      // Armazene os "resolve/reject" em refs ou variáveis acessíveis no botão do modal
+      confirmarEnvio.value = () => {
+         notificarMotoristaModal.value = false;
+         resolve(true);
+      };
+
+      cancelarEnvio.value = () => {
+         notificarMotoristaModal.value = false;
+         resolve(false);
+      };
+   });
+}
 
 const fetchViagensPorRota = async (rotaId) => {
    try {
@@ -851,20 +894,6 @@ const salvarViagemChegada = async (viagemId) => {
          <!-- <CAlert color="dark" v-html="viagemChegadaInscricao"></CAlert> -->
          <CAlert color="dark" v-html="viagemChegadaEscolhida"></CAlert>
 
-         <!-- <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label> -->
-         <!-- <div class="form-text">
-            {{ viagemChegadaFormDados.regiao.descricao }}
-         </div> -->
-
-         <!-- <CFormInput
-            v-model="viagemChegadaFormDados.regiao.descricao"
-            :class="{ 'is-invalid': viagemChegadaFormErros.descricao }"
-         /> -->
-
-         <!-- <CFormInput
-            v-model="viagemChegadaFormDados.regiao.sigla"
-            :class="{ 'is-invalid': viagemChegadaFormErros.sigla }"
-         /> -->
       </CModalBody>
       <CModalFooter>
          <CButton
@@ -879,4 +908,42 @@ const salvarViagemChegada = async (viagemId) => {
          >
       </CModalFooter>
    </CModal>
+
+   <!-- notificarMotoristaModal - Extra Modal Especializado -->
+   <CModal
+      :visible="notificarMotoristaModal"
+      @close="notificarMotoristaModal = false"
+   >
+      <CModalHeader class="bg-primary fw-bold text-white">Notificar Motorista</CModalHeader>
+      <CModalBody>
+         <CAlert color="info">
+            <strong>Notificar Motorista</strong><br/>
+            Abaixo estão as informações das viagens escaladas para o Morotista 'Nome'<br/><br/>
+            Voçe pode <strong>copiar</strong> a mensagem pronta abaixo para enviar por <strong>WhatsApp</strong> ou
+            clicar no botão <strong>Notificar</strong> para enviar por <strong>e-mail</strong>.
+         </CAlert>
+         <!-- <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label> -->
+
+         <!-- <CFormInput
+            v-model="regiaoFormDados.regiao.descricao"
+            :class="{ 'is-invalid': regiaoFormErros.descricao }"
+         /> -->
+
+         <!-- <label class="form-label fw-bold mb-1 mt-0">Sigla</label>
+         <CFormInput
+            v-model="regiaoFormDados.regiao.sigla"
+            :class="{ 'is-invalid': regiaoFormErros.sigla }"
+         /> -->
+      </CModalBody>
+      <CModalFooter>
+         <CButton
+            color="btn btn-secondary btn-sm me-1" @click="cancelarEnvio()"            
+            ><i class="fa fa-times"></i> Fechar</CButton
+         >
+         <CButton color="btn btn-primary btn-sm me-1" @click="confirmarEnvio()"
+            ><i class="fa fa-plane"></i> Enviar E-Mail</CButton
+         >
+      </CModalFooter>
+   </CModal>
+
 </template>
