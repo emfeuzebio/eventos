@@ -8,7 +8,7 @@ import api from '@/services/api';
 
 import DataTablesLib from 'datatables.net-bs5';
 
-// Vamos obter a lista de Eventos Ativo e o Corrente do store
+// Vamos obter a lista de Eventos Ativo e o Corrente do store store
 import { useCurrentEventStore } from '@/stores/currentEvent';
 const currentEventStore = useCurrentEventStore();
 const currentEvent = computed(() => currentEventStore.currentEvent);
