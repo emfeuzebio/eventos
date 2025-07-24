@@ -18,13 +18,13 @@ const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
 // Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
-var canPrint = can(`${entity}.print`);
-var canPrint = false;
+// const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
+// const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
+// const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
+// const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
+// const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
+// var canPrint = can(`${entity}.print`);
+// var canPrint = false;
 
 // DEBUG de todas abilities do User Logado
 // console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);
@@ -56,7 +56,7 @@ const columns = [
    { title: 'E-mail', data: 'email' },
    { title: 'Tel. Celular', data: 'telefone', width: '140px' },
    {
-      title: 'Ativo',
+      title: 'Ativa',
       data: 'ativo',
       class: 'dt-center small',
       width: '40px',
@@ -129,7 +129,7 @@ const buttons = { update: true, delete: true, show: false };
 
 const filters = computed(() => [
    {
-      label: 'Ativo',
+      label: 'Ativa',
       field: 'ativo',
       type: 'select',
       options: [
@@ -240,21 +240,15 @@ const salvarRegiao = async () => {
    <GenericCrud
       ref="crudRef"
       title="Cadastro de Pessoas "
-      description="Gerenciamento do cadastro de Pessoas inscritas no Evetno Atual ou em algum Evento anterior"
+      description="Gerenciamento do cadastro de Pessoas inscritas no Evento Atual ou em algum Evento anterior"
       endpoint="pessoa"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
       :buttons="buttons"
       :extra-column-render="extraColumnRender"
-      :columnActionsWidth="240"
+      :columnActionsWidth="160"
       :abilities="abilities"
-      :canList="canList"
-      :canShow="canShow"
-      :canInsert="canInsert"
-      :canUpdate="canUpdate"
-      :canDelete="canDelete"
-      :canPrint="canPrint"
       @extraAction="onExtraAction"
    >
       <template #form="{ form, errors }">
@@ -325,7 +319,7 @@ const salvarRegiao = async () => {
             {{ errors.value.cracha_feb[0] }}
          </div>
 
-         <label class="form-label fw-bold">Ativo?</label>
+         <label class="form-label fw-bold">Ativa?</label>
          <CFormSelect
             v-model="form.value.ativo"
             :options="[

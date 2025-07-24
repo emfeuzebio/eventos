@@ -63,7 +63,7 @@ const columns = [
       className: 'text-center',
    },
    {
-      title: 'Ativo',
+      title: 'Ativa',
       data: 'ativo',
       class: 'dt-center small',
       render: function (data, type, row) {
@@ -75,7 +75,7 @@ const columns = [
 ];
 
 const currentEventId = computed(() => currentEvent.value?.id ?? '');
-console.log('currentEventId:', currentEventId);
+// console.log('currentEventId:', currentEventId);
 
 // define os valores padrão dos campos do formulário
 const defaultValues = {
@@ -122,6 +122,16 @@ const filters = computed(() => {
             { value: 'Partida', label: 'Partida' },
          ],
       },
+      {
+      label: 'Ativa',
+      field: 'ativo',
+      type: 'select',
+      options: [
+         { value: 'SIM', label: 'SIM' },
+         { value: 'NÃO', label: 'NÃO' },
+      ],
+   },
+
    ];
 });
 
@@ -204,7 +214,7 @@ const rotaNomeInput = ref(null);
             {{ errors.value.destino[0] }}
          </div>
 
-         <label class="form-label fw-bold">Ativo</label>
+         <label class="form-label fw-bold">Ativa</label>
          <CFormSelect
             v-model="form.value.ativo"
             :options="[

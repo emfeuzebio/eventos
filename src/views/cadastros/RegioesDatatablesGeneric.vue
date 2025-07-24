@@ -2,7 +2,9 @@
 import { ref, computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
-import 'datatables.net-dt';
+// import 'datatables.net-dt';
+import DataTablesLib from 'datatables.net-bs5';
+
 
 // import { useEventos } from '@/composables/useEventos';
 // const { fetchEstados, estados } = useEventos();
@@ -16,14 +18,14 @@ const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
 // Permissões específicas para a entidade "veiculo"
-const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
+// const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
+// const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
+// const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
+// const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
+// const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
 
-var canPrint = can(`${entity}.print`);
-var canPrint = false;
+// var canPrint = can(`${entity}.print`);
+// var canPrint = false;
 
 // DEBUG de todas abilities do User Logado
 // console.log('Abilities carregadas:', abilities.value);
@@ -65,9 +67,10 @@ const extraColumnRender = (row) => {
       ? ''
       : 'disabled';
 
-   return `
-    <button class="btn btn-xs btn-outline-info" ${canEnviarZapp} data-custom-action="zap" data-param1-id="${row.param1_id}" data-param2-id="umValor" >Ver</button>
-  `;
+      return '';
+//    return `
+//     <button class="btn btn-xs btn-outline-info" ${canEnviarZapp} data-custom-action="zap" data-param1-id="${row.param1_id}" data-param2-id="umValor" >Ver</button>
+//   `;
 };
 
 /**
@@ -109,7 +112,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
    <!-- {{ eventos }} -->
 
    <GenericCrud
-      title="Cadastro de Regiões"
+      title="Cadastro de Regiões "
       description="Gerenciamento do cadastro de Regiões do País"
       endpoint="regiao"
       :filters="filters"

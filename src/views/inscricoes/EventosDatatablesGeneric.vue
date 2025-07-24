@@ -36,9 +36,8 @@ function chamarRefresh() {
 import { useEventosStore } from '@/stores/useEventosStore'
 const eventosStore = useEventosStore()
 
-// async function onAfterSave() {
 async function onAfterSave({ saved, data }) {
-   console.log('onAfterSave executado', saved);
+   // console.log('onAfterSave executado', saved);
    if (saved) {
       await eventosStore.fetchEventosAtivos()
    }
@@ -134,7 +133,7 @@ const defaultValues = {
 /**
  * ESPECIALIZAÇÃO CRUD: recupera da API autorizações específicas/adicionais
  */
-var canPrint = can(`${entity}.print`);
+// var canPrint = can(`${entity}.print`);
 
 /**
  * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
@@ -167,22 +166,10 @@ const pessoaFormErros = ref({});
  */
 import { useEventos } from '@/composables/useEventos';
 const {
-   fetchEntidades,
-   entidades,
-   fetchFuncoes,
-   funcoes,
-   fetchPessoas,
-   pessoas,
-   fetchEventos,
-   eventos,
    fetchOrganizacoes,
    organizacoes,
 } = useEventos();
 fetchOrganizacoes();
-// fetchEventos();
-// fetchEntidades();
-// fetchFuncoes();
-// fetchPessoas();
 
 /**
  * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.

@@ -67,7 +67,7 @@ const columns = [
       className: 'text-center',
    },
    {
-      title: 'Qts Pessoas',
+      title: 'Qtd Pessoas',
       data: null,
       render: (data) => `?`,
       // inscricoes_com_viagem_chegada_count	1

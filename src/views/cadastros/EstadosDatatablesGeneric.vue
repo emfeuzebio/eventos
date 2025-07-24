@@ -35,7 +35,7 @@ function chamarRefresh() {
 }
 
 // DEBUG de todas abilities do User Logado
-console.log('Abilities carregadas:', abilities.value);
+// console.log('Abilities carregadas:', abilities.value);
 
 /**
  * BASE Crud - colunas da tabela de dados
@@ -116,18 +116,18 @@ const filters = [{}]; // nessse caso sem filtros
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
-   console.log(
-      'onExtraAction ID:',
-      id,
-      'row:',
-      row,
-      'action:',
-      action,
-      'dataset:',
-      dataset,
-      'target: (por ora não usado)',
-      target
-   );
+   // console.log(
+   //    'onExtraAction ID:',
+   //    id,
+   //    'row:',
+   //    row,
+   //    'action:',
+   //    action,
+   //    'dataset:',
+   //    dataset,
+   //    'target: (por ora não usado)',
+   //    target
+   // );
 
    if (action === 'editarRegiao') {
       // console.log('ZAP: ', row, action, dataset, target);
@@ -165,7 +165,7 @@ const salvarRegiao = async () => {
 
    try {
       // console.log('Try Salvar Região:', regiaoFormDados.value.regiao);
-      console.log('Try Salvar Região:', toRaw(regiaoFormDados.value.regiao));
+      // console.log('Try Salvar Região:', toRaw(regiaoFormDados.value.regiao));
 
       await api.put(
          `regiao/${regiaoFormDados.value.regiao.id}`,
@@ -250,7 +250,7 @@ const salvarRegiao = async () => {
       <!-- <CModalHeader class="bg-primary text-white border-bottom shadow-sm">
          <strong>Editar Região</strong>
       </CModalHeader> -->
-      <CModalHeader class="bg-primary text-white">Editar Região</CModalHeader>
+      <CModalHeader class="bg-primary fw-bold text-white">Editar Região</CModalHeader>
       <!-- <CModalHeader class="bg-light p-3">Editar Região</CModalHeader> -->
       <CModalBody>
          <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label>

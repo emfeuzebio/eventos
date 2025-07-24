@@ -45,7 +45,7 @@ const columns = [
    },
    { title: 'Motorista', data: 'motorista' },
    {
-      title: 'Ativo',
+      title: 'Disponível',
       data: 'ativo',
       class: 'dt-center small',
       render: function (data, type, row) {
@@ -58,13 +58,13 @@ const columns = [
 
 // define os valores padrão dos campos do formulário
 const defaultValues = {
-   descricao: 'Carro cor 2 lugares do José',
+   descricao: '',
    tipo: 'Automóvel',
-   marca_modelo: 'Deconhecido',
+   marca_modelo: '',
    capacidade: '3',
-   motorista: 'Sem Nome',
-   email: 'nome@mail',
-   telefone: '(61) 90000-0000',
+   motorista: '',
+   email: '',
+   telefone: '',
    ativo: 'Y',
 };
 
@@ -73,7 +73,6 @@ const defaultValues = {
 
 // monta lista de tipos de veículos para o filtro
 const tipoVeiculo = [
-   { value: '', label: 'Selecione o tipo' },
    { value: 'Automóvel', label: 'Automóvel' },
    { value: 'Van', label: 'Van' },
    { value: 'Micrônibus', label: 'Micrônibus' },
@@ -91,13 +90,22 @@ const filters = computed(() => [
          label: tipo.label,
       })),
    },
+   {
+      label: 'Disponível',
+      field: 'ativo',
+      type: 'select',
+      options: [
+         { value: 'Y', label: 'SIM' },
+         { value: 'N', label: 'NÃO' },
+      ],
+   },   
 ]);
 </script>
 
 <template>
    <GenericCrud
-      title="Cadastro de Veículos"
-      description="Gerenciamento da frota de Veículos ssss"
+      title="Cadastro de Veículos "
+      description="Gerenciamento da frota de Veículos e seus respectivos motorista"
       endpoint="veiculo"
       :filters="filters"
       :columns="columns"
@@ -183,7 +191,7 @@ const filters = computed(() => [
                { value: 'Y', label: 'SIM' },
                { value: 'N', label: 'NÃO' },
             ]"
-            label="Ativo"
+            label="Disponível"
          />
          <div class="form-error" v-if="errors.value.ativo">
             {{ errors.value.ativo[0] }}
