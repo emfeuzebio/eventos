@@ -14,6 +14,9 @@ import DocsComponents from '@/components/DocsComponents'
 import DocsExample from '@/components/DocsExample'
 import DocsIcons from '@/components/DocsIcons'
 
+import CoreUIMultiselect from '@/components/CoreUIMultiselect.vue'
+
+
 // Para tootil tips não funcionou
 // import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
@@ -49,6 +52,9 @@ app.component('CIcon', CIcon)
 app.component('DocsComponents', DocsComponents)
 app.component('DocsExample', DocsExample)
 app.component('DocsIcons', DocsIcons)
+
+// Registro global
+app.component('CoreUIMultiselect', CoreUIMultiselect)   // Select com busca contextual select2 adaptado para CoreUI
 
 app.mount('#app')
 
