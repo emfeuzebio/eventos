@@ -292,7 +292,7 @@ const salvarRegiao = async () => {
          </div>
 
          <label class="form-label fw-bold">Entidade</label>
-         <CFormSelect
+         <CoreUIMultiselect
             v-model="form.value.entidade_id"
             :options="[
                { value: '', label: 'Selecione' },
@@ -334,41 +334,4 @@ const salvarRegiao = async () => {
       </template>
    </GenericCrud>
 
-   <!-- Extra Modal Especializado -->
-   <CModal
-      :visible="pessoaShowModal"
-      @close="pessoaShowModal = false"
-      backdrop="static"
-   >
-      <CModalHeader>
-         <strong>Editar Região</strong>
-      </CModalHeader>
-      <CModalBody>
-         <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label>
-         <!-- <div class="form-text">
-            {{ pessoaFormDados.regiao.descricao }}
-         </div> -->
-
-         <CFormInput
-            v-model="pessoaFormDados.regiao.descricao"
-            :class="{ 'is-invalid': pessoaFormErros.descricao }"
-         />
-
-         <label class="form-label fw-bold mb-1 mt-0">Sigla</label>
-         <CFormInput
-            v-model="pessoaFormDados.regiao.sigla"
-            :class="{ 'is-invalid': pessoaFormErros.sigla }"
-         />
-      </CModalBody>
-      <CModalFooter>
-         <CButton
-            color="btn btn-secondary btn-sm me-1"
-            @click="pessoaShowModal = false"
-            >Fechar</CButton
-         >
-         <CButton color="btn btn-primary btn-sm me-1" @click="salvarRegiao"
-            >Salvar</CButton
-         >
-      </CModalFooter>
-   </CModal>
 </template>

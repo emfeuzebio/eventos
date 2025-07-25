@@ -61,6 +61,15 @@ api.interceptors.response.use(
          router.push('/pages/login');
          // Não propaga o erro para evitar stack trace no console
          return new Promise(() => {}); // retorna uma promessa pendente (sem erro)
+
+      } else if (error.response?.status == 401) {
+         // '401 - Token expirado ou inválido > Go to Page Login.')
+
+         logout()
+         return next({ path: '/pages/login', replace: true }) // <- Evita deixar no histórico         
+         // return new Promise(() => {}); // retorna uma promessa pendente (sem erro)
+         // router.push('/pages/login');
+
       } else if (error.response?.status == 400) {
          showError(error.response?.data?.error + "\n" + error.response?.data?.message || '400 - Erro inesperado.');
       } else if (error.response?.status == 404) {
@@ -72,9 +81,8 @@ api.interceptors.response.use(
          showError(error.response?.data?.error || '419 - Erro inesperado.');
       } else if (error.response && error.response?.status == 404) {
          showError(error.response?.data?.message || '404 - Erro inesperado.');
-      }
-      // Não sendo erros de campos do formulário (422), exibe o erro
-      else if (error.response?.status != 422) {
+      } else if (error.response?.status != 422) {
+         // Não sendo erros de campos do formulário (422), exibe o erro
          showError(error.response?.data?.error || '419 - Erro inesperado.');
       }
       // demais erros são capturados noutro local

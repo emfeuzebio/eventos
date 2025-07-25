@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { formatToBrDateTime } from '@/utils/dateFormat';
@@ -151,6 +151,7 @@ const filters = computed(() => [
       })),
    },
 ]);
+
 </script>
 
 <template>
@@ -166,6 +167,8 @@ const filters = computed(() => [
    >
       <!-- Form Dados do Edit/New MOdal -->
       <template #form="{ form, errors }">
+   
+
          <!-- {{ eventos }} -->
          <!-- {{ form.value }} -->
          <!-- {{ form.value.evento_id }} -->
@@ -205,7 +208,7 @@ const filters = computed(() => [
             </div>
 
             <label class="form-label fw-bold">Rota</label>
-            <CFormSelect
+            <CoreUIMultiselect
                v-model="form.value.rota_id"
                :options="[
                   { value: '', label: 'Selecione' },
@@ -227,7 +230,7 @@ const filters = computed(() => [
             </div>
 
             <label class="form-label fw-bold">Veículo</label>
-            <CFormSelect
+            <CoreUIMultiselect
                v-model="form.value.veiculo_id"
                :options="[
                   { value: '', label: 'Selecione' },

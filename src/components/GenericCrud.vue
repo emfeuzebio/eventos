@@ -5,7 +5,6 @@
             <strong>{{ title }}</strong>
             <small v-if="description">- {{ description }}</small>
          </CCardHeader>
-
          <CCardBody>
             <!-- Linha dos filtros, mensagens e botões -->
             <div class="row align-items-center">
@@ -93,6 +92,7 @@
          :fullscreen="modalFullscreen"
          @close="form.closeModal"
          backdrop="static"
+         v-autofocus-first
       >
          <CModalHeader class="bg-primary text-white">
             <CModalTitle>{{
@@ -157,7 +157,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, nextTick, watch } from 'vue';
 import { useDataTable } from '@/composables/useDataTable';
 import { useForm } from '@/composables/useForm';
 import { useToast } from '@/composables/useToast';
@@ -166,6 +166,8 @@ import { useEventos } from '@/composables/useEventos';
 const { fetchRegioes, regioes } = useEventos();
 
 const { showToast } = useToast();
+
+
 
 // Props configuráveis
 const props = defineProps({
@@ -222,7 +224,7 @@ const filtros = ref({});
 // console.log(props.filters);
 
 props.filters.forEach((filtro) => {
-   filtros.value[filtro.field] = ''; // inicia vazio
+   filtros.value[filtro.field] = filtro.default ?? ''; // usa valor default
 });
 // console.log(filtros);
 
@@ -352,6 +354,20 @@ const form = useForm({
          message: 'Registro excluído com sucesso!',
       });
    },
+});
+
+// Foca no primeiro campo do formulário quando o modal é aberto
+watch(form.editModalVisible, (newValue) => {
+   if (newValue) {
+      nextTick(() => {
+         const firstInput = document.querySelector(
+            '.modal-body input, .modal-body select'
+         );
+         if (firstInput) {
+            firstInput.focus();
+         }
+      });
+   }
 });
 
 // console.log('defaultValues recebidos', props.defaultValues);

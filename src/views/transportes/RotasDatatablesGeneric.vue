@@ -116,6 +116,7 @@ const filters = computed(() => {
       {
          label: 'Tipo de Rota',
          field: 'tipo',
+         // default: 'Chegada',
          type: 'select',
          options: [
             { value: 'Chegada', label: 'Chegada' },
@@ -125,6 +126,7 @@ const filters = computed(() => {
       {
       label: 'Ativa',
       field: 'ativo',
+      // default: 'SIM',
       type: 'select',
       options: [
          { value: 'SIM', label: 'SIM' },

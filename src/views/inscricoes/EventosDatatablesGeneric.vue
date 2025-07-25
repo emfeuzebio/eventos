@@ -188,6 +188,7 @@ const filters = computed(() => [
       label: 'Ativo',
       field: 'ativo',
       type: 'select',
+      default: 'SIM',
       options: [
          { value: 'SIM', label: 'SIM' },
          { value: 'NÃO', label: 'NÃO' },

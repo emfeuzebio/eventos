@@ -83,6 +83,8 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
+
 const props = defineProps({
    visible: Boolean,
    title: String,
@@ -97,4 +99,7 @@ function submitForm() {
    //    emit('destroy', {});
    emit('save', { ...props.formData });
 }
+
+onMounted(()=>{
+})
 </script>
