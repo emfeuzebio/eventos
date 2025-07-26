@@ -250,7 +250,9 @@ const salvarRegiao = async () => {
       <!-- <CModalHeader class="bg-primary text-white border-bottom shadow-sm">
          <strong>Editar Região</strong>
       </CModalHeader> -->
-      <CModalHeader class="bg-primary fw-bold text-white">Editar Região</CModalHeader>
+      <CModalHeader class="bg-primary fw-bold text-white"
+         >Editar Região</CModalHeader
+      >
       <!-- <CModalHeader class="bg-light p-3">Editar Região</CModalHeader> -->
       <CModalBody>
          <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label>

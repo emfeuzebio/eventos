@@ -23,6 +23,7 @@ export function useEventos(ativo = true) {
    const entidades = ref([]);
    const funcoes = ref([]);
    const pessoas = ref([]);
+   const quartosDoHotel = ref([]);
    const viagensDaRota = ref([]);
    const error = ref(null);
 
@@ -193,6 +194,16 @@ export function useEventos(ativo = true) {
       }
    };
 
+   const fetchQuartosDoHotel = async (hotelId) => {
+      // console.log('fetchQuartosDoHotel:', hotelId);
+
+      try {
+         error.value = null;
+         quartosDoHotel.value = (await api.get('/quarto', { params: { hotelId: hotelId } })).data;
+      } catch (err) {
+         error.value = err;
+      }
+    }   
 
    const marcarTrasladoChegada = async (id, dados) => {
       try {
@@ -219,6 +230,7 @@ export function useEventos(ativo = true) {
       funcoes,
       pessoas,
       viagensDaRota,
+      quartosDoHotel,
 
       inscricao,
       
@@ -235,6 +247,7 @@ export function useEventos(ativo = true) {
       fetchEntidades,  
       fetchFuncoes,  
       fetchPessoas,  
+      fetchQuartosDoHotel,    // recupera os Quartos do Hotel
 
       getInscricao,           // recupera uma Inscrição 
 

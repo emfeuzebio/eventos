@@ -1,12 +1,20 @@
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, toRaw } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import DataTablesLib from 'datatables.net-bs5';
 
 import { useEventos } from '@/composables/useEventos';
-const { eventos, fetchEventos, fetchRotas, rotas, loading, error } =
-   useEventos();
+const {
+   eventos,
+   fetchEventos,
+   fetchRotas,
+   rotas,
+   loading,
+   error,
+   fetchQuartosDoHotel,
+   quartosDoHotel,
+} = useEventos();
 
 // Vamos obter a lista de Eventos Ativo e o Corrente do store
 import { useCurrentEventStore } from '@/stores/currentEvent';
@@ -55,13 +63,90 @@ const defaultValues = {
    ativo: 'SIM',
 };
 
+/**
+ * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
+ */
+const extraColumnRender = (row) => {
+   // controle de acesso - recupera as abilities do usuário logado na ação
+   // const canEditarQuartosDoHotel = abilities.includes('inscricao.marcarchegada')
+   // ? ''
+   // : 'disabled';
+
+   return `
+      <button class="btn btn-xs btn-outline-info" data-custom-action="editarQuartosDoHotel" data-evento_id="${row.evento_id}" data-hotel_id="${row.id}" >Adm Quartos</button>
+   `;
+};
+
+/**
+ * ESPECIALIZAÇÃO CRUD: define a variável reativa
+ */
+const quatosFormModal = ref(false);
+const quatosFormDados = ref({});
+const quatosFormErros = ref({});
+
 // carrega listas de entidades da API para popular listas: <selects> os filtros
 // Agora a Lista de Eventos Ativos sõa carregado única vez após o login e ficam na Store
 import { useEventosStore } from '@/stores/useEventosStore';
 const eventosStore = useEventosStore();
 
-// ANTES carregava a lista de Eventos junto com a página
-// fetchEventos();
+// const { fetchQuartosDoHotel, quartosDoHotel } = useEventos();
+
+/**
+ * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
+ */
+const onExtraAction = async ({ id, row, action, dataset, target }) => {
+   if (action === 'editarQuartosDoHotel') {
+      // alert('Editar Quartos do Hotel: ' + row.id);
+      console.log('Editar Quartos do Hotel: ', row, action, dataset, target);
+      // console.log('ZAP: ', row, action, dataset, target);
+
+      // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
+
+      // Recupera os Quartos do Hotel e popula a variável reativa
+      await fetchQuartosDoHotel(row.id);
+      // console.log('Quartos do Hotel:', quartosDoHotel.value);
+      console.log('Quartos do Hotel:', toRaw(quartosDoHotel.value));
+      // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
+      // quatosFormDados.value.quarto = {}; // inicializa o objeto
+
+      // Abre o modal de edição
+      quatosFormModal.value = true;
+   }
+};
+
+const editarQuartosDoHotel = async () => {
+   // Aqui você pode implementar a lógica para editar a região
+   // ou já usamos os dados do formulário preenchidos
+   // console.log('Editar Região:', regiaoFormDados.value);
+   quatosFormModal.value = true;
+   // ou aqui poderia chamar uma API para buscar os dados da região pelo ID
+   // showRegiaoModal.value = false; // Fecha o modal após salvar
+};
+
+/**
+ * ESPECIALIZAÇÃO CRUD: função para atualizar a entidade especializada
+ */
+const salvarQuartoDoHotel = async () => {
+   // console.log('salvarQuartoDoHotel:', quatosFormDados.value.quarto);
+
+   try {
+      await api.put(
+         `regiao/${regiaoFormDados.value.regiao.id}`,
+         toRaw(regiaoFormDados.value.regiao)
+      );
+
+      showToast({
+         title: 'Sucesso',
+         message: `Quarto ID ${quatosFormDados.value.quarto.id} atualizado com sucesso.`,
+      });
+      quatosFormModal.value = false;
+      chamarRefresh(); // chama refreshTable() do composable via expose
+   } catch (error) {
+      if (error.response?.status === 422) {
+         quatosFormErros.value = error.response.data.errors || {};
+      }
+   }
+};
 
 // filtro da página - usar quando não há filtros
 // const filters = [{}]; // nessse caso sem filtros
@@ -98,7 +183,10 @@ const rotaNomeInput = ref(null);
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
+      :extra-column-render="extraColumnRender"
+      :columnActionsWidth="240"
       :abilities="abilities"
+      @extraAction="onExtraAction"
    >
       <template #form="{ form, errors }">
          <!-- {{ rotas }} -->
