@@ -58,9 +58,12 @@ const currentEventId = computed(() => currentEvent.value?.id ?? '');
 // define os valores padrão dos campos do formulário
 const defaultValues = {
    evento_id: currentEventId,
-   nome: '',
-   sigla: '',
-   ativo: 'SIM',
+   hotel_id: '',
+   numero: '',
+   numero_hotel: '',
+   tipo: '',
+   custeado: 'SIM',
+   disponivel: 'SIM',
 };
 
 /**
@@ -103,7 +106,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
 
       // Recupera os Quartos do Hotel e popula a variável reativa
-      await fetchQuartosDoHotel(row.id);
+      await fetchQuartosDoHotel(currentEventId.value, row.id);
       // console.log('Quartos do Hotel:', quartosDoHotel.value);
       console.log('Quartos do Hotel:', toRaw(quartosDoHotel.value));
       // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha

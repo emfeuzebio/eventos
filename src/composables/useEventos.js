@@ -194,12 +194,12 @@ export function useEventos(ativo = true) {
       }
    };
 
-   const fetchQuartosDoHotel = async (hotelId) => {
-      // console.log('fetchQuartosDoHotel:', hotelId);
+   const fetchQuartosDoHotel = async (eventoId, hotelId) => {
+      // console.log('fetchQuartosDoHotel:', eventoId, hotelId);
 
       try {
          error.value = null;
-         quartosDoHotel.value = (await api.get('/quarto', { params: { hotelId: hotelId } })).data;
+         quartosDoHotel.value = (await api.get('/quarto', { params: { evento_id: eventoId, hotel_id: hotelId } })).data;
       } catch (err) {
          error.value = err;
       }
