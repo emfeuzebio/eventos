@@ -111,6 +111,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       console.log('Quartos do Hotel:', toRaw(quartosDoHotel.value));
       // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
       // quatosFormDados.value.quarto = {}; // inicializa o objeto
+      quatosFormDados.value.nome = row.nome; // preenche o nome do hotel
 
       // Abre o modal de edição
       quatosFormModal.value = true;
@@ -243,4 +244,68 @@ const rotaNomeInput = ref(null);
          </div>
       </template>
    </GenericCrud>
+
+   <!-- Extra Modal Especializado -->
+   <CModal
+      :visible="quatosFormModal"
+      @close="quatosFormModal = false"
+      backdrop="static"
+      size="lg"
+   >
+      <CModalHeader class="bg-primary text-white">
+         Editar Quartos do Hotel:
+         <span class="fw-bold"> {{ quatosFormDados.nome }}</span>
+      </CModalHeader>
+      <CModalBody>
+         <label class="form-label fw-bold mb-1 mt-0">Nome do Quartos</label>
+
+         <table ref="quartosTable" class="table table-striped table-bordered">
+            <thead>
+               <tr>
+                  <th>Nome do Quarto</th>
+                  <th>Sigla</th>
+                  <th>Ações</th>
+               </tr>
+            </thead>
+            <tbody>
+               <tr v-for="quarto in quartosDoHotel" :key="quarto.id">
+                  <td>{{ quarto.numero }}</td>
+                  <td>{{ quarto.disponivel }}</td>
+                  <td>
+                     <CButton
+                        color="btn btn-primary btn-xs me-1"
+                        @click="editarQuarto(quarto)"
+                     >
+                        Editar
+                     </CButton>
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+         <!-- <div class="form-text">
+            {{ regiaoFormDados.regiao.descricao }}
+         </div> -->
+
+         <!-- <CFormInput
+            v-model="regiaoFormDados.regiao.descricao"
+            :class="{ 'is-invalid': regiaoFormErros.descricao }"
+         /> -->
+
+         <label class="form-label fw-bold mb-1 mt-0">Sigla</label>
+         <!-- <CFormInput
+            v-model="regiaoFormDados.regiao.sigla"
+            :class="{ 'is-invalid': regiaoFormErros.sigla }"
+         /> -->
+      </CModalBody>
+      <CModalFooter>
+         <CButton
+            color="btn btn-secondary btn-sm me-1"
+            @click="quatosFormModal = false"
+            ><i class="fa fa-times"></i> Fechar</CButton
+         >
+         <!-- <CButton color="btn btn-primary btn-sm me-1" @click="salvarRegiao"
+            ><i class="fa fa-save"></i> Salvar</CButton
+         > -->
+      </CModalFooter>
+   </CModal>
 </template>
