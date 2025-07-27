@@ -1,182 +1,3 @@
-<script setup>
-import { computed, ref, toRaw } from 'vue';
-import GenericCrud from '@/components/GenericCrud.vue';
-import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
-import DataTablesLib from 'datatables.net-bs5';
-
-import { useEventos } from '@/composables/useEventos';
-const {
-   eventos,
-   fetchEventos,
-   fetchRotas,
-   rotas,
-   loading,
-   error,
-   fetchQuartosDoHotel,
-   quartosDoHotel,
-} = useEventos();
-
-// Vamos obter a lista de Eventos Ativo e o Corrente do store
-import { useCurrentEventStore } from '@/stores/currentEvent';
-const currentEventStore = useCurrentEventStore();
-const currentEvent = computed(() => currentEventStore.currentEvent);
-const glbventosAtivos = computed(() => eventosStore.ativos);
-// console.log('Eventos Ativos:', glbventosAtivos);
-// console.log('Eventos Corrente:', currentEvent.value?.id || 'Não selecionado');
-
-// define a Entidade Principal da View
-const entity = 'hotel';
-
-// recuperas as Autorizações (abilities) do JWT
-const { can } = useAbilities();
-const { abilities } = useAbilities();
-
-// DEBUG de todas abilities do User Logado
-// console.log('Abilities carregadas:', abilities.value);
-
-// define parâmetros das tabela de dados
-const columns = [
-   { title: 'ID', data: 'id', width: '30px' },
-   { title: 'Nome', data: 'nome', class: 'fw-bold', width: 'auto' },
-   { title: 'Sigla', data: 'sigla', width: '160px' },
-   {
-      title: 'Ativo',
-      data: 'ativo',
-      class: 'dt-center small',
-      width: '80px',
-      render: function (data, type, row) {
-         return `<span class="${
-            row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
-         }">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
-      },
-   },
-];
-
-const currentEventId = computed(() => currentEvent.value?.id ?? '');
-// console.log('currentEventId:', currentEventId);
-
-// define os valores padrão dos campos do formulário
-const defaultValues = {
-   evento_id: currentEventId,
-   hotel_id: '',
-   numero: '',
-   numero_hotel: '',
-   tipo: '',
-   custeado: 'SIM',
-   disponivel: 'SIM',
-};
-
-/**
- * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
- */
-const extraColumnRender = (row) => {
-   // controle de acesso - recupera as abilities do usuário logado na ação
-   // const canEditarQuartosDoHotel = abilities.includes('inscricao.marcarchegada')
-   // ? ''
-   // : 'disabled';
-
-   return `
-      <button class="btn btn-xs btn-outline-info" data-custom-action="editarQuartosDoHotel" data-evento_id="${row.evento_id}" data-hotel_id="${row.id}" >Adm Quartos</button>
-   `;
-};
-
-/**
- * ESPECIALIZAÇÃO CRUD: define a variável reativa
- */
-const quatosFormModal = ref(false);
-const quatosFormDados = ref({});
-const quatosFormErros = ref({});
-
-// carrega listas de entidades da API para popular listas: <selects> os filtros
-// Agora a Lista de Eventos Ativos sõa carregado única vez após o login e ficam na Store
-import { useEventosStore } from '@/stores/useEventosStore';
-const eventosStore = useEventosStore();
-
-// const { fetchQuartosDoHotel, quartosDoHotel } = useEventos();
-
-/**
- * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
- */
-const onExtraAction = async ({ id, row, action, dataset, target }) => {
-   if (action === 'editarQuartosDoHotel') {
-      // alert('Editar Quartos do Hotel: ' + row.id);
-      console.log('Editar Quartos do Hotel: ', row, action, dataset, target);
-      // console.log('ZAP: ', row, action, dataset, target);
-
-      // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
-
-      // Recupera os Quartos do Hotel e popula a variável reativa
-      await fetchQuartosDoHotel(currentEventId.value, row.id);
-      // console.log('Quartos do Hotel:', quartosDoHotel.value);
-      console.log('Quartos do Hotel:', toRaw(quartosDoHotel.value));
-      // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
-      // quatosFormDados.value.quarto = {}; // inicializa o objeto
-      quatosFormDados.value.nome = row.nome; // preenche o nome do hotel
-
-      // Abre o modal de edição
-      quatosFormModal.value = true;
-   }
-};
-
-const editarQuartosDoHotel = async () => {
-   // Aqui você pode implementar a lógica para editar a região
-   // ou já usamos os dados do formulário preenchidos
-   // console.log('Editar Região:', regiaoFormDados.value);
-   quatosFormModal.value = true;
-   // ou aqui poderia chamar uma API para buscar os dados da região pelo ID
-   // showRegiaoModal.value = false; // Fecha o modal após salvar
-};
-
-/**
- * ESPECIALIZAÇÃO CRUD: função para atualizar a entidade especializada
- */
-const salvarQuartoDoHotel = async () => {
-   // console.log('salvarQuartoDoHotel:', quatosFormDados.value.quarto);
-
-   try {
-      await api.put(
-         `regiao/${regiaoFormDados.value.regiao.id}`,
-         toRaw(regiaoFormDados.value.regiao)
-      );
-
-      showToast({
-         title: 'Sucesso',
-         message: `Quarto ID ${quatosFormDados.value.quarto.id} atualizado com sucesso.`,
-      });
-      quatosFormModal.value = false;
-      chamarRefresh(); // chama refreshTable() do composable via expose
-   } catch (error) {
-      if (error.response?.status === 422) {
-         quatosFormErros.value = error.response.data.errors || {};
-      }
-   }
-};
-
-// filtro da página - usar quando não há filtros
-// const filters = [{}]; // nessse caso sem filtros
-
-// Filtros da Página com valores fixos - filtro reativo aos dados carregados
-const filters = computed(() => {
-   const ativos = eventosStore.ativos || [];
-   const defaultEventId = currentEvent.value?.id || '';
-
-   return [
-      {
-         label: 'Ativo',
-         field: 'ativo',
-         // default: 'SIM',
-         type: 'select',
-         options: [
-            { value: 'SIM', label: 'SIM' },
-            { value: 'NÃO', label: 'NÃO' },
-         ],
-      },
-   ];
-});
-
-const rotaNomeInput = ref(null);
-</script>
-
 <template>
    <!-- {{ rotas }} -->
 
@@ -215,7 +36,6 @@ const rotaNomeInput = ref(null);
          <label class="form-label fw-bold">Nome do Hotel</label>
          <CFormInput
             v-model="form.value.nome"
-            ref="rotaNomeInput"
             :class="{ 'is-invalid': errors.nome }"
          />
          <div class="form-error" v-if="errors.value.nome">
@@ -245,7 +65,7 @@ const rotaNomeInput = ref(null);
       </template>
    </GenericCrud>
 
-   <!-- Extra Modal Especializado -->
+   <!-- Editar Quartos Table - Extra Modal Especializado -->
    <CModal
       :visible="quatosFormModal"
       @close="quatosFormModal = false"
@@ -259,43 +79,26 @@ const rotaNomeInput = ref(null);
       <CModalBody>
          <label class="form-label fw-bold mb-1 mt-0">Nome do Quartos</label>
 
-         <table ref="quartosTable" class="table table-striped table-bordered">
-            <thead>
-               <tr>
-                  <th>Nome do Quarto</th>
-                  <th>Sigla</th>
-                  <th>Ações</th>
-               </tr>
-            </thead>
-            <tbody>
-               <tr v-for="quarto in quartosDoHotel" :key="quarto.id">
-                  <td>{{ quarto.numero }}</td>
-                  <td>{{ quarto.disponivel }}</td>
-                  <td>
-                     <CButton
-                        color="btn btn-primary btn-xs me-1"
-                        @click="editarQuarto(quarto)"
-                     >
-                        Editar
-                     </CButton>
-                  </td>
-               </tr>
-            </tbody>
-         </table>
-         <!-- <div class="form-text">
-            {{ regiaoFormDados.regiao.descricao }}
-         </div> -->
-
-         <!-- <CFormInput
-            v-model="regiaoFormDados.regiao.descricao"
-            :class="{ 'is-invalid': regiaoFormErros.descricao }"
-         /> -->
-
-         <label class="form-label fw-bold mb-1 mt-0">Sigla</label>
-         <!-- <CFormInput
-            v-model="regiaoFormDados.regiao.sigla"
-            :class="{ 'is-invalid': regiaoFormErros.sigla }"
-         /> -->
+         <EasyDataTable
+            :headers="headers"
+            :items="quartosDoHotel"
+            :loading="loading"
+            table-class="table-striped"
+            alternating
+            :pagination="true"
+            :rows-per-page="5"
+            :rows-per-page-options="[5, 10, 20, 50]"
+         >
+            <template #item-acao="quarto">
+               <!-- <pre>{{ quarto }}</pre> -->
+               <CButton
+                  color="btn btn-xs btn-primary"
+                  @click="editarQuartoDoHotel(quarto)"
+               >
+                  Editar
+               </CButton>
+            </template>
+         </EasyDataTable>
       </CModalBody>
       <CModalFooter>
          <CButton
@@ -308,4 +111,257 @@ const rotaNomeInput = ref(null);
          > -->
       </CModalFooter>
    </CModal>
+
+   <!-- Editar o Quarto Modal -->
+   <CModal
+      :visible="editarQuartoModal"
+      @close="fecharEditarQuarto"
+      size="md"
+      backdrop="static"
+   >
+      <CModalHeader class="bg-secondary text-white">
+         Editar Quartos do Hotel
+      </CModalHeader>
+
+      <CModalBody>
+         <div class="mb-3">
+            <label class="form-label">Número</label>
+            <input v-model="quartoSelecionado.numero" class="form-control" />
+            <div v-if="quatosFormErros.numero" class="text-danger small">
+               {{ quatosFormErros.numero[0] }}
+            </div>
+         </div>
+         <div class="mb-3">
+            <label class="form-label">Tipo</label>
+            <input v-model="quartoSelecionado.tipo" class="form-control" />
+            <div v-if="quatosFormErros.tipo" class="text-danger small">
+               {{ quatosFormErros.tipo[0] }}
+            </div>
+         </div>
+         <div class="mb-3">
+            <label class="form-label">Custeado</label>
+            <select v-model="quartoSelecionado.custeado" class="form-select">
+               <option value="SIM">SIM</option>
+               <option value="NÃO">NÃO</option>
+            </select>
+            <div v-if="quatosFormErros.custeado" class="text-danger small">
+               {{ quatosFormErros.custeado[0] }}
+            </div>
+         </div>
+         <div class="mb-3">
+            <label class="form-label">Disponível</label>
+            <select v-model="quartoSelecionado.disponivel" class="form-select">
+               <option value="SIM">SIM</option>
+               <option value="NÃO">NÃO</option>
+            </select>
+            <div v-if="quatosFormErros.disponivel" class="text-danger small">
+               {{ quatosFormErros.disponivel[0] }}
+            </div>
+         </div>
+      </CModalBody>
+
+      <CModalFooter>
+         <CButton color="secondary" size="sm" @click="fecharEditarQuarto"
+            >Cancelar</CButton
+         >
+         <CButton color="primary" size="sm" @click="salvarQuartoDoHotel"
+            >Salvar</CButton
+         >
+      </CModalFooter>
+   </CModal>
 </template>
+
+<script setup>
+import { computed, ref, toRaw, watch } from 'vue';
+import GenericCrud from '@/components/GenericCrud.vue';
+import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
+import api from '@/services/api';
+import DataTablesLib from 'datatables.net-bs5';
+
+import EasyDataTable from 'vue3-easy-data-table';
+import 'vue3-easy-data-table/dist/style.css';
+
+import { useEventos } from '@/composables/useEventos';
+const {
+   eventos,
+   fetchEventos,
+   fetchRotas,
+   rotas,
+   loading,
+   error,
+   fetchQuartosDoHotel,
+   quartosDoHotel,
+} = useEventos();
+
+// Vamos obter a lista de Eventos Ativo e o Corrente do store
+import { useCurrentEventStore } from '@/stores/currentEvent';
+const currentEventStore = useCurrentEventStore();
+const currentEvent = computed(() => currentEventStore.currentEvent);
+const glbventosAtivos = computed(() => eventosStore.ativos);
+// console.log('Eventos Ativos:', glbventosAtivos);
+
+const currentEventId = computed(() => currentEvent.value?.id ?? '');
+// console.log('currentEventId:', currentEventId);
+
+// define a Entidade Principal da View
+const entity = 'hotel';
+
+// recuperas as Autorizações (abilities) do JWT
+const { abilities } = useAbilities();
+// console.log('Abilities carregadas:', abilities.value);
+
+// define as coluna do DataTables
+const columns = [
+   { title: 'ID', data: 'id', width: '30px' },
+   { title: 'Nome', data: 'nome', class: 'fw-bold', width: 'auto' },
+   { title: 'Sigla', data: 'sigla', width: '160px' },
+   {
+      title: 'Ativo',
+      data: 'ativo',
+      class: 'dt-center small',
+      width: '80px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
+      },
+   },
+];
+
+// define os valores padrão dos campos do formulário de edição
+const defaultValues = {
+   evento_id: currentEventId,
+   hotel_id: '',
+   numero: '',
+   numero_hotel: '',
+   tipo: '',
+   custeado: 'SIM',
+   disponivel: 'SIM',
+};
+
+/**
+ * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
+ */
+const extraColumnRender = (row) => {
+   // controle de acesso - recupera as abilities do usuário logado na ação
+   // const canEditarQuartosDoHotel = abilities.includes('inscricao.marcarchegada')
+   // ? ''
+   // : 'disabled';
+
+   return `
+      <button class="btn btn-xs btn-outline-info" data-custom-action="editarQuartosDoHotel" data-evento_id="${row.evento_id}" data-hotel_id="${row.id}" >Adm Quartos</button>
+   `;
+};
+
+// carrega listas de entidades da API para popular listas: <selects> os filtros
+// Agora a Lista de Eventos Ativos sõa carregado única vez após o login e ficam na Store
+import { useEventosStore } from '@/stores/useEventosStore';
+const eventosStore = useEventosStore();
+
+/**
+ * ESPECIALIZAÇÃO CRUD: define a variável reativa
+ */
+
+// Refs
+const quatosFormModal = ref(false);
+const quatosFormErros = ref({});
+const quatosFormDados = ref({});
+
+const editarQuartoModal = ref(false);
+const quartoSelecionado = ref(null);
+const quartos = ref([]);
+
+const headers = [
+   { text: 'ID', value: 'id' },
+   { text: 'Número', value: 'numero' },
+   { text: 'Tipo', value: 'tipo' },
+   { text: 'Custeado', value: 'custeado' },
+   { text: 'Disponível', value: 'disponivel' },
+   { text: 'Ações', value: 'acao' },
+];
+
+// Ações
+const editarQuartoDoHotel = (quarto) => {
+   quartoSelecionado.value = { ...quarto };
+   quatosFormErros.value = {}; // limpa erros antigos
+   // console.log('Editar quarto:', quarto);
+   editarQuartoModal.value = true;
+};
+
+const fecharEditarQuarto = () => {
+   editarQuartoModal.value = false;
+   quartoSelecionado.value = null;
+};
+
+const salvarQuartoDoHotel = async () => {
+   console.log('salvarQuartoDoHotel:', toRaw(quartoSelecionado.value));
+   console.log('salvarQuartoDoHotel:', quartoSelecionado.value.id);
+
+   try {
+      await api.put(
+         `quarto/${quartoSelecionado.value.id}`,
+         toRaw(quartoSelecionado.value)
+      );
+
+      showToast({
+         title: 'Sucesso',
+         message: `Quarto ID ${quartoSelecionado.value.id} atualizado com sucesso.`,
+      });
+      quatosFormModal.value = false;
+      // chamarRefresh(); // chama refreshTable() do composable via expose
+   } catch (error) {
+      if (error.response?.status === 422) {
+         quatosFormErros.value = error.response.data.errors || {};
+      }
+   }
+};
+
+// const { fetchQuartosDoHotel, quartosDoHotel } = useEventos();
+
+/**
+ * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
+ */
+const onExtraAction = async ({ id, row, action, dataset, target }) => {
+   if (action === 'editarQuartosDoHotel') {
+      // alert('Editar Quartos do Hotel: ' + row.id);
+      console.log('Editar Quartos do Hotel: ', row, action, dataset, target);
+      // console.log('ZAP: ', row, action, dataset, target);
+
+      // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
+
+      // Recupera os Quartos do Hotel e popula a variável reativa
+      await fetchQuartosDoHotel(currentEventId.value, row.id);
+      // console.log('Quartos do Hotel:', quartosDoHotel.value);
+      console.log('Quartos do Hotel:', toRaw(quartosDoHotel.value));
+      // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
+      // quatosFormDados.value.quarto = {}; // inicializa o objeto
+      quatosFormDados.value.nome = row.nome; // preenche o nome do hotel
+
+      // Abre o modal de edição
+      quatosFormModal.value = true;
+      // setTimeout(() => initDataTable(), 200);
+   }
+};
+
+// filtro da página - usar quando não há filtros
+// const filters = [{}]; // nessse caso sem filtros
+
+// Filtros da Página com valores fixos - filtro reativo aos dados carregados
+const filters = computed(() => {
+   const ativos = eventosStore.ativos || [];
+   const defaultEventId = currentEvent.value?.id || '';
+
+   return [
+      {
+         label: 'Ativo',
+         field: 'ativo',
+         // default: 'SIM',
+         type: 'select',
+         options: [
+            { value: 'SIM', label: 'SIM' },
+            { value: 'NÃO', label: 'NÃO' },
+         ],
+      },
+   ];
+});
+</script>
