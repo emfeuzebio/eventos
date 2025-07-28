@@ -175,6 +175,18 @@
          </div>
 
          <div class="mb-3">
+            <label class="form-label fw-bold">Capacidade</label>
+            <CFormInput
+               v-model="quartoSelecionado.capacidade"
+               :class="{ 'is-invalid': !!quatosFormErros.capacidade }"
+            />
+            <div class="form-error" v-if="quatosFormErros.capacidade">
+               {{ quatosFormErros.capacidade[0] }}
+            </div>
+            <div class="form-text">Exemplo: Simples, Luxo, Casal, etc.</div>
+         </div>
+
+         <div class="mb-3">
             <label class="form-label fw-bold">Custeado</label>
             <CFormSelect
                v-model="quartoSelecionado.custeado"
@@ -240,6 +252,7 @@ const {
    error,
    fetchQuartosDoHotel,
    quartosDoHotel,
+   fetchQuartoTipos,
 } = useEventos();
 
 // Vamos obter a lista de Eventos Ativo e o Corrente do store
@@ -284,6 +297,7 @@ const defaultValues = {
    numero: '',
    numero_hotel: '',
    tipo: '',
+   capacidade: '1',
    custeado: 'SIM',
    disponivel: 'SIM',
 };
@@ -324,6 +338,7 @@ const headers = [
    { text: 'ID', value: 'id' },
    { text: 'Número', value: 'numero' },
    { text: 'Tipo', value: 'tipo' },
+   { text: 'Capacidade', value: 'capacidade' },
    { text: 'Custeado', value: 'custeado' },
    { text: 'Disponível', value: 'disponivel' },
    { text: 'Ações', value: 'acao' },
@@ -359,6 +374,7 @@ const salvarQuartoDoHotel = async () => {
       numero,
       numero_hotel,
       tipo,
+      capacidade,
       custeado,
       disponivel,
    } = toRaw(quartoSelecionado.value);
@@ -370,6 +386,7 @@ const salvarQuartoDoHotel = async () => {
       numero,
       numero_hotel,
       tipo,
+      capacidade,
       custeado,
       disponivel,
    };
@@ -402,6 +419,11 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       // console.log('ZAP: ', row, action, dataset, target);
 
       // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
+
+
+      const tipos = await fetchQuartoTipos();
+      console.log('Tipo de Quartos:', toRaw(tipos));
+
 
       // Recupera os Quartos do Hotel e popula a variável reativa
       await fetchQuartosDoHotel(currentEventId.value, row.id);

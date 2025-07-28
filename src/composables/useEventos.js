@@ -24,6 +24,7 @@ export function useEventos(ativo = true) {
    const funcoes = ref([]);
    const pessoas = ref([]);
    const quartosDoHotel = ref([]);
+   const quartoTipos = ref([]);
    const viagensDaRota = ref([]);
    const error = ref(null);
 
@@ -205,6 +206,17 @@ export function useEventos(ativo = true) {
       }
     }   
 
+   const fetchQuartoTipos = async () => {
+      // console.log('fetchquartoTipos:', eventoId, hotelId);
+
+      try {
+         error.value = null;
+         quartoTipos.value = (await api.get('/quartotipo', { params: { ativo: 'SIM' } })).data;
+      } catch (err) {
+         error.value = err;
+      }
+    }   
+
    const marcarTrasladoChegada = async (id, dados) => {
       try {
          error.value = null;
@@ -248,6 +260,7 @@ export function useEventos(ativo = true) {
       fetchFuncoes,  
       fetchPessoas,  
       fetchQuartosDoHotel,    // recupera os Quartos do Hotel
+      fetchQuartoTipos,
 
       getInscricao,           // recupera uma Inscrição 
 

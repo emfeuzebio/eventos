@@ -305,6 +305,12 @@ const routes = [
               component: () => import('@/views/transportes/HoteisDatatablesGeneric.vue'),
               meta: { requiresAuth: true }, // Protege esta rota
             },
+            {
+              path: '/transportes/quartoTipos',
+              name: 'Tipos de Quartos',
+              component: () => import('@/views/cadastros/QuartoTiposDatatablesGeneric.vue'),
+              meta: { requiresAuth: true }, // Protege esta rota
+            },
           ],
         },
 

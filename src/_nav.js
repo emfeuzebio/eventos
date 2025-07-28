@@ -377,6 +377,11 @@ export default [
         name: 'Hotéis',
         to: '/transportes/hoteis',
       },
+      {
+        component: 'CNavItem',
+        name: 'Tipos de Quarto',
+        to: '/transportes/quartoTipos',
+      },
     ],
   },
 

@@ -56,6 +56,8 @@ api.interceptors.response.use(
       }      
 
       if (error.response && error.response?.status == 401) {
+         console.log('Erro 401 - Tipo 1', error.response, error.response?.status );
+
          // '401 - Token não fornecido ou malformado > Go to Page Login.')
          removeToken();
          router.push('/pages/login');
@@ -63,6 +65,7 @@ api.interceptors.response.use(
          return new Promise(() => {}); // retorna uma promessa pendente (sem erro)
 
       } else if (error.response?.status == 401) {
+         console.log('Erro 401 - Tipo 2', error.response, error.response?.status );
          // '401 - Token expirado ou inválido > Go to Page Login.')
 
          logout()
