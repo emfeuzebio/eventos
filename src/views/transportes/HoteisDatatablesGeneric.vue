@@ -65,7 +65,7 @@
       </template>
    </GenericCrud>
 
-   <!-- Editar Quartos Table - Extra Modal Especializado -->
+   <!-- Table Editar Quartos - Extra Modal Especializado -->
    <CModal
       :visible="quatosFormModal"
       @close="quatosFormModal = false"
@@ -78,6 +78,21 @@
       </CModalHeader>
       <CModalBody>
          <label class="form-label fw-bold mb-1 mt-0">Nome do Quartos</label>
+
+         <CButton
+            color="btn btn-xs btn-success mb-2"
+            @click="
+               novoQuartoDoHotel();
+               quartoSelecionado.numero = '';
+               quartoSelecionado.tipo = '';
+               quartoSelecionado.custeado = 'NÃO';
+               quartoSelecionado.disponivel = 'SIM';
+               quartoSelecionado.numero = '';
+               quartoSelecionado.numero_hotel = '';
+               quatosFormErros = {};
+            "
+            >Novo Quarto</CButton
+         >
 
          <EasyDataTable
             :headers="headers"
@@ -106,9 +121,6 @@
             @click="quatosFormModal = false"
             ><i class="fa fa-times"></i> Fechar</CButton
          >
-         <!-- <CButton color="btn btn-primary btn-sm me-1" @click="salvarRegiao"
-            ><i class="fa fa-save"></i> Salvar</CButton
-         > -->
       </CModalFooter>
    </CModal>
 
@@ -125,37 +137,74 @@
 
       <CModalBody>
          <div class="mb-3">
-            <label class="form-label">Número</label>
-            <input v-model="quartoSelecionado.numero" class="form-control" />
-            <div v-if="quatosFormErros.numero" class="text-danger small">
+            <label class="form-label fw-bold">Nosso Número</label>
+            <CFormInput
+               v-model="quartoSelecionado.numero"
+               :class="{ 'is-invalid': !!quatosFormErros.numero }"
+            />
+            <div class="form-error" v-if="quatosFormErros.numero">
                {{ quatosFormErros.numero[0] }}
             </div>
+            <div class="form-text">
+               Indicar o número do quarto no controle interno do Evento. Ex. 100
+            </div>
          </div>
+
          <div class="mb-3">
-            <label class="form-label">Tipo</label>
-            <input v-model="quartoSelecionado.tipo" class="form-control" />
-            <div v-if="quatosFormErros.tipo" class="text-danger small">
+            <label class="form-label fw-bold">Número no Hotel</label>
+            <CFormInput
+               v-model="quartoSelecionado.numero_hotel"
+               :class="{ 'is-invalid': !!quatosFormErros.numero_hotel }"
+            />
+            <div class="form-error" v-if="quatosFormErros.numero_hotel">
+               {{ quatosFormErros.numero_hotel[0] }}
+            </div>
+            <div class="form-text">Exemplo: A-101, 202-C, E405, etc.</div>
+         </div>
+
+         <div class="mb-3">
+            <label class="form-label fw-bold">Tipo</label>
+            <CFormInput
+               v-model="quartoSelecionado.tipo"
+               :class="{ 'is-invalid': !!quatosFormErros.tipo }"
+            />
+            <div class="form-error" v-if="quatosFormErros.tipo">
                {{ quatosFormErros.tipo[0] }}
             </div>
+            <div class="form-text">Exemplo: Simples, Luxo, Casal, etc.</div>
          </div>
+
          <div class="mb-3">
-            <label class="form-label">Custeado</label>
-            <select v-model="quartoSelecionado.custeado" class="form-select">
-               <option value="SIM">SIM</option>
-               <option value="NÃO">NÃO</option>
-            </select>
-            <div v-if="quatosFormErros.custeado" class="text-danger small">
+            <label class="form-label fw-bold">Custeado</label>
+            <CFormSelect
+               v-model="quartoSelecionado.custeado"
+               :options="[
+                  { value: 'SIM', label: 'SIM' },
+                  { value: 'NÃO', label: 'NÃO' },
+               ]"
+            />
+            <div class="form-error" v-if="quatosFormErros.custeado">
                {{ quatosFormErros.custeado[0] }}
             </div>
+            <div class="form-text">
+               Selecionar SIM se o quarto for custeado pela promotora do Evento.
+            </div>
          </div>
+
          <div class="mb-3">
-            <label class="form-label">Disponível</label>
-            <select v-model="quartoSelecionado.disponivel" class="form-select">
-               <option value="SIM">SIM</option>
-               <option value="NÃO">NÃO</option>
-            </select>
-            <div v-if="quatosFormErros.disponivel" class="text-danger small">
+            <label class="form-label fw-bold">Disponível</label>
+            <CFormSelect
+               v-model="quartoSelecionado.disponivel"
+               :options="[
+                  { value: 'SIM', label: 'SIM' },
+                  { value: 'NÃO', label: 'NÃO' },
+               ]"
+            />
+            <div class="form-error" v-if="quatosFormErros.disponivel">
                {{ quatosFormErros.disponivel[0] }}
+            </div>
+            <div class="form-text">
+               Selecionar NÃO se o quarto está previsto mas não disponível.
             </div>
          </div>
       </CModalBody>
@@ -281,6 +330,12 @@ const headers = [
 ];
 
 // Ações
+const novoQuartoDoHotel = () => {
+   quartoSelecionado.value = {}; // inicializa o objeto limpo
+   quatosFormErros.value = {}; // limpa erros antigos
+   editarQuartoModal.value = true;
+};
+
 const editarQuartoDoHotel = (quarto) => {
    quartoSelecionado.value = { ...quarto };
    quatosFormErros.value = {}; // limpa erros antigos
@@ -294,14 +349,33 @@ const fecharEditarQuarto = () => {
 };
 
 const salvarQuartoDoHotel = async () => {
-   console.log('salvarQuartoDoHotel:', toRaw(quartoSelecionado.value));
+   // console.log('salvarQuartoDoHotel:', toRaw(quartoSelecionado.value));
    console.log('salvarQuartoDoHotel:', quartoSelecionado.value.id);
 
+   const {
+      evento_id,
+      hotel_id,
+      id,
+      numero,
+      numero_hotel,
+      tipo,
+      custeado,
+      disponivel,
+   } = toRaw(quartoSelecionado.value);
+
+   const payload = {
+      evento_id,
+      hotel_id,
+      id,
+      numero,
+      numero_hotel,
+      tipo,
+      custeado,
+      disponivel,
+   };
+
    try {
-      await api.put(
-         `quarto/${quartoSelecionado.value.id}`,
-         toRaw(quartoSelecionado.value)
-      );
+      await api.put(`quarto/${quartoSelecionado.value.id}`, payload);
 
       showToast({
          title: 'Sucesso',
