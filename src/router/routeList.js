@@ -21,7 +21,10 @@ const routes = [
           // which is lazy-loaded when the route is visited.
           component: () =>
             import(
-              /* webpackChunkName: "dashboard" */ '@/views/dashboard/Dashboard.vue'
+              // '@/views/dashboard/Dashboard.vue' */
+              // '@/views/dashboard/Laboratorio.vue'
+              // '@/views/dashboard/DTAjaxBasica.vue'
+              '@/views/dashboard/DTAjaxParams.vue'
             ),
         },
         {
