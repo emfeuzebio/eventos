@@ -374,8 +374,13 @@ export default [
       },
       {
         component: 'CNavItem',
-        name: 'Hotéis',
+        name: 'Hotéis v1',
         to: '/transportes/hoteis',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Hotéis v2',
+        to: '/hospedagem/hoteis',
       },
       {
         component: 'CNavItem',

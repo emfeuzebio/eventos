@@ -309,6 +309,12 @@ const routes = [
               meta: { requiresAuth: true }, // Protege esta rota
             },
             {
+              path: '/hospedagem/hoteis',
+              name: 'Hotéis2',
+              component: () => import('@/views/hospedagem/HoteisQuartosDt.vue'),
+              meta: { requiresAuth: true }, // Protege esta rota
+            },
+            {
               path: '/transportes/quartoTipos',
               name: 'Tipos de Quartos',
               component: () => import('@/views/cadastros/QuartoTiposDatatablesGeneric.vue'),

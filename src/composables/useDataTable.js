@@ -45,12 +45,14 @@ export function useDataTable({
                //    ...externalFilters.value,
                // },
             })
-               .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
-               .catch((error) => {
-                  console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
-                  // console.error('Erro ao carregar dados:', error);
-                  callback({ data: [] }); // evita que a tabela quebre
-               });
+            .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
+            .catch((error) => {
+               console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
+               if (error.response?.status === 401) {
+                  router.push('/pages/login')     
+                }
+               callback({ data: [] }); // evita que a tabela quebre
+            });
          },
          columns,
          responsive: true,

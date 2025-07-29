@@ -69,7 +69,7 @@
   // Função para recarregar os dados via botão
   function reloadTable() {
     if (dtInstance) {
-      dtInstance.ajax.reload()
+      dtInstance.ajax.reload(null, false)
     }
   }
   </script>
