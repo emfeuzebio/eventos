@@ -228,6 +228,33 @@
          >
       </CModalFooter>
    </CModal>
+
+   <!-- Confirma Excluir Modal  -->
+   <CModal
+      :visible="deleteModalVisible"
+      @close="deleteModalVisible = false"
+      backdrop="static"
+   >
+      <CModalHeader>
+         <strong>Confirmar Exclusão</strong>
+      </CModalHeader>
+      <CModalBody>
+         Tem certeza que deseja excluir este Registro:
+         <br />
+         <b>{{ quartoSelecionado.value.numero }}</b>
+         ?
+      </CModalBody>
+      <CModalFooter>
+         <CButton
+            color="btn btn-secondary btn-sm me-1"
+            @click="fecharConfirmDelete"
+            >Cancelar</CButton
+         >
+         <CButton color="btn btn-danger btn-sm me-1" @click="confirmDelete"
+            >Excluir</CButton
+         >
+      </CModalFooter>
+   </CModal>
 </template>
 
 <script setup>
@@ -323,6 +350,7 @@ const quatosFormModal = ref(false);
 const quatosFormErros = ref({});
 const quatosFormDados = ref({});
 const quatosFormOperacao = ref('editar'); // 'novo' ou 'editar'
+const deleteModalVisible = ref(false); // controle do modal de exclusão
 
 const editarQuartoModal = ref(false);
 const quartoSelecionado = ref(null);
@@ -393,9 +421,10 @@ const dtColumns = [
       data: null,
       className: 'text-center', // título coluna
       class: 'text-center', // dado da coluna
-      width: '80px',
+      width: '120px',
       render: (data, type, row) =>
-         `<button class="btn btn-xs btn-outline-primary btn-edit" data-hotel_id="${row.hotel_id}">Editar</button>`,
+         `<button class="btn btn-xs btn-outline-primary btn-edit" data-hotel_id="${row.hotel_id}">Editar</button>
+         <button class="btn btn-xs btn-outline-danger btn-delete" data-hotel_id="${row.hotel_id}">Excluir</button>`,
    },
 ];
 
@@ -467,7 +496,8 @@ const dtConfig = {
             }
 
             if (e.target && e.target.classList.contains('btn-delete')) {
-               excluir(rowId, rowData);
+               // excluir(rowId, rowData);
+               excluirQuartoDoHotel(rowData);
             }
 
             if (e.target && e.target.classList.contains('btn-show')) {
@@ -509,6 +539,39 @@ const editarQuartoDoHotel = async (quarto) => {
    editarQuartoModal.value = true;
    quatosFormOperacao.value = 'editar'; // define a operação como 'editar'
    await focoNoNumero();
+};
+
+// Fechar o Quarto do Hotel modal
+const excluirQuartoDoHotel = async (quarto) => {
+   quartoSelecionado.value = { ...quarto };
+   // editarQuartoModal.value = false;
+   // quartoSelecionado.value = null;
+   // alert('excluirQuartoDoHotel.' + rowId + ', ' + rowData.numero);
+   // console.log('excluirQuartoDoHotel.', rowId, rowData);
+   deleteModalVisible.value = true; // Abre o modal de confirmação de exclusão
+};
+
+const confirmDelete = async () => {
+   try {
+      await api.delete(`${endpoint}/${quartoSelecionado.value.id}`);
+
+      showToast({
+         title: 'Sucesso',
+         message: `Quarto ID ${quartoSelecionado.value.id} excluído com sucesso.`,
+      });
+
+      deleteModalVisible.value = false;
+      quartoSelecionado.value = null;
+      reloadTable();
+   } catch (error) {
+      // if (error.response?.status === 400) {
+      //    console.log(error.response.data.message);
+      // }
+   }
+};
+
+const fecharConfirmDelete = () => {
+   deleteModalVisible.value = false;
 };
 
 // Fechar o Quarto do Hotel modal
