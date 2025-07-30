@@ -240,8 +240,10 @@
       </CModalHeader>
       <CModalBody>
          Tem certeza que deseja excluir este Quarto de Hotel:
-         <br/>
-         Número: <b>{{ quartoSelecionado?.numero || '' }}</b>, Número no Hotel: <b>{{ quartoSelecionado?.numero_hotel || '' }}</b>, Tipo: <b>{{ quartoSelecionado?.quarto_tipo.nome || 'xx' }}</b> ?
+         <br />
+         Número: <b>{{ quartoSelecionado?.numero || '' }}</b
+         >, Número no Hotel: <b>{{ quartoSelecionado?.numero_hotel || '' }}</b
+         >, Tipo: <b>{{ quartoSelecionado?.quarto_tipo.nome || 'xx' }}</b> ?
       </CModalBody>
       <CModalFooter>
          <CButton
@@ -543,12 +545,10 @@ const editarQuartoDoHotel = async (quarto) => {
 
 // Fechar o Quarto do Hotel modal
 const excluirQuartoDoHotel = async (quarto) => {
-
    // console.log('excluirQuartoDoHotel:', quarto);
    quartoSelecionado.value = { ...quarto };
 
    console.log('excluirQuartoDoHotel:', quartoSelecionado.value);
-
 
    // editarQuartoModal.value = false;
    // quartoSelecionado.value = null;
