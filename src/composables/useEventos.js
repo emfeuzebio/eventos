@@ -243,11 +243,11 @@ export function useEventos(ativo = true) {
       pessoas,
       viagensDaRota,
       quartosDoHotel,
-
+      quartoTipos,
       inscricao,
-      
+
+      // fetchEventos,            
       fetchOrganizacoes,   
-      // fetchEventos,        
       fetchEventos: eventosStore.fetchEventosAtivos,
       fetchVeiculos,       
       fetchRotas,    

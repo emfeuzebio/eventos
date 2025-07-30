@@ -372,20 +372,35 @@ export default [
         name: 'Viagens',
         to: '/transportes/viagens',
       },
+    ],
+  },
+
+  // Hospedagem
+  {
+    component: 'CNavGroup',
+    name: 'Hospedagem',
+    to: '/hospedagem',
+    icon: 'cil-layers',
+    items: [
       {
         component: 'CNavItem',
-        name: 'Hotéis v1',
-        to: '/transportes/hoteis',
+        name: 'Gestão de Hospedagem',
+        to: '/hospedagem/ghospedagem',
       },
+      // {
+      //   component: 'CNavItem',
+      //   name: 'Hotéis v1',
+      //   to: '/hospedagem/hoteis1',
+      // },
       {
         component: 'CNavItem',
-        name: 'Hotéis v2',
-        to: '/hospedagem/hoteis',
+        name: 'Hotéis e Quartos',
+        to: '/hospedagem/hoteis2',
       },
       {
         component: 'CNavItem',
         name: 'Tipos de Quarto',
-        to: '/transportes/quartoTipos',
+        to: '/hospedagem/quartoTipos',
       },
     ],
   },

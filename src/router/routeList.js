@@ -302,22 +302,42 @@ const routes = [
               component: () => import('@/views/transportes/ViagensDatatablesGeneric.vue'),
               meta: { requiresAuth: true }, // Protege esta rota
             },
+          ],
+        },
+
+        // Hospedagem
+        {
+          path: '/hospedagem',
+          name: 'Hospedagem',
+          component: {
+            render() {
+              return h(resolveComponent('router-view'))
+            },
+          },
+          redirect: '/hospedagem/hoteis2',
+          children: [
             {
-              path: '/transportes/hoteis',
-              name: 'Hotéis',
-              component: () => import('@/views/transportes/HoteisDatatablesGeneric.vue'),
+              path: '/hospedagem/ghospedagem',
+              name: 'Gestão de Hospedagem',
+              component: () => import('@/views/pages/Page404.vue'),
               meta: { requiresAuth: true }, // Protege esta rota
             },
             {
-              path: '/hospedagem/hoteis',
+              path: '/hospedagem/hoteis1',
+              name: 'Hotéis1',
+              component: () => import('@/views/hospedagem/HoteisDatatablesGeneric.vue'),
+              meta: { requiresAuth: true }, // Protege esta rota
+            },
+            {
+              path: '/hospedagem/hoteis2',
               name: 'Hotéis2',
-              component: () => import('@/views/hospedagem/HoteisQuartosDt.vue'),
+              component: () => import('@/views/hospedagem/HoteisEQuartosDt.vue'),
               meta: { requiresAuth: true }, // Protege esta rota
             },
             {
-              path: '/transportes/quartoTipos',
+              path: '/hospedagem/quartoTipos',
               name: 'Tipos de Quartos',
-              component: () => import('@/views/cadastros/QuartoTiposDatatablesGeneric.vue'),
+              component: () => import('@/views/hospedagem/QuartoTiposDatatablesGeneric.vue'),
               meta: { requiresAuth: true }, // Protege esta rota
             },
           ],

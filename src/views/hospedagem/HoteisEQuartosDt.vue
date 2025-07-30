@@ -1,6 +1,5 @@
 <template>
-   <!-- {{ rotas }} -->
-
+   <!-- DataTables principal do CRUD -->
    <GenericCrud
       title="Lista de Hotéis "
       description="Gerenciamento de Hotéis"
@@ -77,33 +76,22 @@
       </CModalHeader>
       <CModalBody>
          <CButton
-            
             color="btn btn-sm btn-outline-success mb-2 me-2"
-            @click="
-               novoQuartoDoHotel();
-               quartoSelecionado.numero = '';
-               quartoSelecionado.tipo = '';
-               quartoSelecionado.custeado = 'NÃO';
-               quartoSelecionado.disponivel = 'SIM';
-               quartoSelecionado.numero = '';
-               quartoSelecionado.numero_hotel = '';
-               quatosFormErros = {};
-            "
+            @click="novoQuartoDoHotel()"
             >Novo Quarto</CButton
          >
          <CButton
             color="btn btn-sm btn-outline-secondary mb-2"
             @click="reloadTable()"
-            ><i class="fa fa-refresh"></i></CButton
-         >
+            ><i class="fa fa-refresh"></i
+         ></CButton>
 
-      <!-- DataTable embutido no Modal -->
-      <DataTable
-        :columns="dtColumns"
-        :options="options"
-        class="display table table-striped table-bordered table-hover table-sm compact w-100"
-      />
-
+         <!-- DataTable embutido no Modal -->
+         <DataTable
+            :columns="dtColumns"
+            :options="dtConfig"
+            class="display table table-striped table-bordered table-hover table-sm compact w-100"
+         />
       </CModalBody>
       <CModalFooter>
          <CButton
@@ -128,10 +116,15 @@
       <CModalBody>
          <div class="mb-3">
             <label class="form-label fw-bold">Nosso Número</label>
-            <CFormInput
+            <!-- usando input para funcionar o foco -->
+            <input
+               ref="numeroFoco"
+               type="text"
                v-model="quartoSelecionado.numero"
+               class="form-control"
                :class="{ 'is-invalid': !!quatosFormErros.numero }"
             />
+
             <div class="form-error" v-if="quatosFormErros.numero">
                {{ quatosFormErros.numero[0] }}
             </div>
@@ -149,19 +142,32 @@
             <div class="form-error" v-if="quatosFormErros.numero_hotel">
                {{ quatosFormErros.numero_hotel[0] }}
             </div>
-            <div class="form-text">Informar o número do quarto no Hotel. Ex. A-101, 202-C, E405, etc.</div>
+            <div class="form-text">
+               Informar o número do quarto no Hotel. Ex. A-101, 202-C, E405,
+               etc.
+            </div>
          </div>
 
+         <!-- quartoTipos -->
          <div class="mb-3">
             <label class="form-label fw-bold">Tipo</label>
-            <CFormInput
-               v-model="quartoSelecionado.tipo"
-               :class="{ 'is-invalid': !!quatosFormErros.tipo }"
+            <CoreUIMultiselect
+               v-model="quartoSelecionado.quarto_tipo_id"
+               :class="{ 'is-invalid': !!quatosFormErros.quarto_tipo_id }"
+               :options="[
+                  { value: '', label: 'Selecione' },
+                  ...quartoTipos.map((quartoTipo) => ({
+                     value: quartoTipo.id,
+                     label: quartoTipo.nome,
+                  })),
+               ]"
             />
-            <div class="form-error" v-if="quatosFormErros.tipo">
-               {{ quatosFormErros.tipo[0] }}
+            <div class="form-error" v-if="quatosFormErros.quarto_tipo_id">
+               {{ quatosFormErros.quarto_tipo_id[0] }}
             </div>
-            <div class="form-text">Selecionar o tipo. Ex. Simples, Luxo, Casal, etc.</div>
+            <div class="form-text">
+               Selecionar o tipo. Ex. Simples, Luxo, Casal, etc.
+            </div>
          </div>
 
          <div class="mb-3">
@@ -173,7 +179,9 @@
             <div class="form-error" v-if="quatosFormErros.capacidade">
                {{ quatosFormErros.capacidade[0] }}
             </div>
-            <div class="form-text">Informar a capacidade de hóspedes entre 1 e 9 pessoas.</div>
+            <div class="form-text">
+               Informar a capacidade de hóspedes entre 1 e 9 pessoas.
+            </div>
          </div>
 
          <div class="mb-3">
@@ -223,32 +231,22 @@
 </template>
 
 <script setup>
-import { computed, ref, toRaw, watch } from 'vue';
+import { computed, ref, toRaw, watch, nextTick } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
-import DataTable from 'datatables.net-vue3' 
-import DataTablesLib from 'datatables.net-bs5'
+import DataTable from 'datatables.net-vue3';
+import DataTablesLib from 'datatables.net-bs5';
 import { useToast } from '@/composables/useToast';
 import api from '@/services/api';
 
-DataTable.use(DataTablesLib)
-  
-const endpoint = 'quarto'
+DataTable.use(DataTablesLib);
+
+const endpoint = 'quarto';
 
 import { useEventos } from '@/composables/useEventos';
 
-
-const {
-   eventos,
-   fetchEventos,
-   fetchRotas,
-   rotas,
-   loading,
-   error,
-   fetchQuartosDoHotel,
-   quartosDoHotel,
-   fetchQuartoTipos,
-} = useEventos();
+const { showToast } = useToast(); // Toasts de Alerta
+const { quartoTipos, fetchQuartoTipos } = useEventos();
 
 // Vamos obter a lista de Eventos Ativo e o Corrente do store
 import { useCurrentEventStore } from '@/stores/currentEvent';
@@ -259,8 +257,6 @@ const glbventosAtivos = computed(() => eventosStore.ativos);
 
 const currentEventId = computed(() => currentEvent.value?.id ?? '');
 // console.log('currentEventId:', currentEventId);
-
-const { showToast } = useToast(); // Toasts de Alerta
 
 // define a Entidade Principal da View
 const entity = 'hotel';
@@ -326,146 +322,193 @@ const eventosStore = useEventosStore();
 const quatosFormModal = ref(false);
 const quatosFormErros = ref({});
 const quatosFormDados = ref({});
+const quatosFormOperacao = ref('editar'); // 'novo' ou 'editar'
 
 const editarQuartoModal = ref(false);
 const quartoSelecionado = ref(null);
 
+// Foco no campo número quando o modal é aberto
+const numeroFoco = ref(null);
 
-const eventStore = useCurrentEventStore()
+const focoNoNumero = async () => {
+   await nextTick();
+   numeroFoco.value?.focus();
+};
+
+const eventStore = useCurrentEventStore();
 const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
 // console.log('Evento ID:', globalEventoId.value);
-  
+
 // filtros externos (você pode mudar conforme o seu contexto)
 const externalFilters = ref({
    hotel_id: '1', // exemplo
    ativo: 'SIM', // exemplo
-})
-  
-let dtInstance = null // armazenar instância da tabela para usar o reload
-  
+});
+
+let dtInstance = null; // armazenar instância da tabela para usar o reload
+
 const dtColumns = [
    { title: 'ID', data: 'id', width: '30px' },
-   { title: 'Número', data: 'numero', class: 'text-center fw-bold', className: 'text-center', width: '60px' },
-   { title: 'Nº Hotel', data: 'numero_hotel', class: 'text-center', className: 'text-center', width: '100px' },
+   {
+      title: 'Número',
+      data: 'numero',
+      class: 'text-center fw-bold',
+      className: 'text-center',
+      width: '60px',
+   },
+   {
+      title: 'Nº Hotel',
+      data: 'numero_hotel',
+      class: 'text-center',
+      className: 'text-center',
+      width: '100px',
+   },
    { title: 'Tipo', data: 'quarto_tipo.nome', width: 'auto' },
-   { title: 'Capacidade', data: 'capacidade', width: '100px', class: 'text-center' },
-   { title: 'Custeado	', data: 'custeado', class: 'text-center', width: '100px' },
    {
-   title: 'Ativo',
-   data: null,
-   className: 'text-center', // título coluna
-   class: 'text-center small',
-   width: '80px',
-   render: function (data, type, row) {
-      return `<span class="${
-         row.disponivel === 'SIM' ? 'text-primary' : 'text-danger'
-      }">${row.disponivel}</span>`;
-   },
+      title: 'Capacidade',
+      data: 'capacidade',
+      width: '100px',
+      class: 'text-center',
    },
    {
-   title: 'Ação',
-   data: null,
-   className: 'text-center', // título coluna
-   class: 'text-center',     // dado da coluna
-   width: '80px',
-   render: (data, type, row) => `<button class="btn btn-xs btn-outline-primary btn-edit" data-hotel_id="${row.hotel_id}">Editar</button>`
-},
-]
-  
+      title: 'Custeado	',
+      data: 'custeado',
+      class: 'text-center',
+      width: '100px',
+   },
+   {
+      title: 'Ativo',
+      data: null,
+      className: 'text-center', // título coluna
+      class: 'text-center small',
+      width: '80px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.disponivel === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.disponivel}</span>`;
+      },
+   },
+   {
+      title: 'Ação',
+      data: null,
+      className: 'text-center', // título coluna
+      class: 'text-center', // dado da coluna
+      width: '80px',
+      render: (data, type, row) =>
+         `<button class="btn btn-xs btn-outline-primary btn-edit" data-hotel_id="${row.hotel_id}">Editar</button>`,
+   },
+];
+
 // Configura o DataTables de dentro do Modal
-const options = {
+const dtConfig = {
    responsive: true,
-   serverSide: false,  // Se usar paginação do Laravel, mude para true
-   processing: false,  // para ativer o "Carregando..." do DataTables
+   serverSide: false, // Se usar paginação do Laravel, mude para true
+   processing: false, // para ativer o "Carregando..." do DataTables
    order: [],
    rowId: 'id',
-   dataSrc: '',        // se a resposta for um array simples, use ''
+   dataSrc: '', // se a resposta for um array simples, use ''
    lengthMenu: [
-   [5, 10, 25, 50, 100, -1],
-   [5, 10, 25, 50, 100, 'Todos'],
+      [5, 10, 25, 50, 100, -1],
+      [5, 10, 25, 50, 100, 'Todos'],
    ],
    pageLength: 5,
    ajax: function (_data, callback, _settings) {
-   const filters = {
-      ...externalFilters.value,
-      evento_id: globalEventoId.value,
-   }
+      const filters = {
+         ...externalFilters.value,
+         evento_id: globalEventoId.value,
+      };
 
-   api.get(endpoint, { params: filters })
-      .then(response => {
-         callback({ data: response.data.data || response.data })
-      })
-      .catch(error => {
-         console.error('Erro ao carregar dados:', error)
-         if (error.response?.status === 401) {
-         // Enviar para a página de login se não estiver autenticado
-         router.push('/pages/login')     
-         }
-         callback({ data: [] }) // evitar quebra da tabela
-      })
+      api.get(endpoint, { params: filters })
+         .then((response) => {
+            callback({ data: response.data.data || response.data });
+         })
+         .catch((error) => {
+            console.error('Erro ao carregar dados:', error);
+            if (error.response?.status === 401) {
+               // Enviar para a página de login se não estiver autenticado
+               router.push('/pages/login');
+            }
+            callback({ data: [] }); // evitar quebra da tabela
+         });
    },
    initComplete: function () {
-   dtInstance = this.api() // salva instância para uso em reload()
+      dtInstance = this.api(); // salva instância para uso em reload()
 
-   // Delegar evento click para os botões .btn-edit
-   this.api().table().container().addEventListener('click', (e) => {
+      // Delegar evento click para os botões .btn-edit
+      this.api()
+         .table()
+         .container()
+         .addEventListener('click', (e) => {
+            const tr = e.target.closest('tr'); // Descobre a linha onde clicou
+            const rowData = dtInstance.row(tr).data(); // pega os dados dessa linha
+            const rowId = tr?.id; // pega o ID da linha (se definido)
 
-         const tr = e.target.closest('tr')           // Descobre a linha onde clicou
-         const rowData = dtInstance.row(tr).data()   // pega os dados dessa linha
-         const rowId = tr?.id                        // pega o ID da linha (se definido)
+            // Pega os atributos data-* do botão clicado
+            const eventoId = e.target.getAttribute('data-evento_id');
+            const hotelId = e.target.getAttribute('data-hotel_id');
+            const numero = e.target.getAttribute('data-numero');
 
-         // Pega os atributos data-* do botão clicado
-         const eventoId = e.target.getAttribute('data-evento_id')
-         const hotelId = e.target.getAttribute('data-hotel_id')
-         const numero = e.target.getAttribute('data-numero')
+            if (e.target && e.target.classList.contains('btn-edit')) {
+               // console.log('Editar Linha:', {
+               //    rowId,
+               //    eventoId,
+               //    hotelId,
+               //    numero,
+               //    rowData,
+               // });
 
-         if (e.target && e.target.classList.contains('btn-edit')) {
+               // envia objeto para a função editar
+               // editar({ rowId: rowId, eventoId: eventoId, hotelId: hotelId })
+               editarQuartoDoHotel(rowData);
+               // envia dados + objeto rowData para a função editar
+               // editar(rowId, eventoId, hotelId, rowData)
+               // envia apenas o objeto rowData a função editar
+               // editar(rowData)
+            }
 
-         console.log('Editar Linha:', { rowId, eventoId, hotelId, numero, rowData });
+            if (e.target && e.target.classList.contains('btn-delete')) {
+               excluir(rowId, rowData);
+            }
 
-         // envia objeto para a função editar
-         // editar({ rowId: rowId, eventoId: eventoId, hotelId: hotelId })
-         editarQuartoDoHotel(rowData)
-         // envia dados + objeto rowData para a função editar
-         // editar(rowId, eventoId, hotelId, rowData)
-         // envia apenas o objeto rowData a função editar
-         // editar(rowData)
-         }
-
-         if (e.target && e.target.classList.contains('btn-delete')) {
-         excluir(rowId, rowData)
-         }
-
-         if (e.target && e.target.classList.contains('btn-show')) {
-         ver(rowId, rowData)
-         }
-      })      
+            if (e.target && e.target.classList.contains('btn-show')) {
+               ver(rowId, rowData);
+            }
+         });
    },
    language: {
-   url: '/assets/DataTables.pt_BR.json', // continua usando tradução geral
+      url: '/assets/DataTables.pt_BR.json', // continua usando tradução geral
    },
-}
-
-
-
+};
 
 // Novo Quarto do Hotel - abre o modal para criar um novo quarto
 const novoQuartoDoHotel = async () => {
+   fetchQuartoTipos();
 
-   const tipos = await fetchQuartoTipos();
-   console.log('Tipo de Quartos:', toRaw(tipos));
+   // inicializa o objeto com dados padrão
+   quartoSelecionado.value = {
+      numero: '',
+      numero_hotel: '',
+      quarto_tipo_id: '2',
+      capacidade: '2',
+      custeado: 'NÃO',
+      disponivel: 'SIM',
+   };
 
-   quartoSelecionado.value = {}; // inicializa o objeto limpo
    quatosFormErros.value = {}; // limpa erros antigos
-   editarQuartoModal.value = true;
+   editarQuartoModal.value = true; // Abre o modal de edição
+   quatosFormOperacao.value = 'novo'; // define a operação como 'novo'
+   await focoNoNumero();
 };
 
 // Editar Quarto do Hotel - abre o modal para editar um quarto
-const editarQuartoDoHotel = (quarto) => {
+const editarQuartoDoHotel = async (quarto) => {
+   fetchQuartoTipos();
    quartoSelecionado.value = { ...quarto };
    quatosFormErros.value = {}; // limpa erros antigos
    // console.log('Editar quarto:', quarto);
    editarQuartoModal.value = true;
+   quatosFormOperacao.value = 'editar'; // define a operação como 'editar'
+   await focoNoNumero();
 };
 
 // Fechar o Quarto do Hotel modal
@@ -477,7 +520,7 @@ const fecharEditarQuarto = () => {
 // Salvar/Inserir Quarto do Hotel
 const salvarQuartoDoHotel = async () => {
    // console.log('salvarQuartoDoHotel:', toRaw(quartoSelecionado.value));
-   console.log('salvarQuartoDoHotel:', quartoSelecionado.value.id);
+   // console.log('salvarQuartoDoHotel:', quartoSelecionado.value.id);
 
    const {
       evento_id,
@@ -485,7 +528,7 @@ const salvarQuartoDoHotel = async () => {
       id,
       numero,
       numero_hotel,
-      tipo,
+      quarto_tipo_id,
       capacidade,
       custeado,
       disponivel,
@@ -497,22 +540,33 @@ const salvarQuartoDoHotel = async () => {
       id,
       numero,
       numero_hotel,
-      tipo,
+      quarto_tipo_id,
       capacidade,
       custeado,
       disponivel,
    };
 
    try {
-      await api.put(`quarto/${quartoSelecionado.value.id}`, payload);
+      var mensagem = '';
+
+      if (quatosFormOperacao.value === 'novo') {
+         payload.evento_id = globalEventoId.value; // usa o evento_id do filtro externo
+         payload.hotel_id = externalFilters.value.hotel_id; // usa o hotel_id do filtro externo
+
+         await api.post(`quarto`, payload);
+         mensagem = `Quarto inserido com sucesso.`;
+      } else {
+         await api.put(`quarto/${quartoSelecionado.value.id}`, payload);
+         mensagem = `Quarto ID ${quartoSelecionado.value.id} atualizado com sucesso.`;
+      }
 
       showToast({
          title: 'Sucesso',
-         message: `Quarto ID ${quartoSelecionado.value.id} atualizado com sucesso.`,
+         message: mensagem,
       });
-      
+
       editarQuartoModal.value = false;
-      reloadTable()
+      reloadTable();
    } catch (error) {
       if (error.response?.status === 422) {
          quatosFormErros.value = error.response.data.errors || {};
@@ -523,7 +577,7 @@ const salvarQuartoDoHotel = async () => {
 // Função para recarregar o DataTables
 function reloadTable() {
    if (dtInstance) {
-   dtInstance.ajax.reload(null, false)
+      dtInstance.ajax.reload(null, false);
    }
 }
 
@@ -532,11 +586,11 @@ function reloadTable() {
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
    if (action === 'editarQuartosDoHotel') {
-      console.log('Editar Quartos do Hotel: ', row, action, dataset, target);
+      // console.log('Editar Quartos do Hotel: ', row, action, dataset, target);
       // console.log('ZAP: ', row, action, dataset, target);
 
       externalFilters.value.hotel_id = row.id; // define o hotel_id no filtro externo
-      quatosFormModal.value = true;    // Abre o modal de edição
+      quatosFormModal.value = true; // Abre o modal de edição
 
       // const tipos = await fetchQuartoTipos();
       // console.log('Tipo de Quartos:', toRaw(tipos));
