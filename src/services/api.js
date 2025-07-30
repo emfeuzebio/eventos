@@ -5,6 +5,7 @@ import router from '@/router/router';
 ('@/router');
 import { useGlobalError } from '@/composables/useGlobalError';
 import { useGlobalLoading } from '@/stores/loading';
+import { redirectToLogin } from '@/utils/routerHelper'
 
 // console.log('xxx' + getIssuer());
 const { showError } = useGlobalError(); // fora do interceptor
@@ -46,6 +47,13 @@ api.interceptors.response.use(
    },
    (error) => {
       stopLoading();
+      
+      if (error.response?.status === 401) {
+         console.warn('Erro 401 - Sessão expirada ou token inválido')
+         removeToken()
+         redirectToLogin() // <== aqui é o segredo
+         return new Promise(() => {}) // não propaga erro
+       }
 
       // Tratamento simplificado para erros CORS
       if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {

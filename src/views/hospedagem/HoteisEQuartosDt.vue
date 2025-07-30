@@ -239,19 +239,18 @@
          <strong>Confirmar Exclusão</strong>
       </CModalHeader>
       <CModalBody>
-         Tem certeza que deseja excluir este Registro:
-         <br />
-         <b>{{ quartoSelecionado.value.numero }}</b>
-         ?
+         Tem certeza que deseja excluir este Quarto de Hotel:
+         <br/>
+         Número: <b>{{ quartoSelecionado?.numero || '' }}</b>, Número no Hotel: <b>{{ quartoSelecionado?.numero_hotel || '' }}</b>, Tipo: <b>{{ quartoSelecionado?.quarto_tipo.nome || 'xx' }}</b> ?
       </CModalBody>
       <CModalFooter>
          <CButton
             color="btn btn-secondary btn-sm me-1"
             @click="fecharConfirmDelete"
-            >Cancelar</CButton
+            ><i class="fa fa-times"></i> Cancelar</CButton
          >
          <CButton color="btn btn-danger btn-sm me-1" @click="confirmDelete"
-            >Excluir</CButton
+            ><i class="fa fa-trash"></i> Excluir</CButton
          >
       </CModalFooter>
    </CModal>
@@ -393,9 +392,9 @@ const dtColumns = [
    },
    { title: 'Tipo', data: 'quarto_tipo.nome', width: 'auto' },
    {
-      title: 'Capacidade',
+      title: 'Capcid',
       data: 'capacidade',
-      width: '100px',
+      width: '80px',
       class: 'text-center',
    },
    {
@@ -408,8 +407,9 @@ const dtColumns = [
       title: 'Ativo',
       data: null,
       className: 'text-center', // título coluna
-      class: 'text-center small',
-      width: '80px',
+      // class: 'text-center small',
+      class: 'text-center',
+      width: '70px',
       render: function (data, type, row) {
          return `<span class="${
             row.disponivel === 'SIM' ? 'text-primary' : 'text-danger'
@@ -421,10 +421,10 @@ const dtColumns = [
       data: null,
       className: 'text-center', // título coluna
       class: 'text-center', // dado da coluna
-      width: '120px',
+      width: '140px',
       render: (data, type, row) =>
-         `<button class="btn btn-xs btn-outline-primary btn-edit" data-hotel_id="${row.hotel_id}">Editar</button>
-         <button class="btn btn-xs btn-outline-danger btn-delete" data-hotel_id="${row.hotel_id}">Excluir</button>`,
+         `<button class="btn btn-xs btn-outline-primary btn-edit" data-hotel_id="${row.hotel_id}"><i class="fa fa-edit"></i> Editar</button>
+         <button class="btn btn-xs btn-outline-danger btn-delete" data-hotel_id="${row.hotel_id}"><i class="fa fa-trash"></i> Excluir</button>`,
    },
 ];
 
@@ -543,9 +543,17 @@ const editarQuartoDoHotel = async (quarto) => {
 
 // Fechar o Quarto do Hotel modal
 const excluirQuartoDoHotel = async (quarto) => {
+
+   // console.log('excluirQuartoDoHotel:', quarto);
    quartoSelecionado.value = { ...quarto };
+
+   console.log('excluirQuartoDoHotel:', quartoSelecionado.value);
+
+
    // editarQuartoModal.value = false;
    // quartoSelecionado.value = null;
+   // alert('excluirQuartoDoHotel.' + quarto.numero);
+   // alert('excluirQuartoDoHotel.' + quartoSelecionado.value.numero);
    // alert('excluirQuartoDoHotel.' + rowId + ', ' + rowData.numero);
    // console.log('excluirQuartoDoHotel.', rowId, rowData);
    deleteModalVisible.value = true; // Abre o modal de confirmação de exclusão
