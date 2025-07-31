@@ -47,10 +47,7 @@ export function useDataTable({
             })
             .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
             .catch((error) => {
-               console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
-               if (error.response?.status === 401) {
-                  router.push('/pages/login')     
-                }
+               // console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
                callback({ data: [] }); // evita que a tabela quebre
             });
          },

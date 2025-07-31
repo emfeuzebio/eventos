@@ -129,7 +129,7 @@ export function useEventos(ativo = true) {
          });
          inscricoes.value = res.data;
       } catch (err) {
-         console.error(`Erro ao carregar a lista de Inscrições Ativas do Evento ${eventoId}:`, err)
+         // console.error(`Erro ao carregar a lista de Inscrições Ativas do Evento ${eventoId}:`, err)
          error.value = err;
       }
    };
@@ -144,7 +144,7 @@ export function useEventos(ativo = true) {
          });
          entidades.value = res.data;
       } catch (err) {
-         console.error(`Erro ao carregar a lista de Entidades Ativas:`, err)
+         // console.error(`Erro ao carregar a lista de Entidades Ativas:`, err)
          error.value = err;
       }
    };
@@ -159,7 +159,7 @@ export function useEventos(ativo = true) {
          });
          funcoes.value = res.data;
       } catch (err) {
-         console.error(`Erro ao carregar a lista de Funções/Papeis Ativos:`, err)
+         // console.error(`Erro ao carregar a lista de Funções/Papeis Ativos:`, err)
          error.value = err;
       }
    };
@@ -174,7 +174,7 @@ export function useEventos(ativo = true) {
          });
          pessoas.value = res.data;
       } catch (err) {
-         console.error(`Erro ao carregar a lista de Pessoas Ativos:`, err)
+         // console.error(`Erro ao carregar a lista de Pessoas Ativos:`, err)
          error.value = err;
       }
    };
@@ -190,7 +190,7 @@ export function useEventos(ativo = true) {
          // inscricao.value = res.data;
          return res.data;
       } catch (err) {
-         console.error(`Erro ao carregar a Inscrição Ativas ID ${inscricaoId}:`, err)
+         // console.error(`Erro ao carregar a Inscrição Ativas ID ${inscricaoId}:`, err)
          error.value = err;
       }
    };

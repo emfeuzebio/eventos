@@ -58,7 +58,7 @@ api.interceptors.response.use(
       } 
       // Para todos demais erros diferentes de 422, exibe o erro
       else if (error.response?.status != 422) {
-         showError("<b>Erro " + error.response?.status + "</b> " + error.response?.data?.error + "<br/> " + error.response?.data?.message);
+         showError("<b>Erro " + error.response?.status + "</b> " + (error.response?.data?.error || 'descrição não informada.') + "<br/> " + ( error.response?.data?.message || ''));
       }
 
       return Promise.reject(error);
