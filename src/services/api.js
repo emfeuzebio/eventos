@@ -49,8 +49,11 @@ api.interceptors.response.use(
       stopLoading();
       // console.log('interceptors Erro status:', error.response?.status)
 
-      // '401 - Forbiden - Token expirado ou inválido > Go to Page Login.')
-      // Se a resposta for 401, redireciona para login
+      // Sendo login, ignora o tratamento se o erro veio do endpoint de login
+      const isLoginRequest = error.config?.url?.includes('/auth/login');
+      if (isLoginRequest) return Promise.reject(error);      
+
+      // Se a resposta for 401-Forbbiden, redireciona para login
       if (error.response?.status == 401) {
          removeToken()
          redirectToLogin()
