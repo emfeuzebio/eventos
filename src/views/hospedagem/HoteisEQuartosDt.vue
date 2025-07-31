@@ -72,7 +72,7 @@
       size="lg"
    >
       <CModalHeader class="bg-primary text-white fw-bold">
-         Quartos do Hotel {{ quatosFormDados.nome }}
+         Quartos do Hotel : {{ quatosFormDados.nome }}
       </CModalHeader>
       <CModalBody>
          <CButton
@@ -296,8 +296,9 @@ const { abilities } = useAbilities();
 // define as coluna do DataTables
 const columns = [
    { title: 'ID', data: 'id', width: '30px' },
-   { title: 'Nome', data: 'nome', class: 'fw-bold', width: 'auto' },
+   { title: 'Nome do Hotel', data: 'nome', class: 'fw-bold', width: 'auto' },
    { title: 'Sigla', data: 'sigla', width: '160px' },
+   { title: 'Evento', data: 'evento.sigla', width: '160px' },
    {
       title: 'Ativo',
       data: 'ativo',
@@ -326,20 +327,23 @@ const defaultValues = {
 /**
  * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
  */
+const canAdmQuartosDoHotel = abilities.value.includes('quarto.update')
+
 const extraColumnRender = (row) => {
    // controle de acesso - recupera as abilities do usuário logado na ação
-   // const canEditarQuartosDoHotel = abilities.includes('inscricao.marcarchegada')
-   // ? ''
-   // : 'disabled';
-
+   
+   // console.log('Abilities:', canAdmQuartosDoHotel);
+   
    return `
-      <button class="btn btn-xs btn-outline-info" data-custom-action="editarQuartosDoHotel" data-evento_id="${row.evento_id}" data-hotel_id="${row.id}" >Adm Quartos</button>
+      <button ${canAdmQuartosDoHotel ? '' : 'disabled'} class="btn btn-xs btn-outline-info" data-custom-action="editarQuartosDoHotel" data-evento_id="${row.evento_id}" data-hotel_id="${row.id}" >Adm Quartos</button>
    `;
 };
 
 // carrega listas de entidades da API para popular listas: <selects> os filtros
 // Agora a Lista de Eventos Ativos sõa carregado única vez após o login e ficam na Store
 import { useEventosStore } from '@/stores/useEventosStore';
+import { color } from 'chart.js/helpers';
+import { extractIdentifiers } from 'vue/compiler-sfc';
 const eventosStore = useEventosStore();
 
 /**
@@ -375,6 +379,7 @@ const externalFilters = ref({
 });
 
 let dtInstance = null; // armazenar instância da tabela para usar o reload
+
 
 const dtColumns = [
    { title: 'ID', data: 'id', width: '30px' },
@@ -425,8 +430,9 @@ const dtColumns = [
       class: 'text-center', // dado da coluna
       width: '140px',
       render: (data, type, row) =>
-         `<button class="btn btn-xs btn-outline-primary btn-edit" data-hotel_id="${row.hotel_id}"><i class="fa fa-edit"></i> Editar</button>
-         <button class="btn btn-xs btn-outline-danger btn-delete" data-hotel_id="${row.hotel_id}"><i class="fa fa-trash"></i> Excluir</button>`,
+         `<button ${canAdmQuartosDoHotel ? '' : 'disabled'} class="btn btn-xs btn-outline-primary btn-edit" data-hotel_id="${row.hotel_id}"><i class="fa fa-edit"></i> Editar</button>
+          <button ${canAdmQuartosDoHotel ? '' : 'disabled'} class="btn btn-xs btn-outline-danger btn-delete" data-hotel_id="${row.hotel_id}"><i class="fa fa-trash"></i> Excluir</button>
+         `,
    },
 ];
 
@@ -655,8 +661,18 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       // console.log('Editar Quartos do Hotel: ', row, action, dataset, target);
       // console.log('ZAP: ', row, action, dataset, target);
 
+      if (!currentEvent.value) {
+         showToast({
+            title: 'Sucesso',
+            message: `É obrigatório selecionar um Evento de Trabalho.`,
+            color: 'danger',
+         });
+         return
+      }
+
       externalFilters.value.hotel_id = row.id; // define o hotel_id no filtro externo
       quatosFormModal.value = true; // Abre o modal de edição
+      console.log('Evento ID', currentEvent.value)
 
       // const tipos = await fetchQuartoTipos();
       // console.log('Tipo de Quartos:', toRaw(tipos));
@@ -666,7 +682,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       // console.log('Quartos do Hotel:', quartosDoHotel.value);
       // console.log('Quartos do Hotel:', toRaw(quartosDoHotel.value));
 
-      // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
+      quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
       // quatosFormDados.value.quarto = {}; // inicializa o objeto
       // quatosFormDados.value.nome = row.nome; // preenche o nome do hotel
       // quatosFormModal.value = true;    // Abre o modal de edição
