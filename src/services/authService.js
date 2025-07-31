@@ -36,10 +36,19 @@ export function removeToken() {
  */
 export async function logout() {
   try {
+    // console.log('authService.js logout()')
+
     // const response = await api.post('/auth/logout')
     const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/logout')
     const userStore = useUserStore()
     removeToken()
+
+    // Limpa localStorage manual (por precaução, se persistência não estiver em todos os stores)
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    localStorage.removeItem('currentEvent')
+    localStorage.removeItem('eventos')
+
     userStore.clear()
   } catch (e) {
     // console.error('Erro ao revogar o token:', e)

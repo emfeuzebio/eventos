@@ -37,6 +37,9 @@ export const useAuthStore = defineStore('auth', {
          await eventosStore.fetchEventosAtivos()
       },
       async logout() {
+
+         console.warn('auth.js logout()')
+
          this.token = null;
          this.user = null;
          const response = await api.get(
