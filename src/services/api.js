@@ -1,7 +1,7 @@
 // src/services/api.js
 import axios from 'axios';
 import { getToken, removeToken, getCookie, getIssuer } from './authService';
-import router from '@/router/router';
+
 ('@/router');
 import { useGlobalError } from '@/composables/useGlobalError';
 import { useGlobalLoading } from '@/stores/loading';
@@ -39,7 +39,7 @@ api.interceptors.request.use((config) => {
    return config;
 });
 
-// Se a resposta for 401, redireciona para login
+// intercepta todas requisições e respostas
 api.interceptors.response.use(
    (response) => {
       stopLoading();
@@ -47,56 +47,19 @@ api.interceptors.response.use(
    },
    (error) => {
       stopLoading();
-      
-      if (error.response?.status === 401) {
-         console.warn('Erro 401 - Sessão expirada ou token inválido')
+      // console.log('interceptors Erro status:', error.response?.status)
+
+      // '401 - Forbiden - Token expirado ou inválido > Go to Page Login.')
+      // Se a resposta for 401, redireciona para login
+      if (error.response?.status == 401) {
          removeToken()
-         redirectToLogin() // <== aqui é o segredo
-         return new Promise(() => {}) // não propaga erro
-       }
-
-      // Tratamento simplificado para erros CORS
-      if (error.code === 'ERR_NETWORK' || error.message.includes('Network Error')) {
-         return Promise.reject({ 
-         message: 'Erro de conexão com o servidor',
-         isNetworkError: true 
-         });
-      }      
-
-      if (error.response && error.response?.status == 401) {
-         console.log('Erro 401 - Tipo 1', error.response, error.response?.status );
-
-         // '401 - Token não fornecido ou malformado > Go to Page Login.')
-         removeToken();
-         router.push('/pages/login');
-         // Não propaga o erro para evitar stack trace no console
-         return new Promise(() => {}); // retorna uma promessa pendente (sem erro)
-
-      } else if (error.response?.status == 401) {
-         console.log('Erro 401 - Tipo 2', error.response, error.response?.status );
-         // '401 - Token expirado ou inválido > Go to Page Login.')
-
-         logout()
-         return next({ path: '/pages/login', replace: true }) // <- Evita deixar no histórico         
-         // return new Promise(() => {}); // retorna uma promessa pendente (sem erro)
-         // router.push('/pages/login');
-
-      } else if (error.response?.status == 400) {
-         showError(error.response?.data?.error + "\n" + error.response?.data?.message || '400 - Erro inesperado.');
-      } else if (error.response?.status == 404) {
-         showError(error.response?.data?.error + "\n" + error.response?.data?.message || '404 - Erro ao acessar o Recurso.');
-      } else if (error.response?.status == 409) {
-         // Use 409 Conflict para erros de restrição de integridade (MySQL 23000)
-         showError(error.response?.data?.error + "\n" + error.response?.data?.message || '409 - Erro de onflito de estado/regras.');
-      } else if (error.response?.status == 419) {
-         showError(error.response?.data?.error || '419 - Erro inesperado.');
-      } else if (error.response && error.response?.status == 404) {
-         showError(error.response?.data?.message || '404 - Erro inesperado.');
-      } else if (error.response?.status != 422) {
-         // Não sendo erros de campos do formulário (422), exibe o erro
-         showError(error.response?.data?.error || '419 - Erro inesperado.');
+         redirectToLogin()
+         return new Promise(() => {}) // evita erro no console
+      } 
+      // Para todos demais erros diferentes de 422, exibe o erro
+      else if (error.response?.status != 422) {
+         showError("<b>Erro " + error.response?.status + "</b> " + error.response?.data?.error + "<br/> " + error.response?.data?.message);
       }
-      // demais erros são capturados noutro local
 
       return Promise.reject(error);
    }

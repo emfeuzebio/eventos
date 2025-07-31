@@ -16,6 +16,10 @@ import DocsIcons from '@/components/DocsIcons'
 
 import CoreUIMultiselect from '@/components/CoreUIMultiselect.vue'
 
+// novo
+import { setRouterInstance } from '@/utils/routerHelper'
+setRouterInstance(router)
+
 
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';

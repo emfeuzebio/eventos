@@ -17,12 +17,15 @@
   import DataTable from 'datatables.net-vue3' 
   import DataTablesLib from 'datatables.net-bs5'
   import { useCurrentEventStore } from '@/stores/currentEvent'
+  import { useRouter } from 'vue-router'
   import api from '@/services/api';
+  import { redirectToLogin } from '@/utils/routerHelper'
   
   DataTable.use(DataTablesLib)
   
   const endpoint = 'quarto'
 
+  const router = useRouter()
   const eventStore = useCurrentEventStore()
   const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
   // console.log('Evento ID:', globalEventoId.value);
@@ -95,11 +98,6 @@
           callback({ data: response.data.data || response.data })
         })
         .catch(error => {
-          console.error('Erro ao carregar dados:', error)
-          if (error.response?.status === 401) {
-            // Enviar para a página de login se não estiver autenticado
-            router.push('/pages/login')     
-          }
           callback({ data: [] }) // evitar quebra da tabela
         })
     },

@@ -454,11 +454,6 @@ const dtConfig = {
             callback({ data: response.data.data || response.data });
          })
          .catch((error) => {
-            console.error('Erro ao carregar dados:', error);
-            if (error.response?.status === 401) {
-               // Enviar para a página de login se não estiver autenticado
-               router.push('/pages/login');
-            }
             callback({ data: [] }); // evitar quebra da tabela
          });
    },
