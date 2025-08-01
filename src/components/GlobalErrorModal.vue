@@ -1,9 +1,9 @@
 <template>
    <!-- Erros Global Modal -->
    <CModal :visible="visible" @close="close" class="modal-erro modal-fullscreen-sm-down">
-      <CModalHeader class="bg-danger text-white">
+      <CModalHeader class="text-danger">
          <CModalTitle>
-            Erro!
+            Alerta!
          </CModalTitle>
       </CModalHeader>
       

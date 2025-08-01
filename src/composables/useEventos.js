@@ -11,6 +11,7 @@ import { storeToRefs } from 'pinia'
 
 export function useEventos(ativo = true) {
    const eventos = ref([]);
+   const todosEventos = ref([]);
    const eventosStore = useEventosStore()
    const rotas = ref([]);
    const veiculos = ref([]);
@@ -44,6 +45,16 @@ export function useEventos(ativo = true) {
    //       error.value = err;
    //    }
    // };
+
+   const fetchtodosEventos = async () => {
+      try {
+         error.value = null;
+         todosEventos.value = (await api.get('/evento')).data;
+         todosEventos.value.sort((a, b) => new Date(b.inscricao_data_ini) - new Date(a.inscricao_data_ini));  // Date DeCrescente (b,a)
+      } catch (err) {
+         error.value = err;
+      }
+   };
 
    const fetchRegioes = async () => {
       try {
@@ -230,6 +241,7 @@ export function useEventos(ativo = true) {
 
    return {
       eventos,
+      todosEventos,
       eventosStore,
       veiculos,
       rotas,
@@ -246,7 +258,8 @@ export function useEventos(ativo = true) {
       quartoTipos,
       inscricao,
 
-      // fetchEventos,            
+      // fetchEventos,
+      fetchtodosEventos,
       fetchOrganizacoes,   
       fetchEventos: eventosStore.fetchEventosAtivos,
       fetchVeiculos,       

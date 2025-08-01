@@ -19,15 +19,17 @@
          <label class="form-label fw-bold">Evento</label>
          <CFormSelect
             v-model="form.value.evento_id"
+            :disabled="form.value.ativo === 'NÃO'"
             :options="[
-               ...(glbventosAtivos || [])
-                  .filter((ev) => ev.id === currentEventId)
-                  .map((ev) => ({
-                     value: ev.id,
-                     label: ev.nome,
-                  })),
-            ]"
-         />
+               // ...((glbventosAtivos || []).filter(ev => hotelTemQuartos ? ev.id === 1 : true
+               // ...((glbventosAtivos || []).filter(ev => form.value.ativo === 'NÃO' ? ev.id === form.value.evento_id : true
+               ...((todosEventos    || []).filter(ev => form.value.ativo === 'SIM' ? ev.ativo === 'SIM' : true
+               // ...((todosEventos    || []).filter(ev => true
+               ).map(ev => ({
+                  value: ev.id,
+                  label: ev.nome,
+               })))
+            ]"         />
          <div class="form-error" v-if="errors.value.evento_id">
             {{ errors.value.evento_id[0] }}
          </div>
@@ -35,6 +37,7 @@
          <label class="form-label fw-bold">Nome do Hotel</label>
          <CFormInput
             v-model="form.value.nome"
+            :disabled="form.value.ativo === 'NÃO'"
             :class="{ 'is-invalid': errors.nome }"
          />
          <div class="form-error" v-if="errors.value.nome">
@@ -44,6 +47,7 @@
          <label class="form-label fw-bold">Sigla</label>
          <CFormInput
             v-model="form.value.sigla"
+            :disabled="form.value.ativo === 'NÃO'"
             :class="{ 'is-invalid': errors.sigla }"
          />
          <div class="form-error" v-if="errors.value.sigla">
@@ -264,6 +268,7 @@ import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import DataTable from 'datatables.net-vue3';
 import DataTablesLib from 'datatables.net-bs5';
+import { useGlobalError } from '@/composables/useGlobalError';
 import { useToast } from '@/composables/useToast';
 import api from '@/services/api';
 
@@ -274,7 +279,8 @@ const endpoint = 'quarto';
 import { useEventos } from '@/composables/useEventos';
 
 const { showToast } = useToast(); // Toasts de Alerta
-const { quartoTipos, fetchQuartoTipos } = useEventos();
+const { quartoTipos, fetchQuartoTipos, todosEventos, fetchtodosEventos } = useEventos();
+const { showError } = useGlobalError();   // Modal de Erros
 
 // Vamos obter a lista de Eventos Ativo e o Corrente do store
 import { useCurrentEventStore } from '@/stores/currentEvent';
@@ -282,6 +288,9 @@ const currentEventStore = useCurrentEventStore();
 const currentEvent = computed(() => currentEventStore.currentEvent);
 const glbventosAtivos = computed(() => eventosStore.ativos);
 // console.log('Eventos Ativos:', glbventosAtivos);
+
+// carrega listas de estidades da API para popular listas: <selects> os filtros
+fetchtodosEventos();
 
 const currentEventId = computed(() => currentEvent.value?.id ?? '');
 // console.log('currentEventId:', currentEventId);
@@ -342,8 +351,6 @@ const extraColumnRender = (row) => {
 // carrega listas de entidades da API para popular listas: <selects> os filtros
 // Agora a Lista de Eventos Ativos sõa carregado única vez após o login e ficam na Store
 import { useEventosStore } from '@/stores/useEventosStore';
-import { color } from 'chart.js/helpers';
-import { extractIdentifiers } from 'vue/compiler-sfc';
 const eventosStore = useEventosStore();
 
 /**
@@ -359,6 +366,7 @@ const deleteModalVisible = ref(false); // controle do modal de exclusão
 
 const editarQuartoModal = ref(false);
 const quartoSelecionado = ref(null);
+const hotelTemQuartos = ref(false);
 
 // Foco no campo número quando o modal é aberto
 const numeroFoco = ref(null);
@@ -380,7 +388,7 @@ const externalFilters = ref({
 
 let dtInstance = null; // armazenar instância da tabela para usar o reload
 
-
+// Colunas o DataTable Especializado dentro do Modal
 const dtColumns = [
    { title: 'ID', data: 'id', width: '30px' },
    {
@@ -436,7 +444,7 @@ const dtColumns = [
    },
 ];
 
-// Configura o DataTables de dentro do Modal
+// Configuração do DataTables Especializado dentro do Modal
 const dtConfig = {
    responsive: true,
    serverSide: false, // Se usar paginação do Laravel, mude para true
@@ -515,6 +523,12 @@ const dtConfig = {
 
 // Novo Quarto do Hotel - abre o modal para criar um novo quarto
 const novoQuartoDoHotel = async () => {
+
+   if (!currentEvent.value) {
+      showError("NECESSÁRIO que o <b>Evento de Trabalho</b> esteja selecionado.");
+      return
+   }
+
    fetchQuartoTipos();
 
    // inicializa o objeto com dados padrão
@@ -535,7 +549,14 @@ const novoQuartoDoHotel = async () => {
 
 // Editar Quarto do Hotel - abre o modal para editar um quarto
 const editarQuartoDoHotel = async (quarto) => {
+
+   if (!currentEvent.value) {
+      showError("NECESSÁRIO que o <b>Evento de Trabalho</b> esteja selecionado.");
+      return
+   }
+
    fetchQuartoTipos();
+
    quartoSelecionado.value = { ...quarto };
    quatosFormErros.value = {}; // limpa erros antigos
    // console.log('Editar quarto:', quarto);
@@ -659,16 +680,18 @@ function reloadTable() {
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
    if (action === 'editarQuartosDoHotel') {
       // console.log('Editar Quartos do Hotel: ', row, action, dataset, target);
-      // console.log('ZAP: ', row, action, dataset, target);
+      console.log('ZAP: ', row, action, dataset, target);
 
-      if (!currentEvent.value) {
-         showToast({
-            title: 'Sucesso',
-            message: `É obrigatório selecionar um Evento de Trabalho.`,
-            color: 'danger',
-         });
+      if (row.ativo != 'SIM') {
+         // TODO tranformar o showError num componente como o showToast
+         showError("Somente um <b>Hotel ATIVO</b> pode ter seus Quartos editados.");
          return
       }
+
+      // if (!currentEvent.value) {
+      //    showError("Somente um Evento ATIVO pode ter seus Quartos editados.");
+      //    return
+      // }
 
       externalFilters.value.hotel_id = row.id; // define o hotel_id no filtro externo
       quatosFormModal.value = true; // Abre o modal de edição
