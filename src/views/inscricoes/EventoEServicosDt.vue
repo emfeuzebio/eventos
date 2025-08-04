@@ -81,13 +81,13 @@
       size="lg"
    >
       <CModalHeader class="bg-primary text-white fw-bold">
-         Quartos do Hotel : {{ quatosFormDados.nome }}
+         Evento : {{ quatosFormDados.nome }}
       </CModalHeader>
       <CModalBody>
          <CButton
             color="btn btn-sm btn-outline-success mb-2 me-2"
             @click="novoQuartoDoHotel()"
-            >Novo Quarto</CButton
+            >Novo Serviço</CButton
          >
          <CButton
             color="btn btn-sm btn-outline-secondary mb-2"
@@ -119,117 +119,126 @@
       backdrop="static"
    >
       <CModalHeader class="bg-primary text-white fw-bold">
-         Editar Quarto de Hotel
+         Editar Serviços oferecidos no Evento
       </CModalHeader>
 
       <CModalBody>
+
+         <!-- Dia do Evento -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Nosso Número</label>
+            <label class="form-label fw-bold">Dia do Evento</label>
 
             <!-- usando input para funcionar o foco -->
             <input
                ref="numeroFoco"
-               type="text"
-               v-model="quartoSelecionado.numero"
+               type="date"
+               v-model="quartoSelecionado.data_servico"
                class="form-control"
-               :class="{ 'is-invalid': !!quatosFormErros.numero }"
+               :class="{ 'is-invalid': !!quatosFormErros.data_servico }"
             />
-
-            <div class="form-error" v-if="quatosFormErros.numero">
-               {{ quatosFormErros.numero[0] }}
+            <div class="form-error" v-if="quatosFormErros.data_servico">
+               {{ quatosFormErros.data_servico[0] }}
             </div>
             <div class="form-text">
-               Indicar o número do quarto no controle interno do Evento. Ex. 100
+               Informar a Data do Dia do Evento
             </div>
          </div>
 
+         <!-- Hospedagem -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Oferece Almoço?</label>
+            <label class="form-label fw-bold">Oferece Hospedagem? {{ quartoSelecionado.oferece_hospedagem }}</label>
             <div class="form-check form-switch">
                <input
                   class="form-check-input"
-                  v-model="quartoSelecionado.oferece_hospedagem"
                   type="checkbox"
-                  value="1"
+                  :checked="quartoSelecionado.oferece_hospedagem === 'SIM'"
+                  @change="quartoSelecionado.oferece_hospedagem = $event.target.checked ? 'SIM' : 'NÃO'"
                />
             </div>
             <div class="form-error" v-if="quatosFormErros.oferece_hospedagem">
                {{ quatosFormErros.oferece_hospedagem[0] }}
             </div>
             <div class="form-text">
-               Marque se é oferecido o serviço de Hospedagem neste dia
+               Marque se será oferecido o serviço de Hospedagem neste dia
             </div>
          </div>
 
-         <!-- quartoTipos -->
+         <!-- Translado -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Tipo</label>
-            <CoreUIMultiselect
-               v-model="quartoSelecionado.quarto_tipo_id"
-               :class="{ 'is-invalid': !!quatosFormErros.quarto_tipo_id }"
-               :options="[
-                  { value: '', label: 'Selecione' },
-                  ...quartoTipos.map((quartoTipo) => ({
-                     value: quartoTipo.id,
-                     label: quartoTipo.nome,
-                  })),
-               ]"
-            />
-            <div class="form-error" v-if="quatosFormErros.quarto_tipo_id">
-               {{ quatosFormErros.quarto_tipo_id[0] }}
+            <label class="form-label fw-bold">Oferece Traslado? {{ quartoSelecionado.oferece_traslado	 }}</label>
+            <div class="form-check form-switch">
+               <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="quartoSelecionado.oferece_traslado	 === 'SIM'"
+                  @change="quartoSelecionado.oferece_traslado	 = $event.target.checked ? 'SIM' : 'NÃO'"
+               />
+            </div>
+            <div class="form-error" v-if="quatosFormErros.oferece_traslado	">
+               {{ quatosFormErros.oferece_traslado	[0] }}
             </div>
             <div class="form-text">
-               Selecionar o tipo. Ex. Simples, Luxo, Casal, etc.
+               Marque se será oferecido o serviço de Traslado neste dia
             </div>
          </div>
 
+         <!-- Café da Manhã -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Capacidade</label>
-            <CFormInput
-               v-model="quartoSelecionado.capacidade"
-               :class="{ 'is-invalid': !!quatosFormErros.capacidade }"
-            />
-            <div class="form-error" v-if="quatosFormErros.capacidade">
-               {{ quatosFormErros.capacidade[0] }}
+            <label class="form-label fw-bold">Oferece Café da Manhã? {{ quartoSelecionado.oferece_cafe	 }}</label>
+            <div class="form-check form-switch">
+               <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="quartoSelecionado.oferece_cafe	 === 'SIM'"
+                  @change="quartoSelecionado.oferece_cafe	 = $event.target.checked ? 'SIM' : 'NÃO'"
+               />
+            </div>
+            <div class="form-error" v-if="quatosFormErros.oferece_cafe	">
+               {{ quatosFormErros.oferece_cafe	[0] }}
             </div>
             <div class="form-text">
-               Informar a capacidade de hóspedes entre 1 e 9 pessoas.
+               Marque se será oferecido o serviço de Café da Manhã neste dia
             </div>
          </div>
 
+         <!-- Café da Almoço -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Custeado</label>
-            <CFormSelect
-               v-model="quartoSelecionado.custeado"
-               :options="[
-                  { value: 'SIM', label: 'SIM' },
-                  { value: 'NÃO', label: 'NÃO' },
-               ]"
-            />
-            <div class="form-error" v-if="quatosFormErros.custeado">
-               {{ quatosFormErros.custeado[0] }}
+            <label class="form-label fw-bold">Oferece Almoço? {{ quartoSelecionado.oferece_almoco	 }}</label>
+            <div class="form-check form-switch">
+               <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="quartoSelecionado.oferece_almoco	 === 'SIM'"
+                  @change="quartoSelecionado.oferece_almoco	 = $event.target.checked ? 'SIM' : 'NÃO'"
+               />
+            </div>
+            <div class="form-error" v-if="quatosFormErros.oferece_almoco	">
+               {{ quatosFormErros.oferece_almoco	[0] }}
             </div>
             <div class="form-text">
-               Selecionar SIM se o quarto for custeado pela promotora do Evento.
+               Marque se será oferecido o serviço de Almoço neste dia
             </div>
          </div>
 
+         <!-- Café da Jantar -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Disponível</label>
-            <CFormSelect
-               v-model="quartoSelecionado.disponivel"
-               :options="[
-                  { value: 'SIM', label: 'SIM' },
-                  { value: 'NÃO', label: 'NÃO' },
-               ]"
-            />
-            <div class="form-error" v-if="quatosFormErros.disponivel">
-               {{ quatosFormErros.disponivel[0] }}
+            <label class="form-label fw-bold">Oferece Jantar? {{ quartoSelecionado.oferece_jantar	 }}</label>
+            <div class="form-check form-switch">
+               <input
+                  class="form-check-input"
+                  type="checkbox"
+                  :checked="quartoSelecionado.oferece_jantar	 === 'SIM'"
+                  @change="quartoSelecionado.oferece_jantar	 = $event.target.checked ? 'SIM' : 'NÃO'"
+               />
+            </div>
+            <div class="form-error" v-if="quatosFormErros.oferece_jantar	">
+               {{ quatosFormErros.oferece_jantar	[0] }}
             </div>
             <div class="form-text">
-               Selecionar NÃO se o quarto está previsto mas não disponível.
+               Marque se será oferecido o serviço de Jantar neste dia
             </div>
          </div>
+
       </CModalBody>
 
       <CModalFooter>
@@ -276,6 +285,7 @@ import { computed, ref, toRaw, watch, nextTick } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { formatToBrDate } from '@/utils/dateFormat';
+import { formatToBrDateWeek } from '@/utils/dateFormat';
 import DataTable from 'datatables.net-vue3';
 import DataTablesLib from 'datatables.net-bs5';
 import { useGlobalError } from '@/composables/useGlobalError';
@@ -428,7 +438,7 @@ const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
 // filtros externos (você pode mudar conforme o seu contexto)
 const externalFilters = ref({
    hotel_id: '1', // exemplo
-   ativo: 'SIM', // exemplo
+   ativo: 'SIM',  // exemplo
 });
 
 let dtInstance = null; // armazenar instância da tabela para usar o reload
@@ -439,20 +449,21 @@ const dtColumns = [
    {
       title: 'Dia Evento',
       class: 'text-center fw-bold',
-      className: 'text-center',
+      className: 'text-center', // título coluna
       data: null,
-      width: '100px',
+      width: '120px',
       render: function (data, type, row) {
          const data_servico = row.data_servico?.trim()
-            ? formatToBrDate(row.data_servico)
+            // ? formatToBrDate(row.data_servico)
+            ? formatToBrDateWeek(row.data_servico)
             : 'Não informado';
          return `<span class="">${data_servico}</span>`;
       },
    },
-
    {
       title: 'Hospd',
       data: 'oferece_hospedagem',
+      className: 'text-center', // título coluna      
       class: 'dt-center small',
       width: '80px',
       render: function (data, type, row) {
@@ -462,9 +473,22 @@ const dtColumns = [
       },
    },
    {
+      title: 'Traslado',
+      data: 'oferece_traslado',
+      class: 'dt-center small',
+      className: 'text-center', // título coluna
+      width: '80px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.oferece_traslado === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.oferece_traslado === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
+      },
+   },
+   {
       title: 'Café',
       data: 'oferece_cafe',
       class: 'dt-center small',
+      className: 'text-center', // título coluna
       width: '80px',
       render: function (data, type, row) {
          return `<span class="${
@@ -476,6 +500,7 @@ const dtColumns = [
       title: 'Almoço',
       data: 'oferece_almoco',
       class: 'dt-center small',
+      className: 'text-center', // título coluna
       width: '80px',
       render: function (data, type, row) {
          return `<span class="${
@@ -483,7 +508,18 @@ const dtColumns = [
          }">${row.oferece_almoco === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
       },
    },
-
+   {
+      title: 'Jantar',
+      data: 'oferece_jantar',
+      class: 'dt-center small',
+      className: 'text-center', // título coluna
+      width: '80px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.oferece_jantar === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.oferece_jantar === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
+      },
+   },
    {
       title: 'Ação',
       data: null,
