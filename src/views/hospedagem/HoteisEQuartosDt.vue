@@ -355,6 +355,9 @@ const extraColumnRender = (row) => {
       } class="btn btn-xs btn-outline-info" data-custom-action="editarQuartosDoHotel" data-evento_id="${
       row.evento_id
    }" data-hotel_id="${row.id}" >Adm Quartos</button>
+      <button ${
+         canAdmQuartosDoHotel ? '' : 'disabled'
+      } class="btn btn-xs btn-outline-warning" data-custom-action="imprimirQuartosDoHotel" data-hotel_id="${row.id}" >Impr</button>
    `;
 };
 
@@ -698,6 +701,13 @@ function reloadTable() {
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
+
+   if (action === 'imprimirQuartosDoHotel') {
+      // console.log('imprimirQuartosDoHotel: ', dataset.hotel_id);
+      // alert('imprimirQuartosDoHotel: ' + dataset.hotel_id)
+      gerarRelatorio(dataset.hotel_id)
+   }
+
    if (action === 'editarQuartosDoHotel') {
       // console.log('Editar Quartos do Hotel: ', row, action, dataset, target);
       // console.log('ZAP: ', row, action, dataset, target);
@@ -731,6 +741,33 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       // quatosFormDados.value.quarto = {}; // inicializa o objeto
       // quatosFormDados.value.nome = row.nome; // preenche o nome do hotel
       // quatosFormModal.value = true;    // Abre o modal de edição
+   }
+};
+
+const gerarRelatorio = async (hotelId) => {
+   try {
+      await api.get('/relatorio-hotel', { params: { 'hotel_id': hotelId }});
+      // todosEventos.value = (await api.get('/evento')).data;
+      // console.log('gerarRelatorio', hotelId)
+
+      showToast({
+         title: 'Sucesso',
+         message: `Quarto ID  excluído com sucesso.`,
+      });
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      // Abrir no navegador ou forçar download
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'relatorios.hotelQuartos.pdf');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();      
+
+   } catch (error) {
+      console.log('Erro ao gerar relatório:', error.response.data.message);
    }
 };
 
