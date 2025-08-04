@@ -11,8 +11,9 @@ import { storeToRefs } from 'pinia'
 
 export function useEventos(ativo = true) {
    const eventos = ref([]);
+   const servicosDoEvento = ref([]);
    const todosEventos = ref([]);
-   const eventosStore = useEventosStore()
+   const eventosStore = useEventosStore();
    const rotas = ref([]);
    const veiculos = ref([]);
    const estados = ref([]);
@@ -239,9 +240,22 @@ export function useEventos(ativo = true) {
       }
    };
 
+   const fetchServicosDoEvento = async (eventoId) => {
+      console.log('fetchServicosDoEvento:', eventoId);
+
+      try {
+         error.value = null;
+         servicosDoEvento.value = (await api.get('/servico', { params: { evento_id: eventoId } })).data;
+      } catch (err) {
+         error.value = err;
+      }
+    }   
+
+
    return {
       eventos,
       todosEventos,
+      servicosDoEvento,
       eventosStore,
       veiculos,
       rotas,
@@ -260,6 +274,7 @@ export function useEventos(ativo = true) {
 
       // fetchEventos,
       fetchtodosEventos,
+      fetchServicosDoEvento,
       fetchOrganizacoes,   
       fetchEventos: eventosStore.fetchEventosAtivos,
       fetchVeiculos,       

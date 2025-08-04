@@ -1,14 +1,14 @@
 <template>
    <!-- DataTables principal do CRUD -->
    <GenericCrud
-      title="Lista de Hotéis "
-      description="Gerenciamento de Hotéis"
-      endpoint="hotel"
+      title="Lista de Eventos"
+      description="Gerenciamento de Eventos e seus Serviços por dia"
+      endpoint="evento"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
       :extra-column-render="extraColumnRender"
-      :columnActionsWidth="240"
+      :columnActionsWidth="140"
       :abilities="abilities"
       @extraAction="onExtraAction"
    >
@@ -125,6 +125,7 @@
       <CModalBody>
          <div class="mb-3">
             <label class="form-label fw-bold">Nosso Número</label>
+
             <!-- usando input para funcionar o foco -->
             <input
                ref="numeroFoco"
@@ -143,17 +144,20 @@
          </div>
 
          <div class="mb-3">
-            <label class="form-label fw-bold">Número no Hotel</label>
-            <CFormInput
-               v-model="quartoSelecionado.numero_hotel"
-               :class="{ 'is-invalid': !!quatosFormErros.numero_hotel }"
-            />
-            <div class="form-error" v-if="quatosFormErros.numero_hotel">
-               {{ quatosFormErros.numero_hotel[0] }}
+            <label class="form-label fw-bold">Oferece Almoço?</label>
+            <div class="form-check form-switch">
+               <input
+                  class="form-check-input"
+                  v-model="quartoSelecionado.oferece_hospedagem"
+                  type="checkbox"
+                  value="1"
+               />
+            </div>
+            <div class="form-error" v-if="quatosFormErros.oferece_hospedagem">
+               {{ quatosFormErros.oferece_hospedagem[0] }}
             </div>
             <div class="form-text">
-               Informar o número do quarto no Hotel. Ex. A-101, 202-C, E405,
-               etc.
+               Marque se é oferecido o serviço de Hospedagem neste dia
             </div>
          </div>
 
@@ -271,6 +275,7 @@
 import { computed, ref, toRaw, watch, nextTick } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
+import { formatToBrDate } from '@/utils/dateFormat';
 import DataTable from 'datatables.net-vue3';
 import DataTablesLib from 'datatables.net-bs5';
 import { useGlobalError } from '@/composables/useGlobalError';
@@ -279,13 +284,19 @@ import api from '@/services/api';
 
 DataTable.use(DataTablesLib);
 
-const endpoint = 'quarto';
+const endpoint = 'servico';
 
 import { useEventos } from '@/composables/useEventos';
 
 const { showToast } = useToast(); // Toasts de Alerta
-const { quartoTipos, fetchQuartoTipos, todosEventos, fetchtodosEventos } =
-   useEventos();
+const {
+   quartoTipos,
+   fetchQuartoTipos,
+   todosEventos,
+   fetchtodosEventos,
+   servicosDoEvento,
+   fetchServicosDoEvento,
+} = useEventos();
 const { showError } = useGlobalError(); // Modal de Erros
 
 // Vamos obter a lista de Eventos Ativo e o Corrente do store
@@ -311,9 +322,34 @@ const { abilities } = useAbilities();
 // define as coluna do DataTables
 const columns = [
    { title: 'ID', data: 'id', width: '30px' },
-   { title: 'Nome do Hotel', data: 'nome', class: 'fw-bold', width: 'auto' },
-   { title: 'Sigla', data: 'sigla', width: '160px' },
-   { title: 'Evento', data: 'evento.sigla', width: '160px' },
+   { title: 'Sigla', data: 'sigla', width: '140px', class: 'fw-bold' },
+   { title: 'Nome do Evento', data: 'nome', width: 'auto' },
+   { title: 'Periodo', data: 'periodo', width: 'auto' },
+
+   {
+      title: 'Dt Início',
+      data: null,
+      render: function (data, type, row) {
+         const dt_inicio = row.inscricao_data_ini?.trim()
+            ? formatToBrDate(row.inscricao_data_ini)
+            : 'Não informado';
+         return `<span class="">${dt_inicio}</span>`;
+      },
+      className: 'text-center',
+      width: '100px',
+   },
+   {
+      title: 'Dt Fim',
+      data: null,
+      render: function (data, type, row) {
+         const dt_fim = row.inscricao_data_fim?.trim()
+            ? formatToBrDate(row.inscricao_data_fim)
+            : 'Não informado';
+         return `<span class="">${dt_fim}</span>`;
+      },
+      className: 'text-center',
+      width: '100px',
+   },
    {
       title: 'Ativo',
       data: 'ativo',
@@ -329,32 +365,32 @@ const columns = [
 
 // define os valores padrão dos campos do formulário de edição
 const defaultValues = {
-   evento_id: currentEventId,
-   hotel_id: '',
-   numero: '',
-   numero_hotel: '',
-   tipo: '',
-   capacidade: '1',
-   custeado: 'SIM',
-   disponivel: 'SIM',
+   organizacao_id: 1,
+   nome: '',
+   sigla: '',
+   descricao: '',
+   local: 'FEB',
+   periodo: 'De 10 a 12 de Outubro de 20xx',
+   tema: 'Você e a paz ...',
+   inscricao_data_ini: '',
+   inscricao_data_fim: '',
+   ativo: 'SIM',
 };
 
 /**
  * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
  */
-const canAdmQuartosDoHotel = abilities.value.includes('quarto.update');
+const canAdmServicosDoEvento = abilities.value.includes('servico.update');
 
 const extraColumnRender = (row) => {
-   // controle de acesso - recupera as abilities do usuário logado na ação
-
-   // console.log('Abilities:', canAdmQuartosDoHotel);
+   // console.log('Abilities:', canAdmServicosDoEvento);
 
    return `
       <button ${
-         canAdmQuartosDoHotel ? '' : 'disabled'
+         canAdmServicosDoEvento ? '' : 'disabled'
       } class="btn btn-xs btn-outline-info" data-custom-action="editarQuartosDoHotel" data-evento_id="${
       row.evento_id
-   }" data-hotel_id="${row.id}" >Adm Quartos</button>
+   }" data-hotel_id="${row.id}" >Adm Serviços</button>
    `;
 };
 
@@ -376,7 +412,6 @@ const deleteModalVisible = ref(false); // controle do modal de exclusão
 
 const editarQuartoModal = ref(false);
 const quartoSelecionado = ref(null);
-const hotelTemQuartos = ref(false);
 
 // Foco no campo número quando o modal é aberto
 const numeroFoco = ref(null);
@@ -402,45 +437,53 @@ let dtInstance = null; // armazenar instância da tabela para usar o reload
 const dtColumns = [
    { title: 'ID', data: 'id', width: '30px' },
    {
-      title: 'Número',
-      data: 'numero',
+      title: 'Dia Evento',
       class: 'text-center fw-bold',
       className: 'text-center',
-      width: '60px',
-   },
-   {
-      title: 'Nº Hotel',
-      data: 'numero_hotel',
-      class: 'text-center',
-      className: 'text-center',
-      width: '100px',
-   },
-   { title: 'Tipo', data: 'quarto_tipo.nome', width: 'auto' },
-   {
-      title: 'Capcid',
-      data: 'capacidade',
-      width: '80px',
-      class: 'text-center',
-   },
-   {
-      title: 'Custeado	',
-      data: 'custeado',
-      class: 'text-center',
-      width: '100px',
-   },
-   {
-      title: 'Ativo',
       data: null,
-      className: 'text-center', // título coluna
-      // class: 'text-center small',
-      class: 'text-center',
-      width: '70px',
+      width: '100px',
       render: function (data, type, row) {
-         return `<span class="${
-            row.disponivel === 'SIM' ? 'text-primary' : 'text-danger'
-         }">${row.disponivel}</span>`;
+         const data_servico = row.data_servico?.trim()
+            ? formatToBrDate(row.data_servico)
+            : 'Não informado';
+         return `<span class="">${data_servico}</span>`;
       },
    },
+
+   {
+      title: 'Hospd',
+      data: 'oferece_hospedagem',
+      class: 'dt-center small',
+      width: '80px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.oferece_hospedagem === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.oferece_hospedagem === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
+      },
+   },
+   {
+      title: 'Café',
+      data: 'oferece_cafe',
+      class: 'dt-center small',
+      width: '80px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.oferece_cafe === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.oferece_cafe === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
+      },
+   },
+   {
+      title: 'Almoço',
+      data: 'oferece_almoco',
+      class: 'dt-center small',
+      width: '80px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.oferece_almoco === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.oferece_almoco === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
+      },
+   },
+
    {
       title: 'Ação',
       data: null,
@@ -449,12 +492,12 @@ const dtColumns = [
       width: '140px',
       render: (data, type, row) =>
          `<button ${
-            canAdmQuartosDoHotel ? '' : 'disabled'
+            canAdmServicosDoEvento ? '' : 'disabled'
          } class="btn btn-xs btn-outline-primary btn-edit" data-hotel_id="${
             row.hotel_id
          }"><i class="fa fa-edit"></i> Editar</button>
           <button ${
-             canAdmQuartosDoHotel ? '' : 'disabled'
+             canAdmServicosDoEvento ? '' : 'disabled'
           } class="btn btn-xs btn-outline-danger btn-delete" data-hotel_id="${
             row.hotel_id
          }"><i class="fa fa-trash"></i> Excluir</button>
@@ -649,7 +692,6 @@ const salvarQuartoDoHotel = async () => {
 
    const payload = {
       evento_id,
-      hotel_id,
       id,
       numero,
       numero_hotel,
@@ -664,7 +706,7 @@ const salvarQuartoDoHotel = async () => {
 
       if (quatosFormOperacao.value === 'novo') {
          // payload.evento_id = globalEventoId.value; // usa o evento_id do filtro externo
-         payload.hotel_id = externalFilters.value.hotel_id; // usa o hotel_id do filtro externo
+         payload.evento_id = externalFilters.value.evento_id; // usa o hotel_id do filtro externo
 
          await api.post(`quarto`, payload);
          mensagem = `Quarto inserido com sucesso.`;
@@ -715,7 +757,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       //    return
       // }
 
-      externalFilters.value.hotel_id = row.id; // define o hotel_id no filtro externo
+      externalFilters.value.evento_id = row.id; // define o hotel_id no filtro externo
       quatosFormModal.value = true; // Abre o modal de edição
       // console.log('Evento ID', currentEvent.value);
 
@@ -746,7 +788,7 @@ const filters = computed(() => {
       {
          label: 'Ativo',
          field: 'ativo',
-         // default: 'SIM',
+         default: 'SIM',
          type: 'select',
          options: [
             { value: 'SIM', label: 'SIM' },
@@ -756,3 +798,30 @@ const filters = computed(() => {
    ];
 });
 </script>
+
+<style scoped>
+.form-switch .form-check-input {
+   width: 4em;
+   height: 2em;
+   position: relative;
+}
+
+.form-switch .form-check-input::before {
+   content: 'NÃO';
+   position: absolute;
+   left: 6px;
+   top: 2.3px;
+   font-size: 0.9rem;
+   color: grey;
+   margin-left: 22px;
+}
+
+.form-switch .form-check-input:checked::before {
+   content: 'SIM';
+   left: 22px;
+   color: white;
+   left: 5px;
+   top: 2.3px;
+   margin-left: 0px;
+}
+</style>

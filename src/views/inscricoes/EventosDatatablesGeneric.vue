@@ -13,7 +13,6 @@ import api from '@/services/api';
 // import DataTable from 'datatables.net-vue3';
 import DataTablesLib from 'datatables.net-bs5';
 
-
 // define a Entidade Principal da View
 const entity = 'evento';
 
@@ -33,16 +32,15 @@ function chamarRefresh() {
 }
 
 // Vamos obter a lista de Eventos Ativo e o Corrente do store
-import { useEventosStore } from '@/stores/useEventosStore'
-const eventosStore = useEventosStore()
+import { useEventosStore } from '@/stores/useEventosStore';
+const eventosStore = useEventosStore();
 
 async function onAfterSave({ saved, data }) {
    // console.log('onAfterSave executado', saved);
    if (saved) {
-      await eventosStore.fetchEventosAtivos()
+      await eventosStore.fetchEventosAtivos();
    }
 }
-
 
 /**
  * BASE Crud - colunas da tabela de dados
@@ -165,10 +163,7 @@ const pessoaFormErros = ref({});
  *       lista de Tipos de Eventos
  */
 import { useEventos } from '@/composables/useEventos';
-const {
-   fetchOrganizacoes,
-   organizacoes,
-} = useEventos();
+const { fetchOrganizacoes, organizacoes } = useEventos();
 fetchOrganizacoes();
 
 /**
