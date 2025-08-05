@@ -357,7 +357,9 @@ const extraColumnRender = (row) => {
    }" data-hotel_id="${row.id}" >Adm Quartos</button>
       <button ${
          canAdmQuartosDoHotel ? '' : 'disabled'
-      } class="btn btn-xs btn-outline-warning" data-custom-action="imprimirQuartosDoHotel" data-hotel_id="${row.id}" >Impr</button>
+      } class="btn btn-xs btn-outline-warning" data-custom-action="imprimirQuartosDoHotel" data-hotel_id="${
+      row.id
+   }" >Impr</button>
    `;
 };
 
@@ -701,11 +703,10 @@ function reloadTable() {
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
-
    if (action === 'imprimirQuartosDoHotel') {
       // console.log('imprimirQuartosDoHotel: ', dataset.hotel_id);
       // alert('imprimirQuartosDoHotel: ' + dataset.hotel_id)
-      gerarRelatorio(dataset.hotel_id)
+      gerarRelatorio(dataset.hotel_id);
    }
 
    if (action === 'editarQuartosDoHotel') {
@@ -746,28 +747,34 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
 
 const gerarRelatorio = async (hotelId) => {
    try {
-      await api.get('/relatorio-hotel', { params: { 'hotel_id': hotelId }});
-      // todosEventos.value = (await api.get('/evento')).data;
-      // console.log('gerarRelatorio', hotelId)
+      // console.log('Chamando gerarRelatorio com ID:', hotelId);
+
+      const response = await api.get(`/hotel/relatorio/${hotelId}`, {
+         responseType: 'blob',
+      });
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+
+      // Se quiser abrir no navegador:
+      window.open(url, '_blank');
+
+      // Se quiser forçar download:   
+      // const link = document.createElement('a');
+      // link.href = url;
+      // link.setAttribute('download', 'relatorio-hotel.pdf');
+      // document.body.appendChild(link);
+      // link.click();
+      // document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(url); // Liberar URL da memória
 
       showToast({
          title: 'Sucesso',
-         message: `Quarto ID  excluído com sucesso.`,
+         message: `Relatório gerado com sucesso.`,
       });
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      // Abrir no navegador ou forçar download
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'relatorios.hotelQuartos.pdf');
-      document.body.appendChild(link);
-      link.click();
-      link.remove();      
-
    } catch (error) {
-      console.log('Erro ao gerar relatório:', error.response.data.message);
+      console.log('Erro ao gerar relatório:', error.response?.data.message);
    }
 };
 
