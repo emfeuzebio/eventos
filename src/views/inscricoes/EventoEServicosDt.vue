@@ -85,6 +85,7 @@
       </CModalHeader>
       <CModalBody>
          <CButton
+            v-if="quatosFormDados.ativo === 'SIM'"
             color="btn btn-sm btn-outline-success mb-2 me-2"
             @click="novoQuartoDoHotel()"
             >Novo Serviço</CButton
@@ -123,7 +124,6 @@
       </CModalHeader>
 
       <CModalBody>
-
          <!-- Dia do Evento -->
          <div class="mb-3">
             <label class="form-label fw-bold">Dia do Evento</label>
@@ -139,20 +139,26 @@
             <div class="form-error" v-if="quatosFormErros.data_servico">
                {{ quatosFormErros.data_servico[0] }}
             </div>
-            <div class="form-text">
-               Informar a Data do Dia do Evento
-            </div>
+            <div class="form-text">Informar a Data do Dia do Evento</div>
          </div>
 
          <!-- Hospedagem -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Oferece Hospedagem? {{ quartoSelecionado.oferece_hospedagem }}</label>
+            <label class="form-label fw-bold"
+               >Oferece Hospedagem?
+               {{ quartoSelecionado.oferece_hospedagem }}</label
+            >
             <div class="form-check form-switch">
                <input
                   class="form-check-input"
                   type="checkbox"
                   :checked="quartoSelecionado.oferece_hospedagem === 'SIM'"
-                  @change="quartoSelecionado.oferece_hospedagem = $event.target.checked ? 'SIM' : 'NÃO'"
+                  @change="
+                     quartoSelecionado.oferece_hospedagem = $event.target
+                        .checked
+                        ? 'SIM'
+                        : 'NÃO'
+                  "
                />
             </div>
             <div class="form-error" v-if="quatosFormErros.oferece_hospedagem">
@@ -165,17 +171,24 @@
 
          <!-- Translado -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Oferece Traslado? {{ quartoSelecionado.oferece_traslado	 }}</label>
+            <label class="form-label fw-bold"
+               >Oferece Traslado?
+               {{ quartoSelecionado.oferece_traslado }}</label
+            >
             <div class="form-check form-switch">
                <input
                   class="form-check-input"
                   type="checkbox"
-                  :checked="quartoSelecionado.oferece_traslado	 === 'SIM'"
-                  @change="quartoSelecionado.oferece_traslado	 = $event.target.checked ? 'SIM' : 'NÃO'"
+                  :checked="quartoSelecionado.oferece_traslado === 'SIM'"
+                  @change="
+                     quartoSelecionado.oferece_traslado = $event.target.checked
+                        ? 'SIM'
+                        : 'NÃO'
+                  "
                />
             </div>
-            <div class="form-error" v-if="quatosFormErros.oferece_traslado	">
-               {{ quatosFormErros.oferece_traslado	[0] }}
+            <div class="form-error" v-if="quatosFormErros.oferece_traslado">
+               {{ quatosFormErros.oferece_traslado[0] }}
             </div>
             <div class="form-text">
                Marque se será oferecido o serviço de Traslado neste dia
@@ -184,17 +197,24 @@
 
          <!-- Café da Manhã -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Oferece Café da Manhã? {{ quartoSelecionado.oferece_cafe	 }}</label>
+            <label class="form-label fw-bold"
+               >Oferece Café da Manhã?
+               {{ quartoSelecionado.oferece_cafe }}</label
+            >
             <div class="form-check form-switch">
                <input
                   class="form-check-input"
                   type="checkbox"
-                  :checked="quartoSelecionado.oferece_cafe	 === 'SIM'"
-                  @change="quartoSelecionado.oferece_cafe	 = $event.target.checked ? 'SIM' : 'NÃO'"
+                  :checked="quartoSelecionado.oferece_cafe === 'SIM'"
+                  @change="
+                     quartoSelecionado.oferece_cafe = $event.target.checked
+                        ? 'SIM'
+                        : 'NÃO'
+                  "
                />
             </div>
-            <div class="form-error" v-if="quatosFormErros.oferece_cafe	">
-               {{ quatosFormErros.oferece_cafe	[0] }}
+            <div class="form-error" v-if="quatosFormErros.oferece_cafe">
+               {{ quatosFormErros.oferece_cafe[0] }}
             </div>
             <div class="form-text">
                Marque se será oferecido o serviço de Café da Manhã neste dia
@@ -203,17 +223,23 @@
 
          <!-- Café da Almoço -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Oferece Almoço? {{ quartoSelecionado.oferece_almoco	 }}</label>
+            <label class="form-label fw-bold"
+               >Oferece Almoço? {{ quartoSelecionado.oferece_almoco }}</label
+            >
             <div class="form-check form-switch">
                <input
                   class="form-check-input"
                   type="checkbox"
-                  :checked="quartoSelecionado.oferece_almoco	 === 'SIM'"
-                  @change="quartoSelecionado.oferece_almoco	 = $event.target.checked ? 'SIM' : 'NÃO'"
+                  :checked="quartoSelecionado.oferece_almoco === 'SIM'"
+                  @change="
+                     quartoSelecionado.oferece_almoco = $event.target.checked
+                        ? 'SIM'
+                        : 'NÃO'
+                  "
                />
             </div>
-            <div class="form-error" v-if="quatosFormErros.oferece_almoco	">
-               {{ quatosFormErros.oferece_almoco	[0] }}
+            <div class="form-error" v-if="quatosFormErros.oferece_almoco">
+               {{ quatosFormErros.oferece_almoco[0] }}
             </div>
             <div class="form-text">
                Marque se será oferecido o serviço de Almoço neste dia
@@ -222,23 +248,28 @@
 
          <!-- Café da Jantar -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Oferece Jantar? {{ quartoSelecionado.oferece_jantar	 }}</label>
+            <label class="form-label fw-bold"
+               >Oferece Jantar? {{ quartoSelecionado.oferece_jantar }}</label
+            >
             <div class="form-check form-switch">
                <input
                   class="form-check-input"
                   type="checkbox"
-                  :checked="quartoSelecionado.oferece_jantar	 === 'SIM'"
-                  @change="quartoSelecionado.oferece_jantar	 = $event.target.checked ? 'SIM' : 'NÃO'"
+                  :checked="quartoSelecionado.oferece_jantar === 'SIM'"
+                  @change="
+                     quartoSelecionado.oferece_jantar = $event.target.checked
+                        ? 'SIM'
+                        : 'NÃO'
+                  "
                />
             </div>
-            <div class="form-error" v-if="quatosFormErros.oferece_jantar	">
-               {{ quatosFormErros.oferece_jantar	[0] }}
+            <div class="form-error" v-if="quatosFormErros.oferece_jantar">
+               {{ quatosFormErros.oferece_jantar[0] }}
             </div>
             <div class="form-text">
                Marque se será oferecido o serviço de Jantar neste dia
             </div>
          </div>
-
       </CModalBody>
 
       <CModalFooter>
@@ -261,11 +292,8 @@
          <strong>Confirmar Exclusão</strong>
       </CModalHeader>
       <CModalBody>
-         Tem certeza que deseja excluir este Quarto de Hotel:
-         <br />
-         Número: <b>{{ quartoSelecionado?.numero || '' }}</b
-         >, Número no Hotel: <b>{{ quartoSelecionado?.numero_hotel || '' }}</b
-         >, Tipo: <b>{{ quartoSelecionado?.quarto_tipo.nome || 'xx' }}</b> ?
+         Tem certeza que deseja excluir os Serviços do Dia:
+         <b>{{ quartoSelecionado?.data_servico || '' }}</b> ?
       </CModalBody>
       <CModalFooter>
          <CButton
@@ -300,8 +328,6 @@ import { useEventos } from '@/composables/useEventos';
 
 const { showToast } = useToast(); // Toasts de Alerta
 const {
-   quartoTipos,
-   fetchQuartoTipos,
    todosEventos,
    fetchtodosEventos,
    servicosDoEvento,
@@ -421,7 +447,7 @@ const quatosFormOperacao = ref('editar'); // 'novo' ou 'editar'
 const deleteModalVisible = ref(false); // controle do modal de exclusão
 
 const editarQuartoModal = ref(false);
-const quartoSelecionado = ref(null);
+const quartoSelecionado = ref({});
 
 // Foco no campo número quando o modal é aberto
 const numeroFoco = ref(null);
@@ -438,7 +464,7 @@ const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
 // filtros externos (você pode mudar conforme o seu contexto)
 const externalFilters = ref({
    hotel_id: '1', // exemplo
-   ativo: 'SIM',  // exemplo
+   ativo: 'SIM', // exemplo
 });
 
 let dtInstance = null; // armazenar instância da tabela para usar o reload
@@ -454,8 +480,8 @@ const dtColumns = [
       width: '120px',
       render: function (data, type, row) {
          const data_servico = row.data_servico?.trim()
-            // ? formatToBrDate(row.data_servico)
-            ? formatToBrDateWeek(row.data_servico)
+            ? // ? formatToBrDate(row.data_servico)
+              formatToBrDateWeek(row.data_servico)
             : 'Não informado';
          return `<span class="">${data_servico}</span>`;
       },
@@ -463,7 +489,7 @@ const dtColumns = [
    {
       title: 'Hospd',
       data: 'oferece_hospedagem',
-      className: 'text-center', // título coluna      
+      className: 'text-center', // título coluna
       class: 'dt-center small',
       width: '80px',
       render: function (data, type, row) {
@@ -557,7 +583,6 @@ const dtConfig = {
    ajax: function (_data, callback, _settings) {
       const filters = {
          ...externalFilters.value,
-         // evento_id: globalEventoId.value,
       };
 
       api.get(endpoint, { params: filters })
@@ -604,7 +629,6 @@ const dtConfig = {
             }
 
             if (e.target && e.target.classList.contains('btn-delete')) {
-               // excluir(rowId, rowData);
                excluirQuartoDoHotel(rowData);
             }
 
@@ -627,16 +651,16 @@ const novoQuartoDoHotel = async () => {
       return;
    }
 
-   fetchQuartoTipos();
-
    // inicializa o objeto com dados padrão
    quartoSelecionado.value = {
-      numero: '',
-      numero_hotel: '',
-      quarto_tipo_id: '2',
-      capacidade: '2',
-      custeado: 'NÃO',
-      disponivel: 'SIM',
+      data_servico: null,
+      oferece_transporte: 'NÃO',
+      oferece_hospedagem: 'NÃO',
+      oferece_lavanderia: 'NÃO',
+      oferece_traslado: 'NÃO',
+      oferece_cafe: 'NÃO',
+      oferece_almoco: 'NÃO',
+      oferece_jantar: 'NÃO',
    };
 
    quatosFormErros.value = {}; // limpa erros antigos
@@ -654,8 +678,7 @@ const editarQuartoDoHotel = async (quarto) => {
       return;
    }
 
-   fetchQuartoTipos();
-
+   // fetchQuartoTipos();
    quartoSelecionado.value = { ...quarto };
    quatosFormErros.value = {}; // limpa erros antigos
    // console.log('Editar quarto:', quarto);
@@ -669,14 +692,7 @@ const excluirQuartoDoHotel = async (quarto) => {
    // console.log('excluirQuartoDoHotel:', quarto);
    quartoSelecionado.value = { ...quarto };
 
-   console.log('excluirQuartoDoHotel:', quartoSelecionado.value);
-
-   // editarQuartoModal.value = false;
-   // quartoSelecionado.value = null;
-   // alert('excluirQuartoDoHotel.' + quarto.numero);
-   // alert('excluirQuartoDoHotel.' + quartoSelecionado.value.numero);
-   // alert('excluirQuartoDoHotel.' + rowId + ', ' + rowData.numero);
-   // console.log('excluirQuartoDoHotel.', rowId, rowData);
+   // console.log('excluirQuartoDoHotel:', quartoSelecionado.value);
    deleteModalVisible.value = true; // Abre o modal de confirmação de exclusão
 };
 
@@ -686,7 +702,7 @@ const confirmDelete = async () => {
 
       showToast({
          title: 'Sucesso',
-         message: `Quarto ID ${quartoSelecionado.value.id} excluído com sucesso.`,
+         message: `Serviço ID ${quartoSelecionado.value.id} excluído com sucesso.`,
       });
 
       deleteModalVisible.value = false;
@@ -716,39 +732,39 @@ const salvarQuartoDoHotel = async () => {
 
    const {
       evento_id,
-      hotel_id,
       id,
-      numero,
-      numero_hotel,
-      quarto_tipo_id,
-      capacidade,
-      custeado,
-      disponivel,
+      data_servico,
+      oferece_transporte,
+      oferece_hospedagem,
+      oferece_lavanderia,
+      oferece_traslado,
+      oferece_cafe,
+      oferece_almoco,
+      oferece_jantar,
    } = toRaw(quartoSelecionado.value);
 
    const payload = {
-      evento_id,
+      evento_id: externalFilters.value.evento_id, // usa o hotel_id do filtro externo,
       id,
-      numero,
-      numero_hotel,
-      quarto_tipo_id,
-      capacidade,
-      custeado,
-      disponivel,
+      data_servico,
+      oferece_transporte,
+      oferece_hospedagem,
+      oferece_lavanderia,
+      oferece_traslado,
+      oferece_cafe,
+      oferece_almoco,
+      oferece_jantar,
    };
 
    try {
       var mensagem = '';
 
       if (quatosFormOperacao.value === 'novo') {
-         // payload.evento_id = globalEventoId.value; // usa o evento_id do filtro externo
-         payload.evento_id = externalFilters.value.evento_id; // usa o hotel_id do filtro externo
-
-         await api.post(`quarto`, payload);
-         mensagem = `Quarto inserido com sucesso.`;
+         await api.post(`servico`, payload);
+         mensagem = `Serviço inserido com sucesso.`;
       } else {
-         await api.put(`quarto/${quartoSelecionado.value.id}`, payload);
-         mensagem = `Quarto ID ${quartoSelecionado.value.id} atualizado com sucesso.`;
+         await api.put(`servico/${quartoSelecionado.value.id}`, payload);
+         mensagem = `Serviço ID ${quartoSelecionado.value.id} atualizado com sucesso.`;
       }
 
       showToast({
@@ -788,27 +804,10 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
          return;
       }
 
-      // if (!currentEvent.value) {
-      //    showError("Somente um Evento ATIVO pode ter seus Quartos editados.");
-      //    return
-      // }
-
       externalFilters.value.evento_id = row.id; // define o hotel_id no filtro externo
-      quatosFormModal.value = true; // Abre o modal de edição
-      // console.log('Evento ID', currentEvent.value);
-
-      // const tipos = await fetchQuartoTipos();
-      // console.log('Tipo de Quartos:', toRaw(tipos));
-
-      // Recupera os Quartos do Hotel e popula a variável reativa que lista no EasyTables
-      // await fetchQuartosDoHotel(currentEventId.value, row.id);
-      // console.log('Quartos do Hotel:', quartosDoHotel.value);
-      // console.log('Quartos do Hotel:', toRaw(quartosDoHotel.value));
-
       quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
-      // quatosFormDados.value.quarto = {}; // inicializa o objeto
-      // quatosFormDados.value.nome = row.nome; // preenche o nome do hotel
-      // quatosFormModal.value = true;    // Abre o modal de edição
+      quatosFormModal.value = true; // abre o modal de edição
+      // quatosFormDados.value.quarto = {};     // inicializa o objeto
    }
 };
 
