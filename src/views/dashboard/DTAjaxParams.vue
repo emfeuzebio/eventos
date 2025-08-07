@@ -4,11 +4,30 @@
          Recarregar Dados
       </button>
 
+      DASHBOARD
+
       <DataTable
          :columns="columns"
          :options="options"
          class="display table table-striped table-bordered table-hover table-sm compact w-100"
       />
+   </div>
+
+   <div class="row">
+      <div class="col-md-3 mb-3">
+         <label for="inicio" class="form-label">Início do Evento</label>
+         <div class="input-group">
+            <flat-pickr
+               v-model="dataInicio"
+               :config="config"
+               class="form-control"
+               placeholder="Selecione a data"
+            />
+            <span class="input-group-text">
+               <i class="bi bi-calendar3"></i>
+            </span>
+         </div>
+      </div>
    </div>
 </template>
 
@@ -20,6 +39,25 @@ import { useCurrentEventStore } from '@/stores/currentEvent';
 import { useRouter } from 'vue-router';
 import api from '@/services/api';
 import { redirectToLogin } from '@/utils/routerHelper';
+
+import FlatPickr from 'vue-flatpickr-component';
+import { Portuguese } from 'flatpickr/dist/l10n/pt.js';
+import 'flatpickr/dist/flatpickr.css';
+
+// Início e fim do evento
+const dataInicio = ref(null);
+
+// Configuração do flatpickr
+const config = {
+   enableTime: false,
+   dateFormat: 'd/m/Y',
+   time_24hr: true,
+   // locale: 'pt',
+   enable: ['04/08/2025', '05/08/2025', '06/08/2025', '07/08/2025'],
+   locale: Portuguese,
+   disableMobile: true,
+   mode: 'multiple',
+};
 
 DataTable.use(DataTablesLib);
 
@@ -215,5 +253,15 @@ watch(globalEventoId, () => {
 /* Fonte dos botões Primeiro/Anterior/... */
 .d-none.d-sm-inline {
    font-size: 13px;
+}
+
+/* Ajusta fonte e espaçamento se necessário */
+.flatpickr-calendar {
+   font-family: var(--cui-body-font-family, var(--bs-body-font-family));
+   font-size: 0.875rem; /* compatível com CoreUI */
+}
+
+.flatpickr-weekdays {
+   background: #5856d6;
 }
 </style>
