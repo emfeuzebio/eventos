@@ -56,7 +56,7 @@ const config = {
    enable: ['04/08/2025', '05/08/2025', '06/08/2025', '07/08/2025'],
    locale: Portuguese,
    disableMobile: true,
-   mode: 'multiple',
+   mode: 'multiple', // usar este para configurar período do evento e salvar como array ver GPT solução
 };
 
 DataTable.use(DataTablesLib);
