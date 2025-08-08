@@ -40,7 +40,7 @@ const abilities = getAbilities(); // recupera do JWR as abilities do usuário lo
  * BASE Crud - colunas da tabela de dados
  */
 const columns = [
-   { title: 'ID', data: 'id' },
+   { title: 'ID', data: 'id', width: '30px' },
    { title: 'Nome da Região', data: 'descricao', class: 'fw-bold' },
    { title: 'Sigla', data: 'sigla' },
 ];
@@ -57,6 +57,23 @@ const defaultValues = {
  * BASE Crud - Filtros da tabela de dados
  */
 const filters = [{}]; // nessse caso sem filtros
+
+// const filters = computed(() => {
+//    // const ativos = eventosStore.ativos || [];
+//    return [
+//       {
+//          label: 'Ativoxx',
+//          field: 'ativo_gg',
+//          // default: 'SIM',
+//          type: 'select',
+//          options: [
+//             { value: 'SIM', label: 'SIM' },
+//             { value: 'NÃO', label: 'NÃO' },
+//          ],
+//       },
+//       { field: 'morto',}
+//    ];
+// });
 
 /**
  * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
@@ -121,12 +138,6 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       :extra-column-render="extraColumnRender"
       :columnActionsWidth="200"
       :abilities="abilities"
-      :canList="canList"
-      :canShow="canShow"
-      :canInsert="canInsert"
-      :canUpdate="canUpdate"
-      :canDelete="canDelete"
-      :canPrint="canPrint"
       @extraAction="onExtraAction"
    >
       <template #form="{ form, errors }">

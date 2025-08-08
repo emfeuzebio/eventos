@@ -97,7 +97,7 @@ function chamarRefresh() {
  * BASE Crud - colunas da tabela de dados
  */
 const columns = [
-   { title: 'ID', data: 'id', width: '10px' },
+   { title: 'ID', data: 'id', width: '30px' },
    { title: 'Nome', data: 'nome', width: '220px', class: 'fw-bold' },
    { title: 'Sigla', data: 'sigla', width: '80px' },
    { title: 'Descrição', data: 'descricao', width: 'auto' },

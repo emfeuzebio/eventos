@@ -214,19 +214,16 @@ const props = defineProps({
    afterSave: Function,
 });
 
-// controle CAN() de botões adicionais da página
-const canInsert = props.abilities.includes(props.endpoint + '.store');
-const canPrint = props.abilities.includes(props.endpoint + '.print');
-const canCalcula = props.abilities.includes(props.endpoint + '.calcular');
-
 // controe os filtros
 const filtros = ref({});
-// console.log(props.filters);
+// console.log('Ref para os Filtros da Página:', props.filters);
 
 props.filters.forEach((filtro) => {
-   filtros.value[filtro.field] = filtro.default ?? ''; // usa valor default
-});
-// console.log(filtros);
+  if (filtro?.field) {
+    filtros.value[filtro.field] = filtro.default ?? '';
+  }
+}); 
+// console.log('Filtros aplicados à Página:',filtros); 
 
 // Estados e ações
 const alert = ref({ type: '', message: '' });

@@ -424,7 +424,7 @@ export default [
       },
       {
         component: 'CNavItem',
-        name: 'Entidades Espíritas',
+        name: 'Entidades',
         to: '/cadastros/entidades',
       },
       {

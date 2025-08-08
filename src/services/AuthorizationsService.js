@@ -65,7 +65,12 @@ export function canAll(...abilities) {
 export function useAbilities() {
    const userStore = useUserStore();
 
-   const abilities = computed(() => userStore.abilities || []);
+   // const abilities = computed(() => userStore.abilities || []);
+   // transforma userStore.abilities em array caso venha um objeto
+   const abilities = computed(() => {
+      const a = userStore.abilities;
+      return Array.isArray(a) ? a : [];
+    });   
 
    const can = (ability) => abilities.value.includes(ability);
 

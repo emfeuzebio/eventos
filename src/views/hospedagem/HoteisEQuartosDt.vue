@@ -310,7 +310,7 @@ const { abilities } = useAbilities();
 
 // define as coluna do DataTables
 const columns = [
-   { title: 'ID', data: 'id', width: '30px' },
+   { title: 'ID', data: 'id', width: '40px' },
    { title: 'Nome do Hotel', data: 'nome', class: 'fw-bold', width: 'auto' },
    { title: 'Sigla', data: 'sigla', width: '160px' },
    { title: 'Evento', data: 'evento.sigla', width: '160px' },

@@ -35,7 +35,7 @@ var canPrint = false;
 
 // define parâmetros das tabela de dados
 const columns = [
-   { title: 'ID', data: 'id' },
+   { title: 'ID', data: 'id', width: '30px' },
    { title: 'Nome da Função', data: 'descricao', class: 'fw-bold' },
    { title: 'Sigla', data: 'sigla', width: '160px' },
    { title: 'Qtd Máx', data: 'qtd', width: '120px', className: 'text-center' },
@@ -44,11 +44,13 @@ const columns = [
       data: 'exclusivo_feb',
       class: 'dt-center small',
       width: '140px',
+      className: 'text-center'
    },
    {
       title: 'Ativo',
       data: 'ativo',
       class: 'dt-center small',
+      className: 'text-center',
       width: '80px',
       render: function (data, type, row) {
          return `<span class="${
