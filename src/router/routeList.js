@@ -266,6 +266,10 @@ const routes = [
               path: '/inscricoes/pessoa',
               name: 'Pessoas',
               component: () => import('@/views/inscricoes/PessoasDatatablesGeneric.vue'),
+              meta: {
+                requiresAuth: true,
+                requiredAbilities: ['pessoa.index'],
+              },              
             },
             {
               path: '/inscricoes/inscricoes',

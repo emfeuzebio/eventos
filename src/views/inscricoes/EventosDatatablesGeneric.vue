@@ -1,273 +1,3 @@
-<script setup>
-import { ref, toRaw, computed } from 'vue';
-import GenericCrud from '@/components/GenericCrud.vue';
-import DateInputWrapper from '@/components/DateInputWrapper.vue';
-import DateTimeInputWrapper from '@/components/DateTimeInputWrapper.vue';
-import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
-import { useToast } from '@/composables/useToast';
-import { formatToBrDateTime } from '@/utils/dateFormat';
-import { formatToBrDate } from '@/utils/dateFormat';
-import api from '@/services/api';
-
-// import 'datatables.net-dt';
-// import DataTable from 'datatables.net-vue3';
-import DataTablesLib from 'datatables.net-bs5';
-
-// define a Entidade Principal da View
-const entity = 'evento';
-
-const { showToast } = useToast(); // Toasts de Alerta
-
-// recuperas as Autorizações (abilities) do JWT
-const { can } = useAbilities();
-const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
-
-// DEBUG de todas abilities do User Logado
-// console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);
-
-const crudRef = ref(null);
-
-function chamarRefresh() {
-   crudRef.value?.refreshTable();
-}
-
-// Vamos obter a lista de Eventos Ativo e o Corrente do store
-import { useEventosStore } from '@/stores/useEventosStore';
-const eventosStore = useEventosStore();
-
-async function onAfterSave({ saved, data }) {
-   // console.log('onAfterSave executado', saved);
-   if (saved) {
-      await eventosStore.fetchEventosAtivos();
-   }
-}
-
-/**
- * BASE Crud - colunas da tabela de dados
- */
-const columns = [
-   { title: 'ID', data: 'id', width: '10px' },
-   // { title: 'Organização', data: 'organizacao_id', width: '100px' },
-   {
-      title: 'Sigla',
-      data: 'sigla',
-      width: '140px',
-      class: 'fw-bold',
-   },
-   { title: 'Nome do Evento', data: 'nome', width: '260px' },
-   { title: 'Periodo', data: 'periodo', width: 'auto' },
-   {
-      title: 'Dt Início',
-      data: null,
-      render: function (data, type, row) {
-         const dt_inicio = row.inscricao_data_ini?.trim()
-            ? formatToBrDate(row.inscricao_data_ini)
-            : 'Não informado';
-         return `<span class="">${dt_inicio}</span>`;
-      },
-      className: 'text-center',
-      width: '100px',
-   },
-   {
-      title: 'Dt Fim',
-      data: null,
-      render: function (data, type, row) {
-         const dt_fim = row.inscricao_data_fim?.trim()
-            ? formatToBrDate(row.inscricao_data_fim)
-            : 'Não informado';
-         return `<span class="">${dt_fim}</span>`;
-      },
-      className: 'text-center',
-      width: '100px',
-   },
-   {
-      title: 'Ativo',
-      data: 'ativo',
-      class: 'dt-center small',
-      width: '60px',
-      render: function (data, type, row) {
-         return `<span class="${
-            row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
-         }">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
-      },
-   },
-   // { title: 'Tema', data: 'tema', width: 'auto' },
-
-   // { title: 'Início', data: 'inscricao_data_ini', width: '90px', className: 'text-center', },
-   // { title: 'Fim', data: 'inscricao_data_fim', width: '90px', className: 'text-center', },
-   // {
-   //    title: 'Pessoa | Entidade | Papel | Modalidade',
-   //    data: null, // importante usar null quando o render vai acessar múltiplos campos
-   //    render: function (data, type, row) {
-   //       const nome = row.pessoa?.nome_social || '';
-   //       const modalidade = row.modalidade || 'Não informada';
-   //       const entidade_sigla = row.pessoa?.entidade?.sigla ?? 'Sem Entidade';
-   //       return `<span class="fw-bold">${nome}</span> <small class="text-muted">${entidade_sigla}</small> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
-   //    },
-   //    className: 'text-left',
-   //    width: '320px',
-];
-
-/**
- * BASE Crud - Valores padrão dos campos do formulário
- */
-const defaultValues = {
-   organizacao_id: 1,
-   nome: 'Nome do Evento',
-   sigla: 'Sigla do Evento',
-   descricao: 'Descrição completa do Evento',
-   local: 'FEB',
-   periodo: 'De 10 a 12 de Outubro de 20xx',
-   tema: 'Você e a paz',
-   inscricao_data_ini: '',
-   inscricao_data_fim: '',
-   ativo: 'SIM',
-   // valor_cafe: '0.00',
-   // valor_lanche: '0.00',
-   // valor_almoco: '0.00',
-   // valor_jantar: '0.00',
-};
-
-/**
- * ESPECIALIZAÇÃO CRUD: recupera da API autorizações específicas/adicionais
- */
-// var canPrint = can(`${entity}.print`);
-
-/**
- * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
- */
-const extraColumnRender = (row) => {
-   // controle de acesso - recupera as abilities do usuário logado na ação
-   const canEditarRegiao = abilities.includes('inscricao.marcarchegada')
-      ? ''
-      : 'disabled';
-   return '';
-   //    return `
-   //     <button class="btn btn-xs btn-outline-info" ${canEditarRegiao} data-custom-action="editarRegiao" data-param1="${row.regiao.id}" data-param2="${row.regiao.sigla}" >Editar Região</button>
-   //   `;
-};
-
-/**
- * ESPECIALIZAÇÃO CRUD: define a variável reativa
- */
-const pessoaShowModal = ref(false);
-const pessoaFormDados = ref({});
-const pessoaFormErros = ref({});
-// const organizacoes = ref({});
-
-/**
- * ESPECIALIZAÇÃO CRUD: recupera da API listas de dados necessários para o CRUD
- * ex.: lista de Regiões do País
- *       lista de Cidades
- *       lista de Categorias
- *       lista de Tipos de Eventos
- */
-import { useEventos } from '@/composables/useEventos';
-const { fetchOrganizacoes, organizacoes } = useEventos();
-fetchOrganizacoes();
-
-/**
- * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.
- * Default: true para todos
- */
-const buttons = { update: true, delete: true, show: false };
-
-/**
- * BASE Crud - Filtros da tabela de dados
- * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
- */
-//  const filters = [{}]; // nessse caso sem filtros
-
-const filters = computed(() => [
-   {
-      label: 'Ativo',
-      field: 'ativo',
-      type: 'select',
-      default: 'SIM',
-      options: [
-         { value: 'SIM', label: 'SIM' },
-         { value: 'NÃO', label: 'NÃO' },
-      ],
-   },
-]);
-
-// const filters = computed(() => [
-//    {
-//       label: 'Ativo',
-//       field: 'ativo',
-//       type: 'select',
-//       options: regioes.value.map((regiao) => ({
-//          value: regiao.id,
-//          label: regiao.descricao,
-//       })),
-//    },
-// ]);
-
-/**
- * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
- */
-const onExtraAction = async ({ id, row, action, dataset, target }) => {
-   console.log(
-      'onExtraAction ID:',
-      id,
-      'row:',
-      row,
-      'action:',
-      action,
-      'dataset:',
-      dataset,
-      'target: (por ora não usado)',
-      target
-   );
-
-   if (action === 'editarRegiao') {
-      // console.log('ZAP: ', row, action, dataset, target);
-      // vamos chamar uma função editar a action 'editarRegiao'
-      // nesse caso estamos usando os dados da linha (row) para preencher o formulário
-      pessoaFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
-      editarRegiao();
-      // mas poderiamos também apenas passar o id da região para a função editarRegiao(id) e carregar os dados da API novamente com os dados atualizados
-   }
-};
-
-const editarRegiao = async () => {
-   // Aqui você pode implementar a lógica para editar a região
-   // ou já usamos os dados do formulário preenchidos
-   // console.log('Editar Região:', pessoaFormDados.value);
-   pessoaShowModal.value = true;
-   // ou aqui poderia chamar uma API para buscar os dados da região pelo ID
-   // pessoaShowModal.value = false; // Fecha o modal após salvar
-};
-
-/**
- * ESPECIALIZAÇÃO CRUD: função para atualizar a entidade especializada
- */
-const salvarRegiao = async () => {
-   // console.log('Salvar Região:', pessoaFormDados.value.regiao);
-
-   try {
-      // console.log('Try Salvar Região:', pessoaFormDados.value.regiao);
-      // console.log('Try Salvar Região:', toRaw(pessoaFormDados.value.regiao));
-
-      await api.put(
-         `regiao/${pessoaFormDados.value.regiao.id}`,
-         toRaw(pessoaFormDados.value.regiao)
-      );
-
-      showToast({
-         title: 'Sucesso',
-         message: `Região ID ${pessoaFormDados.value.regiao.id} atualizada com sucesso.`,
-      });
-      pessoaShowModal.value = false;
-      chamarRefresh(); // chama refreshTable() do composable via expose
-   } catch (error) {
-      if (error.response?.status === 422) {
-         pessoaFormErros.value = error.response.data.errors || {};
-      }
-   }
-};
-</script>
-
 <template>
    <!-- {{ rotas }} -->
    <!-- modalFullscreen="fullscreen" -->
@@ -486,3 +216,262 @@ const salvarRegiao = async () => {
       </template>
    </GenericCrud>
 </template>
+
+<script setup>
+import { ref, toRaw, computed } from 'vue';
+import GenericCrud from '@/components/GenericCrud.vue';
+import DateInputWrapper from '@/components/DateInputWrapper.vue';
+import DateTimeInputWrapper from '@/components/DateTimeInputWrapper.vue';
+import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
+import { useToast } from '@/composables/useToast';
+import { formatToBrDateTime } from '@/utils/dateFormat';
+import { formatToBrDate } from '@/utils/dateFormat';
+import api from '@/services/api';
+
+// import 'datatables.net-dt';
+// import DataTable from 'datatables.net-vue3';
+import DataTablesLib from 'datatables.net-bs5';
+
+// define a Entidade Principal da View
+const entity = 'evento';
+
+const { showToast } = useToast(); // Toasts de Alerta
+
+// recuperas as Autorizações (abilities) do JWT
+const { can } = useAbilities();
+const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
+
+// DEBUG de todas abilities do User Logado
+// console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);
+
+const crudRef = ref(null);
+
+function chamarRefresh() {
+   crudRef.value?.refreshTable();
+}
+
+// Vamos obter a lista de Eventos Ativo e o Corrente do store
+import { useEventosStore } from '@/stores/useEventosStore';
+const eventosStore = useEventosStore();
+
+async function onAfterSave({ saved, data }) {
+   // console.log('onAfterSave executado', saved);
+   if (saved) {
+      await eventosStore.fetchEventosAtivos();
+   }
+}
+
+/**
+ * BASE Crud - colunas da tabela de dados
+ */
+const columns = [
+   { title: 'ID', data: 'id', width: '10px' },
+   // { title: 'Organização', data: 'organizacao_id', width: '100px' },
+   {
+      title: 'Sigla',
+      data: 'sigla',
+      width: '140px',
+      class: 'fw-bold',
+   },
+   { title: 'Nome do Evento', data: 'nome', width: '260px' },
+   { title: 'Periodo', data: 'periodo', width: 'auto' },
+   {
+      title: 'Dt Início',
+      data: null,
+      render: function (data, type, row) {
+         const dt_inicio = row.inscricao_data_ini?.trim()
+            ? formatToBrDate(row.inscricao_data_ini)
+            : 'Não informado';
+         return `<span class="">${dt_inicio}</span>`;
+      },
+      className: 'text-center',
+      width: '100px',
+   },
+   {
+      title: 'Dt Fim',
+      data: null,
+      render: function (data, type, row) {
+         const dt_fim = row.inscricao_data_fim?.trim()
+            ? formatToBrDate(row.inscricao_data_fim)
+            : 'Não informado';
+         return `<span class="">${dt_fim}</span>`;
+      },
+      className: 'text-center',
+      width: '100px',
+   },
+   {
+      title: 'Ativo',
+      data: 'ativo',
+      class: 'dt-center small',
+      width: '60px',
+      render: function (data, type, row) {
+         return `<span class="${
+            row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
+      },
+   },
+   // { title: 'Tema', data: 'tema', width: 'auto' },
+
+   // { title: 'Início', data: 'inscricao_data_ini', width: '90px', className: 'text-center', },
+   // { title: 'Fim', data: 'inscricao_data_fim', width: '90px', className: 'text-center', },
+   // {
+   //    title: 'Pessoa | Entidade | Papel | Modalidade',
+   //    data: null, // importante usar null quando o render vai acessar múltiplos campos
+   //    render: function (data, type, row) {
+   //       const nome = row.pessoa?.nome_social || '';
+   //       const modalidade = row.modalidade || 'Não informada';
+   //       const entidade_sigla = row.pessoa?.entidade?.sigla ?? 'Sem Entidade';
+   //       return `<span class="fw-bold">${nome}</span> <small class="text-muted">${entidade_sigla}</small> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
+   //    },
+   //    className: 'text-left',
+   //    width: '320px',
+];
+
+/**
+ * BASE Crud - Valores padrão dos campos do formulário
+ */
+const defaultValues = {
+   organizacao_id: 1,
+   nome: 'Nome do Evento',
+   sigla: 'Sigla do Evento',
+   descricao: 'Descrição completa do Evento',
+   local: 'FEB',
+   periodo: 'De 10 a 12 de Outubro de 20xx',
+   tema: 'Você e a paz',
+   inscricao_data_ini: '',
+   inscricao_data_fim: '',
+   ativo: 'SIM',
+   // valor_cafe: '0.00',
+   // valor_lanche: '0.00',
+   // valor_almoco: '0.00',
+   // valor_jantar: '0.00',
+};
+
+/**
+ * ESPECIALIZAÇÃO CRUD: recupera da API autorizações específicas/adicionais
+ */
+// var canPrint = can(`${entity}.print`);
+
+/**
+ * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
+ */
+const extraColumnRender = (row) => {
+   // controle de acesso - recupera as abilities do usuário logado na ação
+   const canEditarRegiao = abilities.includes('inscricao.marcarchegada')
+      ? ''
+      : 'disabled';
+   return '';
+   //    return `
+   //     <button class="btn btn-xs btn-outline-info" ${canEditarRegiao} data-custom-action="editarRegiao" data-param1="${row.regiao.id}" data-param2="${row.regiao.sigla}" >Editar Região</button>
+   //   `;
+};
+
+/**
+ * ESPECIALIZAÇÃO CRUD: define a variável reativa
+ */
+const pessoaShowModal = ref(false);
+const pessoaFormDados = ref({});
+const pessoaFormErros = ref({});
+// const organizacoes = ref({});
+
+/**
+ * ESPECIALIZAÇÃO CRUD: recupera da API listas de dados necessários para o CRUD
+ * ex.: lista de Regiões do País
+ *       lista de Cidades
+ *       lista de Categorias
+ *       lista de Tipos de Eventos
+ */
+import { useEventos } from '@/composables/useEventos';
+const { fetchOrganizacoes, organizacoes } = useEventos();
+fetchOrganizacoes();
+
+/**
+ * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.
+ * Default: true para todos
+ */
+const buttons = { update: true, delete: true, show: false };
+
+/**
+ * BASE Crud - Filtros da tabela de dados
+ * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
+ */
+//  const filters = [{}]; // nessse caso sem filtros
+
+const filters = computed(() => [
+   {
+      label: 'Ativo',
+      field: 'ativo',
+      type: 'select',
+      default: 'SIM',
+      options: [
+         { value: 'SIM', label: 'SIM' },
+         { value: 'NÃO', label: 'NÃO' },
+      ],
+   },
+]);
+
+// const filters = computed(() => [
+//    {
+//       label: 'Ativo',
+//       field: 'ativo',
+//       type: 'select',
+//       options: regioes.value.map((regiao) => ({
+//          value: regiao.id,
+//          label: regiao.descricao,
+//       })),
+//    },
+// ]);
+
+/**
+ * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
+ */
+const onExtraAction = async ({ id, row, action, dataset, target }) => {
+
+   if (action === 'editarRegiao') {
+      // console.log('ZAP: ', row, action, dataset, target);
+      // vamos chamar uma função editar a action 'editarRegiao'
+      // nesse caso estamos usando os dados da linha (row) para preencher o formulário
+      pessoaFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
+      editarRegiao();
+      // mas poderiamos também apenas passar o id da região para a função editarRegiao(id) e carregar os dados da API novamente com os dados atualizados
+   }
+};
+
+const editarRegiao = async () => {
+   // Aqui você pode implementar a lógica para editar a região
+   // ou já usamos os dados do formulário preenchidos
+   // console.log('Editar Região:', pessoaFormDados.value);
+   pessoaShowModal.value = true;
+   // ou aqui poderia chamar uma API para buscar os dados da região pelo ID
+   // pessoaShowModal.value = false; // Fecha o modal após salvar
+};
+
+/**
+ * ESPECIALIZAÇÃO CRUD: função para atualizar a entidade especializada
+ */
+const salvarRegiao = async () => {
+   // console.log('Salvar Região:', pessoaFormDados.value.regiao);
+
+   try {
+      // console.log('Try Salvar Região:', pessoaFormDados.value.regiao);
+      // console.log('Try Salvar Região:', toRaw(pessoaFormDados.value.regiao));
+
+      await api.put(
+         `regiao/${pessoaFormDados.value.regiao.id}`,
+         toRaw(pessoaFormDados.value.regiao)
+      );
+
+      showToast({
+         title: 'Sucesso',
+         message: `Região ID ${pessoaFormDados.value.regiao.id} atualizada com sucesso.`,
+      });
+      pessoaShowModal.value = false;
+      chamarRefresh(); // chama refreshTable() do composable via expose
+   } catch (error) {
+      if (error.response?.status === 422) {
+         pessoaFormErros.value = error.response.data.errors || {};
+      }
+   }
+};
+</script>
+
