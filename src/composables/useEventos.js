@@ -240,6 +240,28 @@ export function useEventos(ativo = true) {
       }
    };
 
+   const marcarHotelCheckin = async (id, dados) => {
+      try {
+         error.value = null;
+         await api.put(`/inscricao/marcarcheckin/${id}`, dados);
+         return true;
+      } catch (err) {
+         error.value = err;
+         return false;
+      }
+   };
+
+   const marcarHotelCheckout = async (id, dados) => {
+      try {
+         error.value = null;
+         await api.put(`/inscricao/marcarcheckout/${id}`, dados);
+         return true;
+      } catch (err) {
+         error.value = err;
+         return false;
+      }
+   };
+
    const fetchServicosDoEvento = async (eventoId) => {
       console.log('fetchServicosDoEvento:', eventoId);
 
@@ -293,6 +315,8 @@ export function useEventos(ativo = true) {
       getInscricao,           // recupera uma Inscrição 
 
       marcarTrasladoChegada,  // marca a Viagem
+      marcarHotelCheckin,
+      marcarHotelCheckout,
       error,
    };
 }

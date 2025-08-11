@@ -4,8 +4,11 @@
          <CRow class="form-group mx-auto">
             <label class="form-label fw-bold">Categoria</label>
             <CCol sm="3">
-
-               <SearchSelect v-model="selectedItem" :options="listaDeOpcoes" placeholder="Selecione a cidade" />
+               <SearchSelect
+                  v-model="selectedItem"
+                  :options="listaDeOpcoes"
+                  placeholder="Selecione a cidade"
+               />
                <br />
 
                <CoreUIMultiselect
@@ -118,25 +121,22 @@ import { getToken, removeToken, getIssuer } from '@/services/authService';
 import { ref } from 'vue';
 import Multiselect from '@vueform/multiselect';
 
-import SearchSelect from '@/components/SearchSelect.vue'
+import SearchSelect from '@/components/SearchSelect.vue';
 
-const selectedItem = ref(null)
+const selectedItem = ref(null);
 const listaDeOpcoes = [
-  { label: 'São Paulo', value: 1 },
-  { label: 'Rio de Janeiro', value: 2 },
-  { label: 'Belo Horizonte', value: 3 },
-  { label: 'Brasília', value: 4 },
-  { label: 'Salvador', value: 5 },
-  { label: 'Fortaleza', value: 6 },
-  { label: 'Curitiba', value: 7 },
-  { label: 'Manaus', value: 8 },
-  { label: 'Recife', value: 9 },
-  { label: 'Porto Alegre', value: 10 },
-  { label: 'Belém', value: 11 },
-]
-
-
-
+   { label: 'São Paulo', value: 1 },
+   { label: 'Rio de Janeiro', value: 2 },
+   { label: 'Belo Horizonte', value: 3 },
+   { label: 'Brasília', value: 4 },
+   { label: 'Salvador', value: 5 },
+   { label: 'Fortaleza', value: 6 },
+   { label: 'Curitiba', value: 7 },
+   { label: 'Manaus', value: 8 },
+   { label: 'Recife', value: 9 },
+   { label: 'Porto Alegre', value: 10 },
+   { label: 'Belém', value: 11 },
+];
 
 const progressGroupExample1 = [
    { title: 'Monday', value1: 34, value2: 78 },

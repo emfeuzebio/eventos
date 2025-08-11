@@ -328,7 +328,8 @@ const routes = [
             {
               path: '/hospedagem/ghospedagem',
               name: 'Gestão de Hospedagem',
-              component: () => import('@/views/pages/Page404.vue'),
+              // component: () => import('@/views/pages/Page404.vue'),
+              component: () => import('@/views/hospedagem/GestaoHospedagemDt.vue'),
               meta: { requiresAuth: true }, // Protege esta rota
             },
             {
