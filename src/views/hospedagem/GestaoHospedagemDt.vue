@@ -510,19 +510,23 @@ const extraColumnRender = (row) => {
       ? ''
       : 'disabled';
 
+   const canMarcarQuarto = abilities.includes('inscricao.marcarquarto')
+      ? ''
+      : 'disabled';
+
    // trasposição do checkbox para os dados da linha
    const isCheckedCheckin = row.hotel_checkin === 'SIM' ? 'checked' : '';
    const isCheckedCheckout = row.hotel_checkout === 'SIM' ? 'checked' : '';
 
-   // const isSelected = row.hotel_quarto_id === 'SIM' ? 'checked' : '';
+   const custeioHospedagem = row.custeio_hospedagem ?? 'Sem informação';
+   const hotel = row.quarto?.hotel?.nome ?? 'Não definido';
+   const quarto = row.quarto?.numero ?? 'Não definido';
+   const quartoHotel = row.quarto?.numero_hotel ?? '';
+   const quartoCapacidade = row.quarto?.capacidade ?? '';
+   const quartoTipo = row.quarto?.quarto_tipo?.nome ?? '';
+   const pessoaIndicada = 'Nenhum';
 
-   // return '';
-   //  <button class="btn btn-xs btn-outline-info" ${canMarcarcheg} data-custom-action="marcarViagem" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Marcar Viagem</button>
-   // <button class="btn btn-xs btn-outline-success" ${canMarcarcheg} data-custom-action="notificarPessoa" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Msg Pessoa</button>
-   // <button class="btn btn-xs btn-outline-warning" ${canMarcarcheg} data-custom-action="notificarMotorista" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Notif Motorista</button>
-
-   return (
-      `
+   return `
       <div class="d-flex w-100">
          <div class="d-flex justify-content-start" style="width: 15%;">
             <div class="form-check form-switch">
@@ -531,15 +535,16 @@ const extraColumnRender = (row) => {
          </div>
          <div class="d-flex justify-content-center" style="width: 70%;">
 
-            <select class="form-control" data-custom-action="selectQuartoHotel" style="width: 300px !important;" data-quarto-id="231">
-               <option value="">Por Definir</option>
-               <option value="231" ` +
-      (row.hotel_quarto_id == 231 ? 'selected' : '') +
-      `>CFN2024-PLAZA. CFNPLAZA 231 DUPLO</option>
-               <option value="266" ` +
-      (row.hotel_quarto_id == 266 ? 'selected' : '') +
-      `>CFN2024-PLAZA. CFNPLAZA 266 DUPLO</option>
-            </select>
+            <div>
+               <button class="btn btn-xs btn-outline-primary" ${canMarcarQuarto} data-custom-action="selectQuartoHotel" 
+                  data-inscricao-id="${row.id}">Selecionar Quarto
+               </button> <br/>
+
+               <span class="text-muted">Tipo</span> <small class="fw-bold">${custeioHospedagem}</small> <br/>
+               <span class="text-muted">Hotel</span> <small class="fw-bold">${hotel}</small> <br/>
+               <span class="text-muted">Quarto</span> <small class="fw-bold">${quarto} ${quartoHotel} ${quartoTipo} ${quartoCapacidade} </small> <br/>
+               <span class="text-muted">Acompanhante Sugerido</span> <small class="fw-bold">${pessoaIndicada}</small> <br/>
+            </div>
 
          </div>
          <div class="d-flex justify-content-end" style="width: 15%;">
@@ -548,8 +553,7 @@ const extraColumnRender = (row) => {
             </div>
          </div>
       </div>
-   `
-   );
+   `;
 };
 
 /**
@@ -762,6 +766,7 @@ const salvarViagemChegada = async (quartoId) => {
          message: `Marcado o Quarto ${quartoId} na Inscrição ${inscricaoId} com sucesso!`,
       });
 
+      viagemChegadaShowModal.value = false;
       chamarRefresh();
    }
 
