@@ -479,7 +479,7 @@ const dtConfig = {
       [5, 10, 25, 50, 100, -1],
       [5, 10, 25, 50, 100, 'Todos'],
    ],
-   pageLength: 5,
+   pageLength: 10,
    ajax: function (_data, callback, _settings) {
       const filters = {
          ...externalFilters.value,

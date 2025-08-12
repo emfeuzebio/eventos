@@ -6,7 +6,7 @@
       title="Gestão de Hospedagem "
       description="Gestão das Inscrições que solicitaram Hospedagem, inscritas no Evento selecionado acima"
       endpoint="inscricao"
-      columnActionsWidth="400px"
+      columnActionsWidth="450px"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
@@ -355,13 +355,19 @@
          <CFormSelect
             v-model="rotaSelecionada"
             :options="[
-               { value: '', label: 'Nenhum Quarto selecionado' },
+               { value: '', label: 'Desmarcar o Quarto atual' },
                ...quartosAtivosDoEvento.map((quarto) => ({
                   value: quarto.id,
                   label: quarto.descricao,
                })),
             ]"
          />
+
+         <label class="form-label fw-bold mb-1 mt-2"
+            >Dados da Hospedagem marcada</label
+         >
+         <!-- <CAlert color="dark" v-html="viagemChegadaInscricao"></CAlert> -->
+         <CAlert color="dark" v-html="hospedagemEscolhida"></CAlert>         
       </CModalBody>
       <CModalFooter>
          <CButton
@@ -433,7 +439,7 @@ function chamarRefresh() {
 const columns = [
    { title: 'ID', data: 'id', width: '50px' },
    {
-      title: 'Pessoa | Entidade | Papel | Modalidade',
+      title: 'Pessoa | Entidade | Papel | Modalidade | Chegada | Traslado ',
       data: null, // importante usar null quando o render vai acessar múltiplos campos
       render: function (data, type, row) {
          const nome = row.pessoa?.nome_social || '';
@@ -455,38 +461,15 @@ const columns = [
                      <span class="fw-bold">Chegada</span> <br/>
                      <small class="text-muted">${chegada_data_hora}</small> >
                      <small class="text-muted">${chegada_meio_transp}</small>
-                     <small class="text-muted">${chegada_cia_transp}</small> >
-                     <small class="text-muted">${chegada_veiculo}</small>
+                     <small class="text-muted">${chegada_cia_transp}</small> <br/> 
+                     <span class="fw-bold">Traslado</span> ${row.chegada_traslado} <br/>	
+                     <small class="text-muted">${chegada_veiculo}</small> 
                `;
       },
       className: 'text-left',
       width: 'auto',
    },
-   // { title: 'Entidade', data: 'pessoa.entidade.sigla', width: '100px' },
-   // { title: 'Partida', data: 'partida_meio_transp', width: '140px' },
-   // {
-   //    title: 'Traslado de Chegada',
-   //    data: null,
-   //    width: 'auto',
-   //    className: 'text-center',
-   //    render: function (data, type, row) {
-   //       // TODO - API row não está trazndo a Viagem filha da Inscrição para obter os dados para por na Coluna Translado Chegada
-   //       let text = '';
-   //       if (row.viagem_chegada) {
-   //          text += `${
-   //             row.viagem_chegada?.rota.nome || 'Rota Não definida'
-   //          } <br/>`;
-   //          text += `${formatToBrDateTime(
-   //             row.viagem_chegada?.data_hora || 'Data/Hora Não definida'
-   //          )} <br/>`;
-   //          text += `<b>${
-   //             row.viagem_chegada?.veiculo.descricao || 'Veículo Não definido'
-   //          } </b><br/>`;
-   //       }
-
-   //       return text;
-   //    },
-   // },
+   // { title: 'Ativo', data: 'ativo', width: '60px' },
 ];
 
 /**
@@ -524,36 +507,77 @@ const extraColumnRender = (row) => {
    const quartoHotel = row.quarto?.numero_hotel ?? '';
    const quartoCapacidade = row.quarto?.capacidade ?? '';
    const quartoTipo = row.quarto?.quarto_tipo?.nome ?? '';
-   const pessoaIndicada = 'Nenhum';
+   const pessoaIndicada = row.pessoa_indicada_hotel?.nome_completo ?? 'Nenhum';
 
    return `
-      <div class="d-flex w-100">
-         <div class="d-flex justify-content-start" style="width: 15%;">
+   <div class="d-flex flex-column w-100">
+
+      <!-- Primeira linha -->
+      <div class="d-flex w-100 mb-2">
+         <div class="d-flex justify-content-start align-items-center" style="width: 30%;">
+            <label style="padding-right: 4px;">Check-in</label> 
             <div class="form-check form-switch">
-               <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckin" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckin} >
+               <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckin" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckin}>
             </div>
          </div>
-         <div class="d-flex justify-content-center" style="width: 70%;">
 
-            <div>
-               <button class="btn btn-xs btn-outline-primary" ${canMarcarQuarto} data-custom-action="selectQuartoHotel" 
-                  data-inscricao-id="${row.id}">Selecionar Quarto
-               </button> <br/>
-
-               <span class="text-muted">Tipo</span> <small class="fw-bold">${custeioHospedagem}</small> <br/>
-               <span class="text-muted">Hotel</span> <small class="fw-bold">${hotel}</small> <br/>
-               <span class="text-muted">Quarto</span> <small class="fw-bold">${quarto} ${quartoHotel} ${quartoTipo} ${quartoCapacidade} </small> <br/>
-               <span class="text-muted">Acompanhante Sugerido</span> <small class="fw-bold">${pessoaIndicada}</small> <br/>
-            </div>
-
+         <!-- Botão Selecionar Quarto (70%) -->
+         <div class="d-flex justify-content-center align-items-center" style="width: 40%;">
+            <button class="btn btn-xs btn-outline-primary" ${canMarcarQuarto} data-custom-action="selectQuartoHotel" data-inscricao-id="${row.id}">
+               Selecionar Quarto
+            </button>
          </div>
-         <div class="d-flex justify-content-end" style="width: 15%;">
+
+         <div class="d-flex justify-content-end align-items-center" style="width: 30%;">
             <div class="form-check form-switch">
-               <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckout" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckout} >
+               <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckout" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckout}>
             </div>
+            <label style="padding-right: 4px;">Check-Out</label> 
          </div>
       </div>
-   `;
+
+      <!-- Segunda linha -->
+      <div class="d-flex w-100">
+         <div class="w-100">
+            <span class="text-muted">Tipo</span> <small class="fw-bold">${custeioHospedagem}</small><br/>
+            <span class="text-muted">Hotel</span> <small class="fw-bold">${hotel}</small><br/>
+            <span class="text-muted">Quarto</span> <small class="fw-bold">${quarto} ${quartoHotel} ${quartoTipo} ${quartoCapacidade}</small><br/>
+            <span class="text-muted">Acompanhante Sugerido</span> <small class="fw-bold">${pessoaIndicada}</small><br/>
+         </div>
+      </div>
+
+   </div>
+`;
+
+
+   // return `
+   //    <div class="d-flex w-100">
+   //       <div class="d-flex justify-content-start" style="width: 15%;">
+   //          <div class="form-check form-switch">
+   //             <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckin" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckin} >
+   //          </div>
+   //       </div>
+   //       <div class="d-flex justify-content-center" style="width: 70%;">
+
+   //          <div>
+   //             <button class="btn btn-xs btn-outline-primary" ${canMarcarQuarto} data-custom-action="selectQuartoHotel" 
+   //                data-inscricao-id="${row.id}">Selecionar Quarto
+   //             </button> <br/>
+
+   //             <span class="text-muted">Tipo</span> <small class="fw-bold">${custeioHospedagem}</small> <br/>
+   //             <span class="text-muted">Hotel</span> <small class="fw-bold">${hotel}</small> <br/>
+   //             <span class="text-muted">Quarto</span> <small class="fw-bold">${quarto} ${quartoHotel} ${quartoTipo} ${quartoCapacidade} </small> <br/>
+   //             <span class="text-muted">Acompanhante Sugerido</span> <small class="fw-bold">${pessoaIndicada}</small> <br/>
+   //          </div>
+
+   //       </div>
+   //       <div class="d-flex justify-content-end" style="width: 15%;">
+   //          <div class="form-check form-switch">
+   //             <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckout" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckout} >
+   //          </div>
+   //       </div>
+   //    </div>
+   // `;
 };
 
 /**
@@ -562,7 +586,7 @@ const extraColumnRender = (row) => {
 const viagemChegadaShowModal = ref(false);
 const viagemChegadaFormDados = ref({});
 const viagemChegadaFormErros = ref({});
-const viagemChegadaEscolhida = ref('');
+const hospedagemEscolhida = ref('');
 const viagemChegadaInscricao = ref('');
 const inscricaoDados = ref('');
 
@@ -636,15 +660,6 @@ const filters = [{}]; // nessse caso sem filtros
 //          label: entidade.sigla,
 //       })),
 //    },
-//    {
-//       label: 'Modalidade',
-//       field: 'modalidade',
-//       type: 'select',
-//       options: [
-//          { value: 'Presencial', label: 'Presencial' },
-//          { value: 'Virtual', label: 'Virtual' },
-//       ],
-//    },
 // ]);
 
 /**
@@ -654,6 +669,13 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
    if (action == 'hotelCheckin') {
       const inscricaoId = row.id;
       const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      if (!row.evento || row.evento.ativo !== 'SIM') {
+         showError(
+            'Somente <b>Inscrições de Eventos ATIVOS</b> podem ter Check-In marcados.'
+         );
+         return;
+      }
 
       const sucesso = await marcarHotelCheckin(inscricaoId, {
          hotel_checkin: isChecked,
@@ -671,6 +693,14 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
    if (action == 'hotelCheckout') {
       const inscricaoId = row.id;
       const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      if (!row.evento || row.evento.ativo !== 'SIM') {
+         showError(
+            'Somente <b>Inscrições de Eventos ATIVOS</b> podem ter Check-Out marcados.'
+         );
+         return;
+      }
+
 
       // estou usando o 'clear' abaixo porque criei a rota no api e ela não é reconhecida:
       // Se você adicionou ou mudou algo em routes/api.php, siga essa ordem:
@@ -701,18 +731,40 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
 
       const quartoId = dataset.quartoId; // pega o data('quarto-id') do <select>
       // console.log('selectQuartoHotel: ', row, action, dataset, target);
-      // console.log('selectQuartoHotel: ', dataset, target);
-      // console.log('selectQuartoHotel: ', target);
-      // console.log('Quarto Selecionado: ', inscricaoId, quartoId);
 
-      // TODO
+      // Se o Evento da Inscrição não estiver ativo
+      if (!row.evento || row.evento.ativo !== 'SIM') {
+         showError(
+            'Somente <b>Inscrições de Eventos ATIVOS</b> podem ter seus Quartos editados.'
+         );
+         return;
+      }
+
+      // se a Inscrição não estiver ativa
       // if (row.ativo != 'SIM') {
       //    showError(
-      //       'Somente um <b>Inscrição ATIVA</b> pode ter seus Quartos editados.'
+      //       'Somente uma <b>Inscrição ATIVA</b> pode ter seus Quartos editados.'
       //    );
       //    return;
       // }
-      // Route::get('/quarto/quartosativos/{id}', 'quartosAtivosDoEvento')
+
+      inscricaoDados.value = `<b>${
+         row?.pessoa.nome_completo || 'Sem Nome'
+      }</b> <br/>${row.funcao?.descricao || 'Papel não definido'} - ${
+         row.pessoa.entidade?.sigla || 'Entidade Não definida'
+      } - ${row.modalidade || 'Não informada'}<br/> <b>Chegada</b><br/>
+      ${formatToBrDateTime(row.chegada_data_hora || 'Data-Hora Não definida')} <br/> 
+      ${row.chegada_meio_transp || 'Meio Não definido'} > ${row.chegada_cia_transp || ''} <br> <b>Traslado</b> ${row.chegada_traslado} Solicitado <br/>
+      ${row.viagem_chegada?.veiculo.descricao || ''}`;
+
+      hospedagemEscolhida.value = 'A Hospedagem não está marcada';
+      hospedagemEscolhida.value = `
+            <b>Evento</b>:  ${row.evento?.sigla || 'Não Informado'} <br/>
+            <b>Tipo</b>:    ${row.custeio_hospedagem ?? 'Sem informação'} <br/>
+            <b>Hotel</b>:   ${row.quarto?.hotel?.nome ?? ''} <br/>
+            <b>Quarto</b>:  ${row.quarto?.numero ?? ''} ${row.quarto?.numero_hotel ?? ''} ${row.quarto?.quarto_tipo?.nome ?? ''} ${row.quarto?.capacidade ?? ''}<br/>
+            <b>Acompanhante Sugerido</b>: ${row.pessoa_indicada_hotel?.nome_completo || 'Nenhum'} <br/>
+         `;
 
       quartosAtivosDoEvento.value = (
          await api.get(`/quarto/quartosativos/${eventoId}`)
