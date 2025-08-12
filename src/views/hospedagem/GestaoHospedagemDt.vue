@@ -615,6 +615,21 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
          return;
       }
 
+      if (!row.hotel_quarto_id) {
+         showError(
+            '<b>Impossível fazer Check-In</b> sem primeiro marcar um Quarto de Hotel na Inscrição.'
+         );
+         return;
+      }
+
+      if (!row.hotel_checkout || row.hotel_checkout == 'SIM') {
+         showError(
+            '<b>Impossível desfazer o Check-In</b> sem primeiro defazer o <b>Check-Out</b> no Hotel.'
+         );
+         return;
+      }
+
+
       const sucesso = await marcarHotelCheckin(inscricaoId, {
          hotel_checkin: isChecked,
       });
@@ -639,6 +654,19 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
          return;
       }
 
+      if (!row.hotel_quarto_id) {
+         showError(
+            '<b>Impossível fazer Check-Out</b> sem primeiro marcar um Quarto de Hotel na Inscrição.'
+         );
+         return;
+      }
+
+      if (!row.hotel_checkin || row.hotel_checkin !== 'SIM') {
+         showError(
+            '<b>Impossível fazer Check-Out</b> sem primeiro ter feito o <b>Check-In</b> no Hotel.'
+         );
+         return;
+      }
 
       // estou usando o 'clear' abaixo porque criei a rota no api e ela não é reconhecida:
       // Se você adicionou ou mudou algo em routes/api.php, siga essa ordem:
