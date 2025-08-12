@@ -339,10 +339,11 @@
       </template>
    </GenericCrud>
 
-   <!-- Editar Viagem Chegada Modal | Extra Modal Especializado -->
+   <!-- Marcar Quarto de Hotel  | Extra Modal Especializado -->
    <CModal
-      :visible="viagemChegadaShowModal"
-      @close="viagemChegadaShowModal = false"
+      :visible="marcarQuartoHotelModal"
+      @close="marcarQuartoHotelModal = false"
+      backdrop="static"
    >
       <CModalHeader>
          <strong>Marcar Quarto de Hortel</strong>
@@ -353,7 +354,7 @@
 
          <label class="form-label fw-bold">Selecione o Quarto</label>
          <CFormSelect
-            v-model="rotaSelecionada"
+            v-model="quartoSelecionado"
             :options="[
                { value: '', label: 'Desmarcar o Quarto atual' },
                ...quartosAtivosDoEvento.map((quarto) => ({
@@ -372,12 +373,12 @@
       <CModalFooter>
          <CButton
             color="btn btn-secondary btn-sm me-1"
-            @click="viagemChegadaShowModal = false"
+            @click="marcarQuartoHotelModal = false"
             ><i class="fa fa-times"></i> Fechar</CButton
          >
          <CButton
             color="btn btn-primary btn-sm me-1"
-            @click="salvarViagemChegada(rotaSelecionada)"
+            @click="salvarQuartoNaInscricao(quartoSelecionado)"
             >Salvar</CButton
          >
       </CModalFooter>
@@ -406,7 +407,6 @@ const { showError } = useGlobalError(); // Modal de Erros
 
 // define a Entidade Principal da View
 const entity = 'inscricao';
-// const entity = 'inscricao';
 
 const { showToast } = useToast(); // Toasts de Alerta
 
@@ -414,20 +414,10 @@ const { showToast } = useToast(); // Toasts de Alerta
 const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
-// Permissões específicas para a entidade "veiculo"
-// const canList = can(`${entity}.index`); // recupera do JWT se a autorização 'veiculo.index'   é verdadeiro
-// const canShow = can(`${entity}.show`); // recupera do JWT se a autorização 'veiculo.show'   é verdadeiro
-// const canInsert = can(`${entity}.store`); // recupera do JWT se a autorização 'veiculo.store'   é verdadeiro
-// const canUpdate = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update'  é verdadeiro
-// const canDelete = can(`${entity}.destroy`); // recupera do JWT se a autorização 'veiculo.destroy' é verdadeiro
-// var canPrint = can(`${entity}.print`);
-// var canPrint = false;
-
 // DEBUG de todas abilities do User Logado
 // console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);
+
 const crudRef = ref(null);
-const confirmarEnvio = ref(null);
-const cancelarEnvio = ref(null);
 
 function chamarRefresh() {
    crudRef.value?.refreshTable();
@@ -477,10 +467,7 @@ const columns = [
  */
 const defaultValues = {
    entidade_id: null,
-   nome_completo: 'Meu Nome Completo',
-   nome_social: 'Meu Nome',
-   telefone: '(00) 90000-0000',
-   email: 'nome@mail.com',
+   nome_completo: '',
    ativo: 'SIM',
 };
 
@@ -523,7 +510,7 @@ const extraColumnRender = (row) => {
 
          <!-- Botão Selecionar Quarto (70%) -->
          <div class="d-flex justify-content-center align-items-center" style="width: 40%;">
-            <button class="btn btn-xs btn-outline-primary" ${canMarcarQuarto} data-custom-action="selectQuartoHotel" data-inscricao-id="${row.id}">
+            <button class="btn btn-xs btn-outline-primary" ${canMarcarQuarto} data-custom-action="selecionarQuartoHotel" data-inscricao-id="${row.id}">
                Selecionar Quarto
             </button>
          </div>
@@ -547,86 +534,37 @@ const extraColumnRender = (row) => {
       </div>
 
    </div>
-`;
-
-
-   // return `
-   //    <div class="d-flex w-100">
-   //       <div class="d-flex justify-content-start" style="width: 15%;">
-   //          <div class="form-check form-switch">
-   //             <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckin" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckin} >
-   //          </div>
-   //       </div>
-   //       <div class="d-flex justify-content-center" style="width: 70%;">
-
-   //          <div>
-   //             <button class="btn btn-xs btn-outline-primary" ${canMarcarQuarto} data-custom-action="selectQuartoHotel" 
-   //                data-inscricao-id="${row.id}">Selecionar Quarto
-   //             </button> <br/>
-
-   //             <span class="text-muted">Tipo</span> <small class="fw-bold">${custeioHospedagem}</small> <br/>
-   //             <span class="text-muted">Hotel</span> <small class="fw-bold">${hotel}</small> <br/>
-   //             <span class="text-muted">Quarto</span> <small class="fw-bold">${quarto} ${quartoHotel} ${quartoTipo} ${quartoCapacidade} </small> <br/>
-   //             <span class="text-muted">Acompanhante Sugerido</span> <small class="fw-bold">${pessoaIndicada}</small> <br/>
-   //          </div>
-
-   //       </div>
-   //       <div class="d-flex justify-content-end" style="width: 15%;">
-   //          <div class="form-check form-switch">
-   //             <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckout" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckout} >
-   //          </div>
-   //       </div>
-   //    </div>
-   // `;
+   `;
 };
 
 /**
  * ESPECIALIZAÇÃO CRUD: define a variável reativa
  */
-const viagemChegadaShowModal = ref(false);
-const viagemChegadaFormDados = ref({});
-const viagemChegadaFormErros = ref({});
+const marcarQuartoHotelModal = ref(false);
 const hospedagemEscolhida = ref('');
-const viagemChegadaInscricao = ref('');
 const inscricaoDados = ref('');
+const errorMessage = ref('')
 
-const rotaSelecionada = ref(''); // ID da rota selecionada
+const quartoSelecionado = ref(''); // ID da rota selecionada
 const inscricaoSelecionada = ref(''); // ID da viagem selecionada
-
 const quartosAtivosDoEvento = ref([]); // quartosAtivosDoEvento
-
-// const notificarMotoristaModal = ref(false);
-const regiaoFormDados = ref({});
-const regiaoFormErros = ref({});
 
 /**
  * ESPECIALIZAÇÃO CRUD: recupera da API listas de dados necessários para o CRUD
  * ex.: lista de Regiões do País
  *       lista de Cidades
  *       lista de Categorias
- *       lista de Tipos de Eventos
  */
 import { useEventos } from '@/composables/useEventos';
+import { color } from 'chart.js/helpers';
 const {
    fetchEntidades,
-   entidades,
-   fetchFuncoes,
    funcoes,
-   fetchPessoas,
    pessoas,
-   fetchEventos,
-   eventos,
-   marcarTrasladoChegada,
-   fetchRotas,
-   fetchViagensDaRota,
-   rotas,
    marcarHotelCheckin,
    marcarHotelCheckout,
 } = useEventos();
-// fetchEventos();
 fetchEntidades();
-// fetchFuncoes();
-// fetchPessoas();
 
 /**
  * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.
@@ -725,12 +663,11 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       chamarRefresh();
    }
 
-   if (action == 'selectQuartoHotel') {
+   if (action == 'selecionarQuartoHotel') {
       const inscricaoId = row.id; // pega o data da DT linha
       const eventoId = currentEvent.value?.id ?? '';
-
       const quartoId = dataset.quartoId; // pega o data('quarto-id') do <select>
-      // console.log('selectQuartoHotel: ', row, action, dataset, target);
+      // console.log('selecionarQuartoHotel: ', row, action, dataset, target);
 
       // Se o Evento da Inscrição não estiver ativo
       if (!row.evento || row.evento.ativo !== 'SIM') {
@@ -740,7 +677,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
          return;
       }
 
-      // se a Inscrição não estiver ativa
+      // TODO se a Inscrição não estiver ativa
       // if (row.ativo != 'SIM') {
       //    showError(
       //       'Somente uma <b>Inscrição ATIVA</b> pode ter seus Quartos editados.'
@@ -770,47 +707,34 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
          await api.get(`/quarto/quartosativos/${eventoId}`)
       ).data;
 
-      viagemChegadaShowModal.value = true;
+      marcarQuartoHotelModal.value = true;
       inscricaoSelecionada.value = inscricaoId;
-
-      // TODO está gavando sempre quarto_id 231, preciso pegar o id selecionado do <select>
-      // const sucesso = await api.put(`/inscricao/marcarquarto/${inscricaoId}`, {
-      //    hotel_quarto_id: quartoId,
-      // });
-
-      // if (sucesso) {
-      //    showToast({
-      //       title: 'Sucesso',
-      //       message: `Marcado o Quarto ${quartoId} na Inscrição ${inscricaoId} com sucesso!`,
-      //    });
-
-      //    chamarRefresh(); // chama refreshTable() do composable via expose
-      // }
-
-      /**
-       * TODO - aqui caso o request venha com ERRO dizendo que o quarto já está ocupado ou cheio há que tratar
-       */
-      // if (!viagemId) {
-      //    showToast({
-      //       title: 'Sucesso',
-      //       message: `Impossível Marcar o Traslado de Chegada! Não existe uma Viagem marcada.`,
-      //       color: 'danger',
-      //    });
-      //    return;
-      // }
+      quartoSelecionado.value = row.hotel_quarto_id;
    }
 };
 
 /**
  * ESPECIALIZAÇÃO CRUD: função para atualizar a entidade especializada
  */
-const salvarViagemChegada = async (quartoId) => {
+const salvarQuartoNaInscricao = async (quartoId) => {
    const inscricaoId = inscricaoSelecionada.value;
-   // console.log('Salvar salvarViagemChegada:', inscricaoId,viagemId );
 
-   const sucesso = await api.put(`/inscricao/marcarquarto/${inscricaoId}`, {
-      hotel_quarto_id: quartoId,
-   });
+   var sucesso = false;
+
+   try {
+      sucesso = await api.put(`/inscricao/marcarquarto/${inscricaoId}`, {
+         hotel_quarto_id: quartoId,
+      });
+   } catch (error) {
+      if (error.response?.status === 422) {
+         const errors = error.response.data.errors
+         errorMessage.value = formatValidationErrors(errors)   // captura a lista de erros e põe numa string
+
+         showError(
+            errorMessage.value,
+         );
+      }
+   }   
 
    if (sucesso) {
       showToast({
@@ -818,16 +742,20 @@ const salvarViagemChegada = async (quartoId) => {
          message: `Marcado o Quarto ${quartoId} na Inscrição ${inscricaoId} com sucesso!`,
       });
 
-      viagemChegadaShowModal.value = false;
+      marcarQuartoHotelModal.value = false;
       chamarRefresh();
    }
-
-   // try {
-   //    const res = await api.put(`/inscricao/alternarchegada/${inscricaoId}`, {
-   //       viagem_id: viagemId,
-   //    });
-
-   //    chamarRefresh();
-   // } catch (error) {}
 };
+
+function formatValidationErrors(errors) {
+  const mensagens = []
+
+  for (const [campo, msgs] of Object.entries(errors)) {
+    msgs.forEach(msg => mensagens.push(msg))
+  }
+
+  // Quebra de linha HTML para uso com v-html
+  return mensagens.join('<br/>')
+}
+
 </script>
