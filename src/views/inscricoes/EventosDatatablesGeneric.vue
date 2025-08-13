@@ -426,7 +426,6 @@ const filters = computed(() => [
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
-
    if (action === 'editarRegiao') {
       // console.log('ZAP: ', row, action, dataset, target);
       // vamos chamar uma função editar a action 'editarRegiao'
@@ -474,4 +473,3 @@ const salvarRegiao = async () => {
    }
 };
 </script>
-

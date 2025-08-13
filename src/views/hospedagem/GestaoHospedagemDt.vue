@@ -368,7 +368,7 @@
             >Dados da Hospedagem marcada</label
          >
          <!-- <CAlert color="dark" v-html="viagemChegadaInscricao"></CAlert> -->
-         <CAlert color="dark" v-html="hospedagemEscolhida"></CAlert>         
+         <CAlert color="dark" v-html="hospedagemEscolhida"></CAlert>
       </CModalBody>
       <CModalFooter>
          <CButton
@@ -492,7 +492,8 @@ const extraColumnRender = (row) => {
    const hotel = row.quarto?.hotel?.nome ?? 'Não definido';
    const quarto = row.quarto?.numero ?? 'Não definido';
    const quartoHotel = row.quarto?.numero_hotel ?? '';
-   const quartoCapacidade = row.quarto?.capacidade ?? '';
+   // const quartoCapacidade = row.quarto?.capacidade ?? '';
+   const quartoCapacidade = row.quarto ? `(${row.quarto.capacidade})` : '';
    const quartoTipo = row.quarto?.quarto_tipo?.nome ?? '';
    const pessoaIndicada = row.pessoa_indicada_hotel?.nome_completo ?? 'Nenhum';
 
@@ -543,7 +544,7 @@ const extraColumnRender = (row) => {
 const marcarQuartoHotelModal = ref(false);
 const hospedagemEscolhida = ref('');
 const inscricaoDados = ref('');
-const errorMessage = ref('')
+const errorMessage = ref('');
 
 const quartoSelecionado = ref(''); // ID da rota selecionada
 const inscricaoSelecionada = ref(''); // ID da viagem selecionada
@@ -577,28 +578,45 @@ const buttons = { update: false, delete: false, show: false };
  * BASE Crud - Filtros da tabela de dados
  * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
  */
-const filters = [{}]; // nessse caso sem filtros
+// const filters = [{}]; // nessse caso sem filtros
 
-// const filters = computed(() => [
-//    {
-//       label: 'Ativa',
-//       field: 'ativo',
-//       type: 'select',
-//       options: [
-//          { value: 'SIM', label: 'SIM' },
-//          { value: 'NÃO', label: 'NÃO' },
-//       ],
-//    },
-//    {
-//       label: 'Entidade',
-//       field: 'pessoa__entidade_id', // '__' duplo para enganar o PHP que converte o . para _ nas URL
-//       type: 'select',
-//       options: entidades.value.map((entidade) => ({
-//          value: entidade.id,
-//          label: entidade.sigla,
-//       })),
-//    },
-// ]);
+const filters = computed(() => [
+   {
+      label: 'Ativa',
+      field: 'ativo',
+      type: 'select',
+      options: [
+         { value: 'SIM', label: 'SIM' },
+         { value: 'NÃO', label: 'NÃO' },
+      ],
+   },
+   {
+      label: 'Tipo de Hospedagem',
+      field: 'custeio_hospedagem',
+      type: 'select',
+      default: 'Na FEB,Custeada pela FEB,Paga pela Pessoa',
+      options: [
+         { value: 'Não solicitada', label: 'Não solicitada' },
+         {
+            value: 'Na FEB,Custeada pela FEB,Paga pela Pessoa',
+            label: 'Todas Solicitadas',
+         },
+         { value: 'Na FEB', label: 'Na FEB' },
+         { value: 'Custeada pela FEB', label: 'Custeada pela FEB' },
+         { value: 'Paga pela Pessoa', label: 'Paga pela Pessoa' },
+      ],
+   },
+]);
+
+// {
+//    label: 'Entidade',
+//    field: 'pessoa__entidade_id', // '__' duplo para enganar o PHP que converte o . para _ nas URL
+//    type: 'select',
+//    options: entidades.value.map((entidade) => ({
+//       value: entidade.id,
+//       label: entidade.sigla,
+//    })),
+// },
 
 /**
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
@@ -628,7 +646,6 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
          );
          return;
       }
-
 
       const sucesso = await marcarHotelCheckin(inscricaoId, {
          hotel_checkin: isChecked,
@@ -697,10 +714,26 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       const quartoId = dataset.quartoId; // pega o data('quarto-id') do <select>
       // console.log('selecionarQuartoHotel: ', row, action, dataset, target);
 
+      // se a Inscrição estiver INATIVA
+      if (row.ativo == 'NÃO') {
+         showError(
+            '<b>Impossível selecionar Quarto</b> para uma Inscrição <b>NÃO ATIVA</b>.'
+         );
+         return;
+      }
+
       // Se o Evento da Inscrição não estiver ativo
       if (!row.evento || row.evento.ativo !== 'SIM') {
          showError(
             'Somente <b>Inscrições de Eventos ATIVOS</b> podem ter seus Quartos editados.'
+         );
+         return;
+      }
+
+      // A Inscrição NÃO solicitou Hospedagem, portanto não é possível selecionar um Quarto.
+      if (row.custeio_hospedagem == 'Não solicitada') {
+         showError(
+            `Esta Inscrição ID ${inscricaoId} <b>NÃO solicitou Hospedagem</b>, portanto não é possível selecionar um Quarto.`
          );
          return;
       }
@@ -718,8 +751,12 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       }</b> <br/>${row.funcao?.descricao || 'Papel não definido'} - ${
          row.pessoa.entidade?.sigla || 'Entidade Não definida'
       } - ${row.modalidade || 'Não informada'}<br/> <b>Chegada</b><br/>
-      ${formatToBrDateTime(row.chegada_data_hora || 'Data-Hora Não definida')} <br/> 
-      ${row.chegada_meio_transp || 'Meio Não definido'} > ${row.chegada_cia_transp || ''} <br> <b>Traslado</b> ${row.chegada_traslado} Solicitado <br/>
+      ${formatToBrDateTime(
+         row.chegada_data_hora || 'Data-Hora Não definida'
+      )} <br/> 
+      ${row.chegada_meio_transp || 'Meio Não definido'} > ${
+         row.chegada_cia_transp || ''
+      } <br> <b>Traslado</b> ${row.chegada_traslado} Solicitado <br/>
       ${row.viagem_chegada?.veiculo.descricao || ''}`;
 
       hospedagemEscolhida.value = 'A Hospedagem não está marcada';
@@ -727,8 +764,14 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
             <b>Evento</b>:  ${row.evento?.sigla || 'Não Informado'} <br/>
             <b>Tipo</b>:    ${row.custeio_hospedagem ?? 'Sem informação'} <br/>
             <b>Hotel</b>:   ${row.quarto?.hotel?.nome ?? ''} <br/>
-            <b>Quarto</b>:  ${row.quarto?.numero ?? ''} ${row.quarto?.numero_hotel ?? ''} ${row.quarto?.quarto_tipo?.nome ?? ''} ${row.quarto?.capacidade ?? ''}<br/>
-            <b>Acompanhante Sugerido</b>: ${row.pessoa_indicada_hotel?.nome_completo || 'Nenhum'} <br/>
+            <b>Quarto</b>:  ${row.quarto?.numero ?? ''} ${
+         row.quarto?.numero_hotel ?? ''
+      } ${row.quarto?.quarto_tipo?.nome ?? ''} ${
+         row.quarto?.capacidade ?? ''
+      }<br/>
+            <b>Acompanhante Sugerido</b>: ${
+               row.pessoa_indicada_hotel?.nome_completo || 'Nenhum'
+            } <br/>
          `;
 
       quartosAtivosDoEvento.value = (
@@ -755,14 +798,12 @@ const salvarQuartoNaInscricao = async (quartoId) => {
       });
    } catch (error) {
       if (error.response?.status === 422) {
-         const errors = error.response.data.errors
-         errorMessage.value = formatValidationErrors(errors)   // captura a lista de erros e põe numa string
+         const errors = error.response.data.errors;
+         errorMessage.value = formatValidationErrors(errors); // captura a lista de erros e põe numa string
 
-         showError(
-            errorMessage.value,
-         );
+         showError(errorMessage.value);
       }
-   }   
+   }
 
    if (sucesso) {
       showToast({
@@ -776,14 +817,13 @@ const salvarQuartoNaInscricao = async (quartoId) => {
 };
 
 function formatValidationErrors(errors) {
-  const mensagens = []
+   const mensagens = [];
 
-  for (const [campo, msgs] of Object.entries(errors)) {
-    msgs.forEach(msg => mensagens.push(msg))
-  }
+   for (const [campo, msgs] of Object.entries(errors)) {
+      msgs.forEach((msg) => mensagens.push(msg));
+   }
 
-  // Quebra de linha HTML para uso com v-html
-  return mensagens.join('<br/>')
+   // Quebra de linha HTML para uso com v-html
+   return mensagens.join('<br/>');
 }
-
 </script>
