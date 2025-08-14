@@ -13,6 +13,7 @@
       :buttons="buttons"
       :extra-column-render="extraColumnRender"
       :abilities="abilities"
+      :canPrint="canPrint"
       @extraAction="onExtraAction"
    >
       <template #form="{ form, errors }">
@@ -413,6 +414,9 @@ const { showToast } = useToast(); // Toasts de Alerta
 // recuperas as Autorizações (abilities) do JWT
 const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
+
+const canPrint = can(`${entity}.update`); // recupera do JWT se a autorização 'veiculo.update' é verdadeiro
+// console.log('canPrint:', canPrint); // Isso deve ser true ou false
 
 // DEBUG de todas abilities do User Logado
 // console.log(`Abilities carregadas da entidade '${entity}'':`, abilities);

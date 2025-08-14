@@ -759,7 +759,7 @@ const gerarRelatorio = async (hotelId) => {
       // Se quiser abrir no navegador:
       window.open(url, '_blank');
 
-      // Se quiser forçar download:   
+      // Se quiser forçar download:
       // const link = document.createElement('a');
       // link.href = url;
       // link.setAttribute('download', 'relatorio-hotel.pdf');

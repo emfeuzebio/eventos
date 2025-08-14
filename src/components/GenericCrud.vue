@@ -58,7 +58,7 @@
                   <CButton
                      class="btn btn-sm btn-outline-info me-1"
                      v-if="canPrint"
-                     @click="btnImprimir"
+                     @click="form.print"
                      >Imprimir</CButton
                   >
                   <CButton
@@ -167,8 +167,6 @@ const { fetchRegioes, regioes } = useEventos();
 
 const { showToast } = useToast();
 
-
-
 // Props configuráveis
 const props = defineProps({
    title: String,
@@ -206,10 +204,10 @@ const props = defineProps({
    //    default: () => [{}],
    // },
    extraColumnRender: Function,
-   // canInsert: Boolean,
+   canInsert: Boolean,
    // canUpdate: Boolean,
    // canDelete: Boolean,
-   // canPrint: Boolean,
+   canPrint: Boolean,
    onSaved: Function,
    afterSave: Function,
 });
@@ -219,11 +217,11 @@ const filtros = ref({});
 // console.log('Ref para os Filtros da Página:', props.filters);
 
 props.filters.forEach((filtro) => {
-  if (filtro?.field) {
-    filtros.value[filtro.field] = filtro.default ?? '';
-  }
-}); 
-// console.log('Filtros aplicados à Página:',filtros); 
+   if (filtro?.field) {
+      filtros.value[filtro.field] = filtro.default ?? '';
+   }
+});
+// console.log('Filtros aplicados à Página:',filtros);
 
 // Estados e ações
 const alert = ref({ type: '', message: '' });

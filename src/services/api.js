@@ -41,31 +41,87 @@ api.interceptors.request.use((config) => {
 
 // intercepta todas requisições e respostas
 api.interceptors.response.use(
-   (response) => {
+   response => {
       stopLoading();
       return response;
    },
-   (error) => {
+   async error => {
       stopLoading();
-      // console.log('interceptors Erro status:', error.response?.status)
 
-      // Sendo login, ignora o tratamento se o erro veio do endpoint de login
+      const res = error.response;
+      const status = res?.status || 'Desconhecido';
       const isLoginRequest = error.config?.url?.includes('/auth/login');
-      if (isLoginRequest) return Promise.reject(error);      
 
-      // Se a resposta for 401-Forbbiden, redireciona para login
-      if (error.response?.status == 401) {
-         removeToken()
-         redirectToLogin()
-         return new Promise(() => {}) // evita erro no console
-      } 
-      // Para todos demais erros diferentes de 422, exibe o erro
-      else if (error.response?.status != 422) {
-         showError("<b>Erro " + error.response?.status + "</b> " + (error.response?.data?.error || 'descrição não informada.') + "<br/> " + ( error.response?.data?.message || ''));
+      // Ignora tratamento se for a requisição de login
+      if (isLoginRequest) return Promise.reject(error);
+
+      // Redireciona para login se não autorizado
+      if (status === 401) {
+         removeToken();
+         redirectToLogin();
+         return new Promise(() => {}); // bloqueia execução posterior silenciosamente
+      }
+
+      // Verifica se a resposta de erro é um Blob com JSON
+      let errorText = 'descrição não informada.';
+      let message = '';
+
+      if (res?.data instanceof Blob && res.data.type === 'application/json') {
+         try {
+            const text = await res.data.text(); // moderno, substitui FileReader
+            const parsed = JSON.parse(text);
+            errorText = parsed.error || errorText;
+            message = parsed.message || message;
+         } catch (e) {
+            console.warn('Erro ao interpretar JSON do blob:', e);
+         }
+      } else if (res?.data) {
+         errorText = res.data.error || errorText;
+         message = res.data.message || message;
+      }
+
+      // Exibe o erro (exceto validações 422)
+      if (status !== 422) {
+         showError(`<b>Erro ${status}</b> ${errorText}<br/>${message}`);
       }
 
       return Promise.reject(error);
    }
 );
+
+
+// api.interceptors.response.use(
+//    (response) => {
+//       stopLoading();
+//       return response;
+//    },
+//    (error) => {
+//       stopLoading();
+//       // console.log('interceptors Erro status:', error.response?.status)
+
+//       // Sendo login, ignora o tratamento se o erro veio do endpoint de login
+//       const isLoginRequest = error.config?.url?.includes('/auth/login');
+//       if (isLoginRequest) return Promise.reject(error);      
+
+//       // Se a resposta for 401-Forbbiden, redireciona para login
+//       if (error.response?.status == 401) {
+//          removeToken()
+//          redirectToLogin()
+//          return new Promise(() => {}) // evita erro no console
+//       } 
+//       // Para todos demais erros diferentes de 422, exibe o erro
+//       else if (error.response?.status != 422) {
+//          // showError("<b>Erro " + error.response?.status + "</b> " + (error.response?.data?.error || 'descrição não informada.') + "<br/> " + ( error.response?.data?.message || ''));
+
+//          const status = error.response?.status;
+//          const message = error.response?.data?.message || 'Sem message';
+//          const errorText = error.response?.data?.error || 'descrição não informada.';
+
+//          showError(`<b>Erro ${status}</b> ${errorText}<br/>${message}`);         
+//       }
+
+//       return Promise.reject(error);
+//    }
+// );
 
 export default api;

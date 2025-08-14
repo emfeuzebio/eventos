@@ -95,6 +95,29 @@ export function useForm({
       clearFieldData();
    }
 
+   async function print() {
+      // console.log('print', globalEventoId.value);
+
+      try {
+         // const response = await api.get(`/hotel/relatorio/${globalEventoId.value}`, {
+         const response = await api.get(`/hotel/relhospedagemdoevento/${globalEventoId.value}`, {
+            responseType: 'blob',
+         });
+
+         const blob = new Blob([response.data], { type: 'application/pdf' });
+         const url = window.URL.createObjectURL(blob);
+         window.open(url, '_blank');
+         window.URL.revokeObjectURL(url); // Liberar URL da memória
+
+         showToast({
+            title: 'Sucesso',
+            message: `Relatório gerado com sucesso.`,
+         });
+      } catch (error) {
+         console.log('useForm: Erro ao gerar relatório:', error.response?.data.message);
+      }      
+   }
+
    function confirmDeleteModal(rowData) {
       // console.log(`Confirmação de exclusão para o ID:`)
       selectedToDelete.value = { ...rowData };
@@ -164,5 +187,6 @@ export function useForm({
       confirmDeleteModal,
       cancelDelete,
       confirmDelete,
+      print,
    };
 }
