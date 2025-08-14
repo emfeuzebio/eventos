@@ -354,7 +354,7 @@
          <CAlert color="primary" v-html="inscricaoDados"></CAlert>
 
          <label class="form-label fw-bold">Selecione o Quarto</label>
-         <CFormSelect
+         <CoreUIMultiselect
             v-model="quartoSelecionado"
             :options="[
                { value: '', label: 'Desmarcar o Quarto atual' },
@@ -364,7 +364,6 @@
                })),
             ]"
          />
-
          <label class="form-label fw-bold mb-1 mt-2"
             >Dados da Hospedagem marcada</label
          >
@@ -448,16 +447,18 @@ const columns = [
             row.chegada_data_hora || 'Data-Hora Não definida'
          );
          const chegada_veiculo =
-            row.viagem_chegada?.veiculo.descricao || 'Veículo Não definido';
+            row.viagem_chegada?.veiculo.descricao ||
+            (row.chegada_traslado == 'SIM' ? 'Veículo Não definido' : '');
 
          return `<span class="fw-bold">${nome}</span> <small class="text-muted">${entidade_sigla}</small> <br/>
                      <small class="text-muted">${papel} - ${modalidade}</small> <br/>
-                     <span class="fw-bold">Chegada</span> <br/>
+                     <span class="fw-bold">Chegada</span> 
                      <small class="text-muted">${chegada_data_hora}</small> >
                      <small class="text-muted">${chegada_meio_transp}</small>
                      <small class="text-muted">${chegada_cia_transp}</small> <br/> 
-                     <span class="fw-bold">Traslado</span> ${row.chegada_traslado} <br/>	
-                     <small class="text-muted">${chegada_veiculo}</small> 
+                     <span class="fw-bold">Traslado</span> ${row.chegada_traslado} 
+                     <small class="text-muted">${chegada_veiculo}</small> <br/>
+                     <span class="fw-bold">Hospedagem</span> <small class="text-muted">${row.custeio_hospedagem}</small> 	
                `;
       },
       className: 'text-left',
