@@ -63,7 +63,7 @@
                   >
                   <CButton
                      class="btn btn-sm btn-outline-success me-1"
-                     v-if="canInsert"
+                     v-if="props.abilities.includes(props.endpoint + '.store')"
                      @click="form.insertNewModal"
                      ><i class="fa fa-plus"></i> Inserir Novo</CButton
                   >
@@ -204,7 +204,7 @@ const props = defineProps({
    //    default: () => [{}],
    // },
    extraColumnRender: Function,
-   canInsert: Boolean,
+   // canInsert: Boolean,
    // canUpdate: Boolean,
    // canDelete: Boolean,
    canPrint: Boolean,
