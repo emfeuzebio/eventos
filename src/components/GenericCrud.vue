@@ -9,7 +9,7 @@
             <!-- Linha dos filtros, mensagens e botões -->
             <div class="row align-items-center">
                <!-- Coluna 1: Filtros -->
-               <div class="col-md-7 d-flex flex-wrap align-items-center gap-2">
+               <div class="col-md-6 d-flex flex-wrap align-items-center gap-2">
                   <div class="d-flex flex-wrap gap-21 mb-1">
                      <div
                         v-for="filter in props.filters"
@@ -54,28 +54,21 @@
                </div>
 
                <!-- Coluna 3: Botões -->
-               <div class="col-md-5 text-end">
+               <div class="col-md-6 text-end">
                   <span v-for="buttom in props.pageButtons" :key="buttom.label">
                      <CButton
                         :class="buttom.class"
                         @click="
-                           {
-                              {
-                                 buttom.action;
-                              }
-                           }
+                           onClickPageButtonsActions(
+                              buttom.label,
+                              buttom.action
+                           )
                         "
                      >
-                        {{ buttom.label }}
+                        <span v-html="buttom.label"></span>
                      </CButton>
                   </span>
 
-                  <CButton
-                     class="btn btn-sm btn-outline-info me-1"
-                     v-if="props.abilities.includes(props.endpoint + '.print')"
-                     @click="form.print"
-                     >Imprimir</CButton
-                  >
                   <CButton
                      class="btn btn-sm btn-outline-success me-1"
                      v-if="props.abilities.includes(props.endpoint + '.store')"
@@ -177,9 +170,6 @@ import { useDataTable } from '@/composables/useDataTable';
 import { useForm } from '@/composables/useForm';
 import { useToast } from '@/composables/useToast';
 
-import { useEventos } from '@/composables/useEventos';
-const { fetchRegioes, regioes } = useEventos();
-
 const { showToast } = useToast();
 
 // Props configuráveis
@@ -218,10 +208,6 @@ const props = defineProps({
       ],
    },
    filters: Array,
-   // filters: {
-   //    type: Object,
-   //    default: () => [{}],
-   // },
    extraColumnRender: Function,
    // canInsert: Boolean,
    // canUpdate: Boolean,
@@ -262,8 +248,21 @@ const emit = defineEmits([
    'delete',
    'custom',
    'extraAction',
+   'pageButtonsActions',
    'afterSave',
 ]);
+
+const onClickPageButtonsActions = (label, action) => {
+   // showToast({
+   //    title: 'Ação',
+   //    message: 'Clicou no page Buttom ' + label + ', Ação: ' + action,
+   // });
+
+   emit('pageButtonsActions', {
+      label: label,
+      action: action,
+   });
+};
 
 // console.log(`Abilities:`, props.abilities);
 

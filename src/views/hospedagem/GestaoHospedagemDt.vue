@@ -7,6 +7,7 @@
       description="Gestão das Inscrições que solicitaram Hospedagem, inscritas no Evento selecionado acima"
       endpoint="inscricao"
       columnActionsWidth="450px"
+      :pageButtons="pageButtons"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
@@ -15,6 +16,7 @@
       :abilities="abilities"
       :canPrint="canPrint"
       @extraAction="onExtraAction"
+      @pageButtonsActions="onPageButtonsActions"
    >
       <template #form="{ form, errors }">
          <!-- {{ form.value.estados }} -->
@@ -400,7 +402,9 @@ import DataTablesLib from 'datatables.net-bs5';
 import { useCurrentEventStore } from '@/stores/currentEvent';
 const currentEventStore = useCurrentEventStore();
 const currentEvent = computed(() => currentEventStore.currentEvent);
-// const currentEventId = currentEvent.value?.id ?? '';
+
+const eventStore = useCurrentEventStore();
+const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
 // console.log('currentEventId:', currentEventId);
 
 const { showError } = useGlobalError(); // Modal de Erros
@@ -452,13 +456,13 @@ const columns = [
 
          return `<span class="fw-bold">${nome}</span> <small class="text-muted">${entidade_sigla}</small> <br/>
                      <small class="text-muted">${papel} - ${modalidade}</small> <br/>
-                     <span class="fw-bold">Chegada</span> 
+                     <span class="fw-bold">Chegada</span>
                      <small class="text-muted">${chegada_data_hora}</small> >
                      <small class="text-muted">${chegada_meio_transp}</small>
-                     <small class="text-muted">${chegada_cia_transp}</small> <br/> 
-                     <span class="fw-bold">Traslado</span> ${row.chegada_traslado} 
+                     <small class="text-muted">${chegada_cia_transp}</small> <br/>
+                     <span class="fw-bold">Traslado</span> ${row.chegada_traslado}
                      <small class="text-muted">${chegada_veiculo}</small> <br/>
-                     <span class="fw-bold">Hospedagem</span> <small class="text-muted">${row.custeio_hospedagem}</small> 	
+                     <span class="fw-bold">Hospedagem</span> <small class="text-muted">${row.custeio_hospedagem}</small>
                `;
       },
       className: 'text-left',
@@ -508,7 +512,7 @@ const extraColumnRender = (row) => {
       <!-- Primeira linha -->
       <div class="d-flex w-100 mb-2">
          <div class="d-flex justify-content-start align-items-center" style="width: 30%;">
-            <label style="padding-right: 4px;">Check-in</label> 
+            <label style="padding-right: 4px;">Check-in</label>
             <div class="form-check form-switch">
                <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckin" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckin}>
             </div>
@@ -525,7 +529,7 @@ const extraColumnRender = (row) => {
             <div class="form-check form-switch">
                <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckout" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckout}>
             </div>
-            <label style="padding-right: 4px;">Check-Out</label> 
+            <label style="padding-right: 4px;">Check-Out</label>
          </div>
       </div>
 
@@ -758,7 +762,7 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       } - ${row.modalidade || 'Não informada'}<br/> <b>Chegada</b><br/>
       ${formatToBrDateTime(
          row.chegada_data_hora || 'Data-Hora Não definida'
-      )} <br/> 
+      )} <br/>
       ${row.chegada_meio_transp || 'Meio Não definido'} > ${
          row.chegada_cia_transp || ''
       } <br> <b>Traslado</b> ${row.chegada_traslado} Solicitado <br/>
@@ -831,4 +835,93 @@ function formatValidationErrors(errors) {
    // Quebra de linha HTML para uso com v-html
    return mensagens.join('<br/>');
 }
+
+/**
+ * BASE Crud - Page Buttons são o Botões Extras no canto superior direito
+ */
+// const pageButtons = [{}]; // nessse caso sem filtros
+const pageButtons = computed(() => [
+   {
+      label: '<i class="fa fa-print"></i> Hóspedes',
+      action: 'printRelHospedagemDoEvento',
+      class: 'btn btn-sm btn-outline-info me-1',
+   },
+   // {
+   //    label: '<i class="fa fa-print"></i> Quartos',
+   //    action: 'printRelQuartosDoEvento',
+   //    class: 'btn btn-sm btn-outline-info me-1',
+   // },
+]);
+
+/**
+ * CAPTURA as ações click dos pega Buttons e chama as funções necessárias
+ */
+const onPageButtonsActions = async ({ label, action }) => {
+   // console.log('onPageButtonsActions: ', label, action);
+
+   // Vamos chamar a função necessária para este evento
+   if (action === 'printRelHospedagemDoEvento') {
+      printRelHospedagemDoEvento();
+   }
+
+   // if (action === 'printRelQuartosDoEvento') {
+   //    printRelQuartosDoEvento();
+   // }
+};
+
+async function printRelHospedagemDoEvento() {
+   try {
+      const response = await api.get(
+         `/hotel/relhospedagemdoevento/${globalEventoId.value}`,
+         {
+            responseType: 'blob',
+         }
+      );
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      window.URL.revokeObjectURL(url); // Liberar URL da memória
+
+      showToast({
+         title: 'Sucesso',
+         message: `Relatório gerado com sucesso.`,
+      });
+   } catch (error) {
+      showToast({
+         title: 'Alerta de Erro',
+         message:
+            'useForm: Erro ao gerar relatório: ' + error.response?.data.message,
+         color: 'danger',
+      });
+   }
+}
+
+// async function printRelQuartosDoEvento() {
+//    try {
+//       const response = await api.get(
+//          `/hotel/relatorio/${globalEventoId.value}`,
+//          {
+//             responseType: 'blob',
+//          }
+//       );
+
+//       const blob = new Blob([response.data], { type: 'application/pdf' });
+//       const url = window.URL.createObjectURL(blob);
+//       window.open(url, '_blank');
+//       window.URL.revokeObjectURL(url); // Liberar URL da memória
+
+//       showToast({
+//          title: 'Sucesso',
+//          message: `Relatório gerado com sucesso.`,
+//       });
+//    } catch (error) {
+//       showToast({
+//          title: 'Alerta de Erro',
+//          message:
+//             'useForm: Erro ao gerar relatório: ' + error.response?.data.message,
+//          color: 'danger',
+//       });
+//    }
+// }
 </script>

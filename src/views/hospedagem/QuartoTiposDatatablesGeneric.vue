@@ -18,6 +18,7 @@
       :extra-column-render="extraColumnRender"
       :abilities="abilities"
       @extraAction="onExtraAction"
+      @pageButtonsActions="onPageButtonsActions"
    >
       <template #form="{ form, errors }">
          <!-- {{ rotas }} -->
@@ -160,25 +161,7 @@ const { fetchEntidades, entidades } = useEventos();
  */
 const buttons = { update: true, delete: true, show: false };
 
-/**
- * BASE Crud - Filtros da tabela de dados
- * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
- */
 //  const filters = [{}]; // nessse caso sem filtros
-
-const pageButtons = computed(() => [
-   {
-      label: 'Print1',
-      action: 'relatorio1',
-      class: 'btn btn-sm btn-outline-info me-1',
-   },
-   {
-      label: 'Print2',
-      action: 'relatorio2',
-      class: 'btn btn-sm btn-outline-warning me-1',
-   },
-]);
-
 const filters = computed(() => [
    {
       label: 'Ativo',
@@ -204,4 +187,34 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       // mas poderiamos também apenas passar o id da região para a função editarRegiao(id) e carregar os dados da API novamente com os dados atualizados
    }
 };
+
+/**
+ * BASE Crud - Page Buttons são o Botões Extras no canto superior direito
+ */
+const pageButtons = [{}]; // nessse caso sem filtros
+// const pageButtons = computed(() => [
+//    {
+//       label: 'Print1',
+//       action: 'pageButtom1',
+//       class: 'btn btn-sm btn-outline-info me-1',
+//    },
+//    {
+//       label: 'Print2',
+//       action: 'pageButtom2',
+//       class: 'btn btn-sm btn-outline-warning me-1',
+//    },
+// ]);
+
+const onPageButtonsActions = async ({ label, action }) => {
+   // console.log('onPageButtonsActions: ', label, action);
+
+   if (action === 'pageButtom2') {
+      // Vamos chamar a função necessária para este evento
+      pageButtom2();
+   }
+};
+
+async function pageButtom2() {
+   console.log('pageButtom2');
+}
 </script>

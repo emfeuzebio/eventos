@@ -354,12 +354,14 @@ const extraColumnRender = (row) => {
          canAdmQuartosDoHotel ? '' : 'disabled'
       } class="btn btn-xs btn-outline-info" data-custom-action="editarQuartosDoHotel" data-evento_id="${
       row.evento_id
-   }" data-hotel_id="${row.id}" >Adm Quartos</button>
+   }" data-hotel_id="${
+      row.id
+   }" ><i class="fa fa-pencil"></i> Adm Quartos</button>
       <button ${
          canAdmQuartosDoHotel ? '' : 'disabled'
       } class="btn btn-xs btn-outline-warning" data-custom-action="imprimirQuartosDoHotel" data-hotel_id="${
       row.id
-   }" >Impr</button>
+   }" ><i class="fa fa-print"></i> Quartos</button>
    `;
 };
 
