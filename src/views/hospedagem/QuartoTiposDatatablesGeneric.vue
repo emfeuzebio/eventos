@@ -10,6 +10,7 @@
       description="Gerenciamento os Tipos de Quartos de Hotel"
       endpoint="quartotipo"
       columnActionsWidth="160px"
+      :pageButtons="pageButtons"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
@@ -18,10 +19,10 @@
       :abilities="abilities"
       @extraAction="onExtraAction"
    >
-   <template #form="{ form, errors }">
+      <template #form="{ form, errors }">
          <!-- {{ rotas }} -->
          <!-- {{ form.value }} -->
-         
+
          <CFormLabel class="form-label fw-bold">Nome</CFormLabel>
          <CFormInput
             v-model="form.value.nome"
@@ -84,7 +85,6 @@ const { showToast } = useToast(); // Toasts de Alerta
 // recuperas as Autorizações (abilities) do JWT
 const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
-
 
 // DEBUG de todas abilities do User Logado
 const crudRef = ref(null);
@@ -152,10 +152,7 @@ const pessoaFormErros = ref({});
  * ex.: lista de Regiões do País
  */
 import { useEventos } from '@/composables/useEventos';
-const {
-   fetchEntidades,
-   entidades,
-} = useEventos();
+const { fetchEntidades, entidades } = useEventos();
 
 /**
  * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.
@@ -168,6 +165,19 @@ const buttons = { update: true, delete: true, show: false };
  * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
  */
 //  const filters = [{}]; // nessse caso sem filtros
+
+const pageButtons = computed(() => [
+   {
+      label: 'Print1',
+      action: 'relatorio1',
+      class: 'btn btn-sm btn-outline-info me-1',
+   },
+   {
+      label: 'Print2',
+      action: 'relatorio2',
+      class: 'btn btn-sm btn-outline-warning me-1',
+   },
+]);
 
 const filters = computed(() => [
    {
@@ -185,16 +195,13 @@ const filters = computed(() => [
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
-
    if (action === 'editarRegiao') {
       // console.log('ZAP: ', row, action, dataset, target);
       // vamos chamar uma função editar a action 'editarRegiao'
       // nesse caso estamos usando os dados da linha (row) para preencher o formulário
-
       // pessoaFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
       // editarRegiao();
       // mas poderiamos também apenas passar o id da região para a função editarRegiao(id) e carregar os dados da API novamente com os dados atualizados
    }
 };
-
 </script>

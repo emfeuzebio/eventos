@@ -9,7 +9,7 @@
             <!-- Linha dos filtros, mensagens e botões -->
             <div class="row align-items-center">
                <!-- Coluna 1: Filtros -->
-               <div class="col-md-8 d-flex flex-wrap align-items-center gap-2">
+               <div class="col-md-7 d-flex flex-wrap align-items-center gap-2">
                   <div class="d-flex flex-wrap gap-21 mb-1">
                      <div
                         v-for="filter in props.filters"
@@ -54,10 +54,25 @@
                </div>
 
                <!-- Coluna 3: Botões -->
-               <div class="col-md-4 text-end">
+               <div class="col-md-5 text-end">
+                  <span v-for="buttom in props.pageButtons" :key="buttom.label">
+                     <CButton
+                        :class="buttom.class"
+                        @click="
+                           {
+                              {
+                                 buttom.action;
+                              }
+                           }
+                        "
+                     >
+                        {{ buttom.label }}
+                     </CButton>
+                  </span>
+
                   <CButton
                      class="btn btn-sm btn-outline-info me-1"
-                     v-if="canPrint"
+                     v-if="props.abilities.includes(props.endpoint + '.print')"
                      @click="form.print"
                      >Imprimir</CButton
                   >
@@ -175,6 +190,10 @@ const props = defineProps({
    description: String,
    endpoint: String,
    columnActionsWidth: String,
+   pageButtons: {
+      type: Object,
+      default: () => [{}],
+   },
    defaultValues: {
       type: Object,
       default: () => ({}),
@@ -222,6 +241,9 @@ props.filters.forEach((filtro) => {
    }
 });
 // console.log('Filtros aplicados à Página:',filtros);
+
+// controe dos pageButtons
+console.log('Ref para os pageButtons da Página:', props.pageButtons);
 
 // Estados e ações
 const alert = ref({ type: '', message: '' });
