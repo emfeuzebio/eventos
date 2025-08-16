@@ -514,15 +514,15 @@ const config = {
    mode: 'multiple', // usar este para configurar período do evento e salvar como array ver GPT solução
 };
 
-const flatpickrDataServico = {
+// Flatpickr config como ref para ser reativo
+const flatpickrDataServico = ref({
    enableTime: false,
    dateFormat: 'd/m/Y',
    time_24hr: true,
-   // enable: ['04/08/2025', '05/08/2025', '06/08/2025', '07/08/2025'],
+   enable: [], // ← será setado dinamicamente
    locale: Portuguese,
    disableMobile: true,
-   // mode: 'multiple', // usar este para configurar período do evento e salvar como array ver GPT solução
-};
+});
 
 DataTable.use(DataTablesLib);
 
@@ -687,7 +687,7 @@ const dtColumns = [
       class: 'text-center fw-bold',
       className: 'text-center', // título coluna
       data: null,
-      width: '160px',
+      width: '170px',
       render: function (data, type, row) {
          const data_servico = row.data_servico?.trim()
             ? //? // ? formatToBrDate(row.data_servico)
@@ -796,13 +796,12 @@ const dtConfig = {
          ...externalFilters.value,
       };
 
-      api.get(endpoint, { params: filters })
-         .then((response) => {
-            callback({ data: response.data.data || response.data });
-         })
-         .catch((error) => {
-            callback({ data: [] }); // evitar quebra da tabela
-         });
+      api.get(endpoint, { params: filters }).then((response) => {
+         callback({ data: response.data.data || response.data });
+      });
+      // .catch((error) => {
+      //    callback({ data: [] }); // evitar quebra da tabela
+      // });
    },
    initComplete: function () {
       dtInstance = this.api(); // salva instância para uso em reload()
@@ -896,15 +895,18 @@ const editarQuartoDoHotel = async (quarto) => {
    };
    quatosFormErros.value = {}; // limpa erros antigos
    // console.log('Editar quarto:', quarto);
-   editarQuartoModal.value = true;
    quatosFormOperacao.value = 'editar'; // define a operação como 'editar'
+   editarQuartoModal.value = true; // abre o modal
    await focoNoNumero();
 };
 
 // Fechar o Quarto do Hotel modal
 const excluirQuartoDoHotel = async (quarto) => {
    // console.log('excluirQuartoDoHotel:', quarto);
-   quartoSelecionado.value = { ...quarto };
+   quartoSelecionado.value = {
+      ...quarto,
+      data_servico: formatToBrDiaSemana(quarto.data_servico),
+   };
 
    // console.log('excluirQuartoDoHotel:', quartoSelecionado.value);
    deleteModalVisible.value = true; // Abre o modal de confirmação de exclusão
@@ -1018,6 +1020,23 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
             'Somente um <b>Hotel ATIVO</b> pode ter seus Quartos editados.'
          );
          return;
+      }
+
+      // vamos atualizar o flatpickrDataServico com a lista de Dias do Evento
+      const raw = row.periodo_datas;
+
+      // Converte para array: 07/08/2025,08/08/2025,..
+      const datasPermitidas = (row.periodo_datas || '')
+         .split(',')
+         .map((d) => d.trim())
+         .filter(Boolean); // remove vazios
+
+      // Atualiza as datas permitidas no flatpickr
+      flatpickrDataServico.value.enable = datasPermitidas;
+
+      // Ajusta mês/ano inicial do calendário para a 1ª data
+      if (datasPermitidas.length > 0) {
+         flatpickrDataServico.value.defaultDate = datasPermitidas[0];
       }
 
       externalFilters.value.evento_id = row.id; // define o hotel_id no filtro externo

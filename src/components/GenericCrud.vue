@@ -229,7 +229,7 @@ props.filters.forEach((filtro) => {
 // console.log('Filtros aplicados à Página:',filtros);
 
 // controe dos pageButtons
-console.log('Ref para os pageButtons da Página:', props.pageButtons);
+// console.log('Ref para os pageButtons da Página:', props.pageButtons);
 
 // Estados e ações
 const alert = ref({ type: '', message: '' });
