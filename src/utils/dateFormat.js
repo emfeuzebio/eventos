@@ -1,3 +1,6 @@
+import { parseISO, format, isValid, parse } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
 /**
  * Converte para Data + Hora pt-BR com Dia da Semana na frente
  * 
@@ -113,6 +116,57 @@ export function formatToBrDateWeek(dateStr) {
   const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1)
 
   return `${capitalizedWeekday} ${dateTime}`  
+}
+
+/**
+ * Converte uma string (em dd/MM/yyyy) ou um objeto Date para yyyy-MM-dd (MySQL)
+ * @param {string|Date} valor
+ * @returns {string|null}
+ */
+export function formatarDataParaMySQL(valor) {
+  if (!valor) return null;
+
+  let data;
+
+  if (typeof valor === 'string') {
+    // Corrige aqui: espera string no formato 'dd/MM/yyyy'
+    data = parse(valor, 'dd/MM/yyyy', new Date());
+  } else {
+    data = valor;
+  }
+
+  return isValid(data) ? format(data, 'yyyy-MM-dd') : null;
+}
+
+/**
+ * Formata uma data para exibição em português no formato "Qui 04 Abr 2024"
+ * Aceita string 'dd/MM/yyyy' ou Date.
+ */
+export function formatToBrDiaSemana(valor) {
+  if (!valor) return '';
+
+  let data;
+
+  if (typeof valor === 'string') {
+    // Usa o parse correto para o formato que vem da API
+    data = parse(valor, 'yyyy-MM-dd', new Date());
+  } else {
+    data = valor;
+  }
+
+  if (!isValid(data)) return '';
+
+  const formatada = format(data, 'EEE dd MMM yyyy', { locale: ptBR });
+
+  // Capitaliza as iniciais: 'qui 04 abr 2024' → 'Qui 04 Abr 2024'
+  return formatada
+    .split(' ')
+    .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
+    .join(' ');  
+
+  // return isValid(data)
+  //   ? format(data, 'EEE dd MMM yyyy', { locale: ptBR })
+  //   : '';
 }
 
 

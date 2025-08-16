@@ -890,8 +890,7 @@ async function printRelHospedagemDoEvento() {
    } catch (error) {
       showToast({
          title: 'Alerta de Erro',
-         message:
-            'useForm: Erro ao gerar relatório: ' + error.response?.data.message,
+         message: 'Erro ao gerar o relatório: ' + error.response?.data.message,
          color: 'danger',
       });
    }

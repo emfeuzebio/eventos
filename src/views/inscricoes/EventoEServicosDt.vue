@@ -2,6 +2,7 @@
    <!-- DataTables principal do CRUD -->
    <GenericCrud
       title="Lista de Eventos"
+      modalSize="lg"
       description="Gerenciamento de Eventos e seus Serviços por dia"
       endpoint="evento"
       :filters="filters"
@@ -13,63 +14,223 @@
       @extraAction="onExtraAction"
    >
       <template #form="{ form, errors }">
-         <!-- {{ rotas }} -->
-         <!-- {{ form.value }} -->
+         <!-- {{ form.value.estados }} -->
+         <!-- {{ estados }} -->
 
-         <label class="form-label fw-bold">Evento</label>
-         <CFormSelect
-            v-model="form.value.evento_id"
-            :disabled="form.value.ativo === 'NÃO'"
-            :options="[
-               // ...((glbventosAtivos || []).filter(ev => hotelTemQuartos ? ev.id === 1 : true
-               // ...((glbventosAtivos || []).filter(ev => form.value.ativo === 'NÃO' ? ev.id === form.value.evento_id : true
-               ...(todosEventos || [])
-                  .filter(
-                     (ev) =>
-                        form.value.ativo === 'SIM' ? ev.ativo === 'SIM' : true
-                     // ...((todosEventos    || []).filter(ev => true
-                  )
-                  .map((ev) => ({
-                     value: ev.id,
-                     label: ev.nome,
-                  })),
-            ]"
-         />
-         <div class="form-error" v-if="errors.value.evento_id">
-            {{ errors.value.evento_id[0] }}
-         </div>
+         <CCard>
+            <!-- <CCardHeader
+               ><CCardTitle>Editar Evento</CCardTitle></CCardHeader
+            > -->
+            <CCardBody>
+               <!-- Organização a que pertence o Evento -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Organização do Evento</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <CFormSelect
+                        v-model="form.value.organizacao_id"
+                        :options="[
+                           { value: '', label: 'Selecione' },
+                           ...organizacoes.map((organizacao) => ({
+                              value: organizacao.id,
+                              label: organizacao.nome,
+                           })),
+                        ]"
+                     />
+                     <div class="form-error" v-if="errors.value.organizacao_id">
+                        {{ errors.value.organizacao_id[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
 
-         <label class="form-label fw-bold">Nome do Hotel</label>
-         <CFormInput
-            v-model="form.value.nome"
-            :disabled="form.value.ativo === 'NÃO'"
-            :class="{ 'is-invalid': errors.nome }"
-         />
-         <div class="form-error" v-if="errors.value.nome">
-            {{ errors.value.nome[0] }}
-         </div>
+               <!-- Nome do Evento -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Nome</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <CFormInput
+                        v-model="form.value.nome"
+                        :class="{ 'is-invalid': errors.nome }"
+                     />
+                     <div class="form-error" v-if="errors.value.nome">
+                        {{ errors.value.nome[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
 
-         <label class="form-label fw-bold">Sigla</label>
-         <CFormInput
-            v-model="form.value.sigla"
-            :disabled="form.value.ativo === 'NÃO'"
-            :class="{ 'is-invalid': errors.sigla }"
-         />
-         <div class="form-error" v-if="errors.value.sigla">
-            {{ errors.value.sigla[0] }}
-         </div>
+               <!-- Sigla do Evento -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Sigla</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <CFormInput
+                        v-model="form.value.sigla"
+                        :class="{ 'is-invalid': errors.sigla }"
+                     />
+                     <div class="form-error" v-if="errors.value.sigla">
+                        {{ errors.value.sigla[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
 
-         <label class="form-label fw-bold">Ativo</label>
-         <CFormSelect
-            v-model="form.value.ativo"
-            :options="[
-               { value: 'SIM', label: 'SIM' },
-               { value: 'NÃO', label: 'NÃO' },
-            ]"
-         />
-         <div class="form-error" v-if="errors.value.ativo">
-            {{ errors.value.ativo[0] }}
-         </div>
+               <!-- Descrição -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Observações</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <CFormTextarea
+                        v-model="form.value.descricao"
+                        :class="{ 'is-invalid': errors.descricao }"
+                        rows="6"
+                        placeholder="Descrição ..."
+                     />
+                     <div class="form-error" v-if="errors.value.descricao">
+                        {{ errors.value.descricao[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
+               <!-- Local do Evento -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Local</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <CFormTextarea
+                        v-model="form.value.local"
+                        :class="{ 'is-invalid': errors.local }"
+                        rows="2"
+                        placeholder="Local..."
+                     />
+                     <div class="form-error" v-if="errors.value.local">
+                        {{ errors.value.local[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
+               <!-- Período do Evento -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Período em Datas</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <div class="input-group">
+                        <flat-pickr
+                           v-model="form.value.periodo_datas"
+                           :config="config"
+                           class="form-control"
+                           placeholder="Selecione a data"
+                        />
+                        <span class="input-group-text">
+                           <i class="fa fa-calendar"></i>
+                        </span>
+                     </div>
+                     <div class="form-error" v-if="errors.value.periodo_datas">
+                        {{ errors.value.periodo_datas[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Período em Texto</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <CFormInput
+                        v-model="form.value.periodo"
+                        :class="{ 'is-invalid': errors.periodo }"
+                     />
+                     <div class="form-error" v-if="errors.value.periodo">
+                        {{ errors.value.periodo[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
+               <!-- Tema do Evento -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Tema</CFormLabel
+                  >
+                  <CCol sm="8">
+                     <CFormInput
+                        v-model="form.value.tema"
+                        :class="{ 'is-invalid': errors.tema }"
+                     />
+                     <div class="form-error" v-if="errors.value.tema">
+                        {{ errors.value.tema[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
+               <!-- Data Início do Evento -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Data Início</CFormLabel
+                  >
+                  <CCol sm="4">
+                     <CFormInput
+                        v-model="form.value.inscricao_data_ini"
+                        type="date"
+                        :class="{
+                           'is-invalid': errors.inscricao_data_ini,
+                        }"
+                     />
+                     <div
+                        class="form-error"
+                        v-if="errors.value.inscricao_data_ini"
+                     >
+                        {{ errors.value.inscricao_data_ini[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
+               <!-- Data Término do Evento -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Data Fim</CFormLabel
+                  >
+                  <CCol sm="4">
+                     <CFormInput
+                        v-model="form.value.inscricao_data_fim"
+                        type="date"
+                        :class="{
+                           'is-invalid': errors.inscricao_data_fim,
+                        }"
+                     />
+                     <div
+                        class="form-error"
+                        v-if="errors.value.inscricao_data_fim"
+                     >
+                        {{ errors.value.inscricao_data_fim[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+
+               <!-- Ativo -->
+               <CRow class="form-group" style="margin-top: 16px">
+                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
+                     >Ativo?</CFormLabel
+                  >
+                  <CCol sm="4">
+                     <CFormSelect
+                        v-model="form.value.ativo"
+                        :options="[
+                           { value: '', label: 'Selecione' },
+                           { value: 'SIM', label: 'SIM' },
+                           { value: 'NÃO', label: 'NÃO' },
+                        ]"
+                     />
+                     <div class="form-error" v-if="errors.value.ativo">
+                        {{ errors.value.ativo[0] }}
+                     </div>
+                  </CCol>
+               </CRow>
+            </CCardBody>
+         </CCard>
       </template>
    </GenericCrud>
 
@@ -127,15 +288,22 @@
          <!-- Dia do Evento -->
          <div class="mb-3">
             <label class="form-label fw-bold">Dia do Evento</label>
+            {{ quartoSelecionado.data_servico }}
 
             <!-- usando input para funcionar o foco -->
-            <input
-               ref="numeroFoco"
-               type="date"
-               v-model="quartoSelecionado.data_servico"
-               class="form-control"
-               :class="{ 'is-invalid': !!quatosFormErros.data_servico }"
-            />
+            <div class="input-group">
+               <flat-pickr
+                  ref="numeroFoco"
+                  v-model="quartoSelecionado.data_servico"
+                  :config="flatpickrDataServico"
+                  class="form-control"
+                  :class="{ 'is-invalid': !!quatosFormErros.data_servico }"
+                  placeholder="Selecione a data"
+               />
+               <span class="input-group-text">
+                  <i class="fa fa-calendar"></i>
+               </span>
+            </div>
             <div class="form-error" v-if="quatosFormErros.data_servico">
                {{ quatosFormErros.data_servico[0] }}
             </div>
@@ -312,13 +480,49 @@
 import { computed, ref, toRaw, watch, nextTick } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
-import { formatToBrDate } from '@/utils/dateFormat';
-import { formatToBrDateWeek } from '@/utils/dateFormat';
+import {
+   formatToBrDate,
+   formatToBrDateWeek,
+   formatToBrDiaSemana,
+   formatarDataParaMySQL,
+} from '@/utils/dateFormat';
 import DataTable from 'datatables.net-vue3';
 import DataTablesLib from 'datatables.net-bs5';
 import { useGlobalError } from '@/composables/useGlobalError';
 import { useToast } from '@/composables/useToast';
 import api from '@/services/api';
+
+import FlatPickr from 'vue-flatpickr-component';
+import { Portuguese } from 'flatpickr/dist/l10n/pt.js';
+import 'flatpickr/dist/flatpickr.css';
+
+import { parseISO, format, isValid } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+
+// const dataBrPorExtenso = format(new Date(), "dd 'de' MMMM 'de' yyyy", {
+//    locale: ptBR,
+// });
+
+// Configuração do flatpickr
+const config = {
+   enableTime: false,
+   dateFormat: 'd/m/Y',
+   time_24hr: true,
+   // enable: ['04/08/2025', '05/08/2025', '06/08/2025', '07/08/2025'],
+   locale: Portuguese,
+   disableMobile: true,
+   mode: 'multiple', // usar este para configurar período do evento e salvar como array ver GPT solução
+};
+
+const flatpickrDataServico = {
+   enableTime: false,
+   dateFormat: 'd/m/Y',
+   time_24hr: true,
+   // enable: ['04/08/2025', '05/08/2025', '06/08/2025', '07/08/2025'],
+   locale: Portuguese,
+   disableMobile: true,
+   // mode: 'multiple', // usar este para configurar período do evento e salvar como array ver GPT solução
+};
 
 DataTable.use(DataTablesLib);
 
@@ -342,6 +546,9 @@ const currentEvent = computed(() => currentEventStore.currentEvent);
 const glbventosAtivos = computed(() => eventosStore.ativos);
 // console.log('Eventos Ativos:', glbventosAtivos);
 
+const { fetchOrganizacoes, organizacoes } = useEventos();
+fetchOrganizacoes();
+
 // carrega listas de estidades da API para popular listas: <selects> os filtros
 fetchtodosEventos();
 
@@ -361,36 +568,37 @@ const columns = [
    { title: 'Sigla', data: 'sigla', width: '140px', class: 'fw-bold' },
    { title: 'Nome do Evento', data: 'nome', width: 'auto' },
    { title: 'Periodo', data: 'periodo', width: 'auto' },
+   { title: 'Datas', data: 'periodo_datas', width: '100px' },
 
-   {
-      title: 'Dt Início',
-      data: null,
-      render: function (data, type, row) {
-         const dt_inicio = row.inscricao_data_ini?.trim()
-            ? formatToBrDate(row.inscricao_data_ini)
-            : 'Não informado';
-         return `<span class="">${dt_inicio}</span>`;
-      },
-      className: 'text-center',
-      width: '100px',
-   },
-   {
-      title: 'Dt Fim',
-      data: null,
-      render: function (data, type, row) {
-         const dt_fim = row.inscricao_data_fim?.trim()
-            ? formatToBrDate(row.inscricao_data_fim)
-            : 'Não informado';
-         return `<span class="">${dt_fim}</span>`;
-      },
-      className: 'text-center',
-      width: '100px',
-   },
+   // {
+   //    title: 'Dt Início',
+   //    data: null,
+   //    render: function (data, type, row) {
+   //       const dt_inicio = row.inscricao_data_ini?.trim()
+   //          ? formatToBrDate(row.inscricao_data_ini)
+   //          : 'Não informado';
+   //       return `<span class="">${dt_inicio}</span>`;
+   //    },
+   //    className: 'text-center',
+   //    width: '100px',
+   // },
+   // {
+   //    title: 'Dt Fim',
+   //    data: null,
+   //    render: function (data, type, row) {
+   //       const dt_fim = row.inscricao_data_fim?.trim()
+   //          ? formatToBrDate(row.inscricao_data_fim)
+   //          : 'Não informado';
+   //       return `<span class="">${dt_fim}</span>`;
+   //    },
+   //    className: 'text-center',
+   //    width: '100px',
+   // },
    {
       title: 'Ativo',
       data: 'ativo',
       class: 'dt-center small',
-      width: '80px',
+      width: '60px',
       render: function (data, type, row) {
          return `<span class="${
             row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
@@ -426,7 +634,9 @@ const extraColumnRender = (row) => {
          canAdmServicosDoEvento ? '' : 'disabled'
       } class="btn btn-xs btn-outline-info" data-custom-action="editarQuartosDoHotel" data-evento_id="${
       row.evento_id
-   }" data-hotel_id="${row.id}" >Adm Serviços</button>
+   }" data-hotel_id="${
+      row.id
+   }" ><i class="fa fa-pencil"></i> Adm Serviços</button>
    `;
 };
 
@@ -454,7 +664,7 @@ const numeroFoco = ref(null);
 
 const focoNoNumero = async () => {
    await nextTick();
-   numeroFoco.value?.focus();
+   // numeroFoco.value?.focus();
 };
 
 const eventStore = useCurrentEventStore();
@@ -473,16 +683,17 @@ let dtInstance = null; // armazenar instância da tabela para usar o reload
 const dtColumns = [
    { title: 'ID', data: 'id', width: '30px' },
    {
-      title: 'Dia Evento',
+      title: 'Dia do Evento',
       class: 'text-center fw-bold',
       className: 'text-center', // título coluna
       data: null,
-      width: '120px',
+      width: '160px',
       render: function (data, type, row) {
          const data_servico = row.data_servico?.trim()
-            ? // ? formatToBrDate(row.data_servico)
-              formatToBrDateWeek(row.data_servico)
-            : 'Não informado';
+            ? //? // ? formatToBrDate(row.data_servico)
+              formatToBrDiaSemana(row.data_servico)
+            : // formatToBrDateWeek(row.data_servico)
+              'Não informado';
          return `<span class="">${data_servico}</span>`;
       },
    },
@@ -679,7 +890,10 @@ const editarQuartoDoHotel = async (quarto) => {
    }
 
    // fetchQuartoTipos();
-   quartoSelecionado.value = { ...quarto };
+   quartoSelecionado.value = {
+      ...quarto,
+      data_servico: parseISO(quarto.data_servico),
+   };
    quatosFormErros.value = {}; // limpa erros antigos
    // console.log('Editar quarto:', quarto);
    editarQuartoModal.value = true;
@@ -746,7 +960,9 @@ const salvarQuartoDoHotel = async () => {
    const payload = {
       evento_id: externalFilters.value.evento_id, // usa o hotel_id do filtro externo,
       id,
-      data_servico,
+      // data_servico,
+      // data_servico: format(data_servico, 'yyyy-MM-dd'),
+      data_servico: formatarDataParaMySQL(data_servico),
       oferece_transporte,
       oferece_hospedagem,
       oferece_lavanderia,

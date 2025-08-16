@@ -41,15 +41,15 @@ export function useDataTable({
 
             api.get(endpoint, {
                params: filters,
-               // params: {
-               //    ...externalFilters.value,
-               // },
             })
-            .then((response) => callback({ data: response.data })) // Entrega os dados ao DataTables
-            .catch((error) => {
-               // console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
-               callback({ data: [] }); // evita que a tabela quebre
-            });
+            .then((response) => { 
+               // Entrega os dados ao DataTables
+               callback({ data: response.data });
+            }) 
+            // .catch((error) => {
+            //    // console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
+            //    callback({ data: [] }); // evita que a tabela quebre
+            // });
          },
          columns,
          responsive: true,

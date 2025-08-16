@@ -707,13 +707,12 @@ function reloadTable() {
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
    if (action === 'imprimirQuartosDoHotel') {
       // console.log('imprimirQuartosDoHotel: ', dataset.hotel_id);
-      // alert('imprimirQuartosDoHotel: ' + dataset.hotel_id)
       gerarRelatorio(dataset.hotel_id);
+      // abrirRelatorioHotel(dataset.hotel_id);
    }
 
    if (action === 'editarQuartosDoHotel') {
       // console.log('Editar Quartos do Hotel: ', row, action, dataset, target);
-      // console.log('ZAP: ', row, action, dataset, target);
 
       if (row.ativo != 'SIM') {
          // TODO tranformar o showError num componente como o showToast
@@ -723,27 +722,11 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
          return;
       }
 
-      // if (!currentEvent.value) {
-      //    showError("Somente um Evento ATIVO pode ter seus Quartos editados.");
-      //    return
-      // }
-
       externalFilters.value.hotel_id = row.id; // define o hotel_id no filtro externo
       quatosFormModal.value = true; // Abre o modal de edição
       // console.log('Evento ID', currentEvent.value);
 
-      // const tipos = await fetchQuartoTipos();
-      // console.log('Tipo de Quartos:', toRaw(tipos));
-
-      // Recupera os Quartos do Hotel e popula a variável reativa que lista no EasyTables
-      // await fetchQuartosDoHotel(currentEventId.value, row.id);
-      // console.log('Quartos do Hotel:', quartosDoHotel.value);
-      // console.log('Quartos do Hotel:', toRaw(quartosDoHotel.value));
-
       quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
-      // quatosFormDados.value.quarto = {}; // inicializa o objeto
-      // quatosFormDados.value.nome = row.nome; // preenche o nome do hotel
-      // quatosFormModal.value = true;    // Abre o modal de edição
    }
 };
 
@@ -760,15 +743,6 @@ const gerarRelatorio = async (hotelId) => {
 
       // Se quiser abrir no navegador:
       window.open(url, '_blank');
-
-      // Se quiser forçar download:
-      // const link = document.createElement('a');
-      // link.href = url;
-      // link.setAttribute('download', 'relatorio-hotel.pdf');
-      // document.body.appendChild(link);
-      // link.click();
-      // document.body.removeChild(link);
-
       window.URL.revokeObjectURL(url); // Liberar URL da memória
 
       showToast({
@@ -776,7 +750,26 @@ const gerarRelatorio = async (hotelId) => {
          message: `Relatório gerado com sucesso.`,
       });
    } catch (error) {
-      console.log('Erro ao gerar relatório:', error.response?.data.message);
+      showToast({
+         title: 'Alerta de Erro',
+         message: 'Erro ao gerar o Relatório: ' + error.response?.data.message,
+         color: 'danger',
+      });
+   }
+};
+
+const abrirRelatorioHotel = async (hotelId) => {
+   try {
+      // const response = await api.get(`/hotel/relatoriourl/${hotelId}`);
+      const response = await api.get(`/hotel/relatoriourl/${hotelId}/link`);
+      const signedUrl = response.data.url;
+      window.open(signedUrl, '_blank');
+   } catch (error) {
+      showToast({
+         title: 'Erro',
+         message: 'Não foi possível abrir o relatório.',
+         variant: 'danger',
+      });
    }
 };
 
