@@ -96,6 +96,23 @@
          </div>
          <div class="form-text">Ex: -46.63330800</div>
 
+         <div class="mb-3">
+            <div v-if="form.value.maps_url">
+               <a
+                  :href="form.value.maps_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-outline-primary btn-sm"
+               >
+                  Ver no Google Maps
+               </a>
+            </div>
+
+            <div v-else class="text-muted">
+               Localização ainda não informada.
+            </div>
+         </div>
+
          <label class="form-label fw-bold">Ativo</label>
          <CFormSelect
             v-model="form.value.ativo"
