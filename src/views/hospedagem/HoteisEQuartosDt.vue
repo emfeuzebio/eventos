@@ -59,6 +59,43 @@
             {{ errors.value.sigla[0] }}
          </div>
 
+         <label class="form-label fw-bold">Endereço Completo</label>
+         <CFormTextarea
+            v-model="form.value.endereco"
+            :class="{ 'is-invalid': errors.endereco }"
+            rows="2"
+            placeholder="Ex. SHN, Q. 2 BL E - Asa Norte, Brasília - DF, 70702-904"
+         />
+         <div class="form-error" v-if="errors.value.endereco">
+            {{ errors.value.endereco[0] }}
+         </div>
+
+         <!-- Latitude -->
+         <label class="form-label fw-bold">Latitude</label>
+         <CFormInput
+            v-model="form.value.latitude"
+            type="number"
+            step="0.00000001"
+            :class="{ 'is-invalid': errors.value.latitude }"
+         />
+         <div class="form-error" v-if="errors.value.latitude">
+            {{ errors.value.latitude[0] }}
+         </div>
+         <div class="form-text">Ex Brasília: -15.7902595</div>
+
+         <!-- Longitude -->
+         <label class="form-label fw-bold">Longitude</label>
+         <CFormInput
+            v-model="form.value.longitude"
+            type="number"
+            step="0.00000001"
+            :class="{ 'is-invalid': errors.value.longitude }"
+         />
+         <div class="form-error" v-if="errors.value.longitude">
+            {{ errors.value.longitude[0] }}
+         </div>
+         <div class="form-text">Ex: -46.63330800</div>
+
          <label class="form-label fw-bold">Ativo</label>
          <CFormSelect
             v-model="form.value.ativo"

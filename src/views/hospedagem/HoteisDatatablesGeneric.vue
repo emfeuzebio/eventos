@@ -42,7 +42,7 @@
             {{ errors.value.nome[0] }}
          </div>
 
-         <label class="form-label fw-bold">Sigla</label>
+         <label class="form-label fw-bold">Sigla x</label>
          <CFormInput
             v-model="form.value.sigla"
             :class="{ 'is-invalid': errors.sigla }"
@@ -420,10 +420,8 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
 
       // quatosFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
 
-
       const tipos = await fetchQuartoTipos();
       console.log('Tipo de Quartos:', toRaw(tipos));
-
 
       // Recupera os Quartos do Hotel e popula a variável reativa
       await fetchQuartosDoHotel(currentEventId.value, row.id);

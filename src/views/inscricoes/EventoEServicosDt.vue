@@ -9,7 +9,7 @@
       :columns="columns"
       :defaultValues="defaultValues"
       :extra-column-render="extraColumnRender"
-      :columnActionsWidth="140"
+      :columnActionsWidth="120"
       :abilities="abilities"
       @extraAction="onExtraAction"
    >
@@ -565,10 +565,11 @@ const { abilities } = useAbilities();
 // define as coluna do DataTables
 const columns = [
    { title: 'ID', data: 'id', width: '30px' },
-   { title: 'Sigla', data: 'sigla', width: '140px', class: 'fw-bold' },
+   { title: 'Sigla', data: 'sigla', width: '160px', class: 'fw-bold' },
    { title: 'Nome do Evento', data: 'nome', width: 'auto' },
-   { title: 'Periodo', data: 'periodo', width: 'auto' },
+   // { title: 'Periodo', data: 'periodo', width: 'auto' },
    { title: 'Datas', data: 'periodo_datas', width: '100px' },
+   { title: 'Inscrições', data: 'qtd_inscricoes_ativas', width: '80px' },
 
    // {
    //    title: 'Dt Início',
