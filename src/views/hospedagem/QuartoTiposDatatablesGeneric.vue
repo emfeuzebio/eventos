@@ -99,7 +99,7 @@ function chamarRefresh() {
  */
 const columns = [
    { title: 'ID', data: 'id', width: '30px' },
-   { title: 'Nome', data: 'nome', width: '220px', class: 'fw-bold' },
+   { title: 'Nome', data: 'nome', width: '160px', class: 'fw-bold' },
    { title: 'Sigla', data: 'sigla', width: '80px' },
    { title: 'Descrição', data: 'descricao', width: 'auto' },
    {
@@ -107,7 +107,7 @@ const columns = [
       data: 'ativo',
       // class: 'dt-center small',
       className: 'text-center',
-      width: '80px',
+      width: '60px',
       render: function (data, type, row) {
          return `<span class="${
             row.ativo === 'SIM' ? 'text-primary' : 'text-danger'

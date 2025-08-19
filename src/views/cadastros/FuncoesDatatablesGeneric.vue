@@ -36,22 +36,27 @@ var canPrint = false;
 // define parâmetros das tabela de dados
 const columns = [
    { title: 'ID', data: 'id', width: '30px' },
-   { title: 'Nome da Função', data: 'descricao', class: 'fw-bold' },
-   { title: 'Sigla', data: 'sigla', width: '160px' },
-   { title: 'Qtd Máx', data: 'qtd', width: '120px', className: 'text-center' },
+   {
+      title: 'Nome da Função',
+      data: 'descricao',
+      class: 'fw-bold',
+      width: 'auto',
+   },
+   { title: 'Sigla', data: 'sigla', width: '150px' },
+   { title: 'Qtd Máx', data: 'qtd', width: '100px', className: 'text-center' },
    {
       title: 'Exclusivo FEB',
       data: 'exclusivo_feb',
       class: 'dt-center small',
-      width: '140px',
-      className: 'text-center'
+      width: '130px',
+      className: 'text-center',
    },
    {
       title: 'Ativo',
       data: 'ativo',
       class: 'dt-center small',
       className: 'text-center',
-      width: '80px',
+      width: '60px',
       render: function (data, type, row) {
          return `<span class="${
             row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
@@ -62,8 +67,8 @@ const columns = [
 
 // define os valores padrão dos campos do formulário
 const defaultValues = {
-   descricao: 'Descrição',
-   sigla: 'Sigla',
+   descricao: '',
+   sigla: '',
    qtd: '1',
    exclusivo_feb: 'NÃO',
    ativo: 'SIM',

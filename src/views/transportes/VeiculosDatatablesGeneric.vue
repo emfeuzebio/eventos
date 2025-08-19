@@ -34,24 +34,29 @@ const { abilities } = useAbilities();
 
 // define parâmetros das tabela de dados
 const columns = [
-   { title: 'ID', data: 'id' },
-   { title: 'Descrição do Veículo', data: 'descricao', class: 'fw-bold' },
+   { title: 'ID', data: 'id', width: '30px' },
+   {
+      title: 'Descrição do Veículo',
+      data: 'descricao',
+      class: 'fw-bold',
+      width: 'auto',
+   },
    { title: 'Tipo', data: 'tipo' },
    {
-      title: 'Capacidade',
+      title: 'Capc',
       data: 'capacidade',
       render: (data) => `${data} p`,
       className: 'text-center',
    },
    { title: 'Motorista', data: 'motorista' },
    {
-      title: 'Disponível',
+      title: 'Disp',
       data: 'ativo',
       class: 'dt-center small',
       render: function (data, type, row) {
          return `<span class="${
-            row.ativo === 'Y' ? 'text-primary' : 'text-danger'
-         }">${row.ativo === 'Y' ? 'SIM' : 'NÃO'}</span>`;
+            row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
+         }">${row.ativo === 'SIM' ? 'SIM' : 'NÃO'}</span>`;
       },
    },
 ];
@@ -65,7 +70,7 @@ const defaultValues = {
    motorista: '',
    email: '',
    telefone: '',
-   ativo: 'Y',
+   ativo: 'SIM',
 };
 
 // filtro da página - usar quando não há filtros
@@ -95,10 +100,10 @@ const filters = computed(() => [
       field: 'ativo',
       type: 'select',
       options: [
-         { value: 'Y', label: 'SIM' },
-         { value: 'N', label: 'NÃO' },
+         { value: 'SIM', label: 'SIM' },
+         { value: 'NÃO', label: 'NÃO' },
       ],
-   },   
+   },
 ]);
 </script>
 
@@ -188,8 +193,8 @@ const filters = computed(() => [
          <CFormSelect
             v-model="form.value.ativo"
             :options="[
-               { value: 'Y', label: 'SIM' },
-               { value: 'N', label: 'NÃO' },
+               { value: 'SIM', label: 'SIM' },
+               { value: 'NÃO', label: 'NÃO' },
             ]"
             label="Disponível"
          />

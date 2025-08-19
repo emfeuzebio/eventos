@@ -8,7 +8,7 @@
       :columns="columns"
       :defaultValues="defaultValues"
       :extra-column-render="extraColumnRender"
-      :columnActionsWidth="240"
+      :columnActionsWidth="190"
       :abilities="abilities"
       @extraAction="onExtraAction"
    >
@@ -364,15 +364,21 @@ const { abilities } = useAbilities();
 
 // define as coluna do DataTables
 const columns = [
-   { title: 'ID', data: 'id', width: '40px' },
+   { title: 'ID', data: 'id', width: '30px' },
    { title: 'Nome do Hotel', data: 'nome', class: 'fw-bold', width: 'auto' },
    { title: 'Sigla', data: 'sigla', width: '160px' },
-   { title: 'Evento', data: 'evento.sigla', width: '160px' },
+   {
+      title: 'Quartos',
+      data: 'qtd_quartos_ativos',
+      width: '50px',
+      class: 'dt-center',
+   },
+   { title: 'Evento', data: 'evento.sigla', width: '150px' },
    {
       title: 'Ativo',
       data: 'ativo',
       class: 'dt-center small',
-      width: '80px',
+      width: '60px',
       render: function (data, type, row) {
          return `<span class="${
             row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
@@ -422,6 +428,8 @@ const extraColumnRender = (row) => {
 // carrega listas de entidades da API para popular listas: <selects> os filtros
 // Agora a Lista de Eventos Ativos sõa carregado única vez após o login e ficam na Store
 import { useEventosStore } from '@/stores/useEventosStore';
+import { isNullOrUndef } from 'chart.js/helpers';
+import { sassNull } from 'sass';
 const eventosStore = useEventosStore();
 
 /**

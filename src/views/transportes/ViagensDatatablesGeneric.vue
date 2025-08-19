@@ -61,13 +61,13 @@ const { abilities } = useAbilities();
 const columns = [
    { title: 'ID', data: 'id' },
    {
-      title: 'Data da Viagem',
+      title: 'Data Viagem',
       data: 'data_hora',
       render: (data) => formatToBrDateTime(`${data}`),
       className: 'text-center',
    },
    {
-      title: 'Qtd Pessoas',
+      title: 'Pessoas',
       data: null,
       render: (data) => `?`,
       // inscricoes_com_viagem_chegada_count	1
@@ -151,7 +151,6 @@ const filters = computed(() => [
       })),
    },
 ]);
-
 </script>
 
 <template>
@@ -167,8 +166,6 @@ const filters = computed(() => [
    >
       <!-- Form Dados do Edit/New MOdal -->
       <template #form="{ form, errors }">
-   
-
          <!-- {{ eventos }} -->
          <!-- {{ form.value }} -->
          <!-- {{ form.value.evento_id }} -->

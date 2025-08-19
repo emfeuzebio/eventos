@@ -436,7 +436,7 @@ function chamarRefresh() {
 const columns = [
    { title: 'ID', data: 'id', width: '50px' },
    {
-      title: 'Pessoa | Entidade | Papel | Modalidade | Chegada | Traslado ',
+      title: 'Pessoa e Dados da Inscrição',
       data: null, // importante usar null quando o render vai acessar múltiplos campos
       render: function (data, type, row) {
          const nome = row.pessoa?.nome_social || '';
@@ -454,8 +454,9 @@ const columns = [
             row.viagem_chegada?.veiculo.descricao ||
             (row.chegada_traslado == 'SIM' ? 'Veículo Não definido' : '');
 
-         return `<span class="fw-bold">${nome}</span> <small class="text-muted">${entidade_sigla}</small> <br/>
-                     <small class="text-muted">${papel} - ${modalidade}</small> <br/>
+         return `<span class="fw-bold">${nome}</span> <small class="text-muted">${papel} > ${entidade_sigla} </small> <br/>
+                     <span class="fw-bold">Modalidade</span>
+                     <small class="text-muted">${modalidade}</small> <br/>
                      <span class="fw-bold">Chegada</span>
                      <small class="text-muted">${chegada_data_hora}</small> >
                      <small class="text-muted">${chegada_meio_transp}</small>
@@ -485,13 +486,19 @@ const defaultValues = {
  */
 const extraColumnRender = (row) => {
    // controle de acesso - recupera as abilities do usuário logado na ação
-   const canHospedar = abilities.includes('inscricao.chkhospedou')
-      ? ''
-      : 'disabled';
 
-   const canMarcarQuarto = abilities.includes('inscricao.marcarquarto')
-      ? ''
-      : 'disabled';
+   // Apenas Inscrições da Modalidade Presencial podem Hospedar
+   const ehPresencial = row.modalidade == 'Presencial' ? true : false;
+
+   const canHospedar =
+      abilities.includes('inscricao.chkhospedou') && ehPresencial
+         ? ''
+         : 'disabled';
+
+   const canMarcarQuarto =
+      abilities.includes('inscricao.marcarquarto') && ehPresencial
+         ? ''
+         : 'disabled';
 
    // trasposição do checkbox para os dados da linha
    const isCheckedCheckin = row.hotel_checkin === 'SIM' ? 'checked' : '';
@@ -507,44 +514,44 @@ const extraColumnRender = (row) => {
    const pessoaIndicada = row.pessoa_indicada_hotel?.nome_completo ?? 'Nenhum';
 
    return `
-   <div class="d-flex flex-column w-100">
+      <div class="d-flex flex-column w-100">
 
-      <!-- Primeira linha -->
-      <div class="d-flex w-100 mb-2">
-         <div class="d-flex justify-content-start align-items-center" style="width: 30%;">
-            <label style="padding-right: 4px;">Check-in</label>
-            <div class="form-check form-switch">
-               <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckin" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckin}>
+         <!-- Primeira linha -->
+         <div class="d-flex w-100 mb-2">
+            <div class="d-flex justify-content-start align-items-center" style="width: 30%;">
+               <label style="padding-right: 4px;">Check-in</label>
+               <div class="form-check form-switch">
+                  <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckin" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckin}>
+               </div>
+            </div>
+
+            <!-- Botão Selecionar Quarto (70%) -->
+            <div class="d-flex justify-content-center align-items-center" style="width: 40%;">
+               <button class="btn btn-xs btn-outline-primary" ${canMarcarQuarto} data-custom-action="selecionarQuartoHotel" data-inscricao-id="${row.id}">
+                  Selecionar Quarto
+               </button>
+            </div>
+
+            <div class="d-flex justify-content-end align-items-center" style="width: 30%;">
+               <div class="form-check form-switch">
+                  <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckout" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckout}>
+               </div>
+               <label style="padding-right: 4px;">Check-Out</label>
             </div>
          </div>
 
-         <!-- Botão Selecionar Quarto (70%) -->
-         <div class="d-flex justify-content-center align-items-center" style="width: 40%;">
-            <button class="btn btn-xs btn-outline-primary" ${canMarcarQuarto} data-custom-action="selecionarQuartoHotel" data-inscricao-id="${row.id}">
-               Selecionar Quarto
-            </button>
-         </div>
-
-         <div class="d-flex justify-content-end align-items-center" style="width: 30%;">
-            <div class="form-check form-switch">
-               <input class="form-check-input" ${canHospedar} data-custom-action="hotelCheckout" type="checkbox" data-inscricao-id="${row.id}" ${isCheckedCheckout}>
+         <!-- Segunda linha -->
+         <div class="d-flex w-100">
+            <div class="w-100">
+               <span class="text-muted">Tipo</span> <small class="fw-bold">${custeioHospedagem}</small><br/>
+               <span class="text-muted">Hotel</span> <small class="fw-bold">${hotel}</small><br/>
+               <span class="text-muted">Quarto</span> <small class="fw-bold">${quarto} ${quartoHotel} ${quartoTipo} ${quartoCapacidade}</small><br/>
+               <span class="text-muted">Acompanhante Sugerido</span> <small class="fw-bold">${pessoaIndicada}</small><br/>
             </div>
-            <label style="padding-right: 4px;">Check-Out</label>
          </div>
-      </div>
 
-      <!-- Segunda linha -->
-      <div class="d-flex w-100">
-         <div class="w-100">
-            <span class="text-muted">Tipo</span> <small class="fw-bold">${custeioHospedagem}</small><br/>
-            <span class="text-muted">Hotel</span> <small class="fw-bold">${hotel}</small><br/>
-            <span class="text-muted">Quarto</span> <small class="fw-bold">${quarto} ${quartoHotel} ${quartoTipo} ${quartoCapacidade}</small><br/>
-            <span class="text-muted">Acompanhante Sugerido</span> <small class="fw-bold">${pessoaIndicada}</small><br/>
-         </div>
       </div>
-
-   </div>
-   `;
+      `;
 };
 
 /**

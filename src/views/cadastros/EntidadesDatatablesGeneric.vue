@@ -40,17 +40,22 @@ const { abilities } = useAbilities();
 
 // define parâmetros das tabela de dados
 const columns = [
-   { title: 'ID', data: 'id', width: '40px' },
+   { title: 'ID', data: 'id', width: '30px' },
    { title: 'Nome', data: 'nome', class: 'fw-bold', width: 'auto' },
-   { title: 'Sigla', data: 'sigla', width: '140px' },
+   { title: 'Sigla', data: 'sigla', width: '120px' },
    // { title: 'Descrição', data: 'descricao' },
-   { title: 'Telefone', data: 'telefone1', width: '140px', className: 'text-center', },
+   {
+      title: 'Telefone',
+      data: 'telefone1',
+      width: '120px',
+      className: 'text-center',
+   },
    {
       title: 'Ativo',
       data: 'ativo',
       className: 'text-center',
       class: 'dt-center small',
-      width: '80px',
+      width: '60px',
       render: function (data, type, row) {
          return `<span class="${
             row.ativo === 'SIM' ? 'text-primary' : 'text-danger'
