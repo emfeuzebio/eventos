@@ -10,6 +10,7 @@
       :pageButtons="pageButtons"
       :filters="filters"
       :columns="columns"
+      :order="order"
       :defaultValues="defaultValues"
       :buttons="buttons"
       :extra-column-render="extraColumnRender"
@@ -436,7 +437,24 @@ function chamarRefresh() {
 const columns = [
    { title: 'ID', data: 'id', width: '50px' },
    {
+      // esta coluna existe apenas para ordenação correta pela Data Hora chegada
+      // abaixo adicionamos o 'T' entre a Data e a Hora para ficar no formato ISO-8601
+      // e a ordenção ficar perfeita, senão o DataTables consideraria como uma String
+      title: 'DH Chegada',
+      data: 'chegada_data_hora',
+      visible: false,
+      render: (data, type) => {
+         if (type === 'sort' && data) {
+            // converte '2025-08-19 14:30:00' para '2025-08-19T14:30:00'
+            return data.replace(' ', 'T');
+         }
+         return data || '';
+      },
+   },
+   {
       title: 'Pessoa e Dados da Inscrição',
+      className: 'text-left',
+      width: 'auto',
       data: null, // importante usar null quando o render vai acessar múltiplos campos
       render: function (data, type, row) {
          const nome = row.pessoa?.nome_social || '';
@@ -466,8 +484,6 @@ const columns = [
                      <span class="fw-bold">Hospedagem</span> <small class="text-muted">${row.custeio_hospedagem}</small>
                `;
       },
-      className: 'text-left',
-      width: 'auto',
    },
    // { title: 'Ativo', data: 'ativo', width: '60px' },
 ];
@@ -594,6 +610,9 @@ const buttons = { update: false, delete: false, show: false };
  * BASE Crud - Filtros da tabela de dados
  * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
  */
+
+const order = [1, 'asc']; // chegada_data_hora: nessse caso ordena pela segunda coluna [0,1,3,...] mesmo que ela esteja visible = false
+
 // const filters = [{}]; // nessse caso sem filtros
 
 const filters = computed(() => [

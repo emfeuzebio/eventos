@@ -10,6 +10,7 @@ export function useDataTable({
    tableId,
    endpoint,
    columns,
+   order,
    onClickEdit,
    onClickDelete,
    onClickShow,
@@ -21,13 +22,13 @@ export function useDataTable({
 
    // computed() para ser reativo com o Pinia
    const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
+   // console.log('order:', order)
 
    function init() {
       if (dataTable.value) {
          dataTable.value.destroy();
          $(`#${tableId}`).empty();
       }
-
 
       dataTable.value = $(`#${tableId}`).DataTable({
          ajax: function (_data, callback, _settings) {
@@ -53,9 +54,9 @@ export function useDataTable({
          },
          columns,
          responsive: true,
-         processing: false,
-         order: [],  // Desabilita ordenação automática, ao montar mantém a ordem original da API
-         rowId: 'id',
+         processing: false,         // default para não chamar a ampulheta do DataTables
+         order: order || [],        // default é sem ordenação []
+         rowId: 'id',               // default é o DT_Row ser a coluna ID
          // dataSrc: '',
          dataSrc: function (response) {
             return response.data;

@@ -34,7 +34,7 @@ export function removeToken() {
 /**
  * Faz logout: revoga o token na API + limpa token + limpa store
  */
-export async function logout() {
+export async function logout() { 
   try {
     // console.log('authService.js logout()')
 

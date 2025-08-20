@@ -207,6 +207,7 @@ const props = defineProps({
          { title: 'Coluna 2', data: null, class: 'dt-left' },
       ],
    },
+   order: String,
    filters: Array,
    extraColumnRender: Function,
    // canInsert: Boolean,
@@ -216,6 +217,10 @@ const props = defineProps({
    onSaved: Function,
    afterSave: Function,
 });
+
+// controe os order
+// const filtros = ref({});
+// console.log('Ref para os Filtros da Página:', props.filters);
 
 // controe os filtros
 const filtros = ref({});
@@ -271,6 +276,7 @@ const { init, refreshTable } = useDataTable(
    {
       tableId,
       endpoint: props.endpoint,
+      order: props.order,
       externalFilters: filtros,
       autoWidth: false, // desativa o ajuste automático para que a largura definida funcione
       columns: [
@@ -324,7 +330,6 @@ const { init, refreshTable } = useDataTable(
          },
       ],
 
-      // onClickSelectViagem: () => fetchRegioes(),
       onClickSelectViagem: () => abrirModal(),
       onClickEdit: (id) => form.load(id),
       onClickDelete: (rowData) => form.confirmDeleteModal(rowData),
