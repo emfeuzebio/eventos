@@ -6,7 +6,7 @@
       modalSize="xxl"
       modalFullscreen="fullscreen"
       title="Gestão de Chegadas "
-      description="Gestão dos Traslados de Chegadas de Pessoas inscritas em Evento"
+      description="<br/>Gestão dos Traslados de Chegadas das Pessoas inscritas em Evento <br/> Ordenado pela Data-Hora de Chegada"
       endpoint="inscricao"
       columnActionsWidth="140px"
       :filters="filters"
@@ -909,7 +909,7 @@ function abreModalNotificarMotorista(inscricaoId, viagemId) {
 
 const fetchViagensPorRota = async (rotaId) => {
    try {
-      console.log('fetchViagensPorRota', rotaId);
+      // console.log('fetchViagensPorRota', rotaId);
       viagensDaRota.value = []; // limpa anterior
       const res = await api.get(`/viagem`, {
          params: { rota_id: rotaId, evento_id: currentEvent.value?.id ?? '' },
@@ -925,7 +925,7 @@ const editarViagemChegada = async () => {
    // ou já usamos os dados do formulário preenchidos
    // console.log('Editar:', viagemChegadaFormDados.value);
    // ou aqui poderia chamar uma API para buscar os dados da região pelo ID
-   fetchRotas(currentEvent.value?.id ?? '');
+   fetchRotas(currentEvent.value?.id ?? '', 'Chegada');
    rotaSelecionada.value = false;
    viagemSelecionada.value = false;
    viagemChegadaShowModal.value = true;

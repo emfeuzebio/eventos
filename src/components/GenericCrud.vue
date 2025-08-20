@@ -3,7 +3,7 @@
       <CCard class="mb-4">
          <CCardHeader>
             <strong>{{ title }}</strong>
-            <small v-if="description">- {{ description }}</small>
+            <span v-html="description"></span>
          </CCardHeader>
          <CCardBody>
             <!-- Linha dos filtros, mensagens e botões -->
