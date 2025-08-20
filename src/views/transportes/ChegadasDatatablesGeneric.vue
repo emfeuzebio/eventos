@@ -8,7 +8,7 @@
       title="Gestão de Chegadas "
       description="<br/>Gestão dos Traslados de Chegadas das Pessoas inscritas em Evento <br/> Ordenado pela Data-Hora de Chegada"
       endpoint="inscricao"
-      columnActionsWidth="140px"
+      columnActionsWidth="160px"
       :filters="filters"
       :columns="columns"
       :order="order"
@@ -642,14 +642,17 @@ const extraColumnRender = (row) => {
    // return '';
 
    return `
-      <button class="btn btn-xs btn-outline-info" ${canMarcarcheg} data-custom-action="marcarViagem" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Marcar Viagem</button>
+      <div class="text-center">
+         <button class="btn btn-xs btn-outline-info" ${canMarcarcheg} data-custom-action="marcarViagem" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}"><i class="fa fa-edit"></i> Marcar Viagem</button>
 
-      <button class="btn btn-xs btn-outline-success" ${canMarcarcheg} data-custom-action="notificarPessoa" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Msg Pessoa</button>
+         <button class="btn btn-xs btn-outline-success" ${canMarcarcheg} data-custom-action="notificarPessoa" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}"><i class="fa fa-plane"></i> Notificar Pessoa</button>
 
-      <button class="btn btn-xs btn-outline-warning" ${canMarcarcheg} data-custom-action="notificarMotorista" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}">Notif Motorista</button>
-
-      <div class="form-check form-switch">
-         <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-viagem-id="${row.traslado_chegada_viagem_id}"data-inscricao-id="${row.id}" ${isChecked} >
+         <button class="btn btn-xs btn-outline-success" ${canMarcarcheg} data-custom-action="notificarMotorista" data-viagem-id="${row.traslado_chegada_viagem_id}" data-inscricao-id="${row.id}"><i class="fa fa-plane"></i> Notificar Motorista</button>
+         
+         <div class="form-check form-switch d-inline-block">
+            <label style="font-size: 12px; font-weight: bold;">Trasladou?</label>
+            <input class="form-check-input" ${canMarcarcheg} data-custom-action="trasladou" type="checkbox" data-viagem-id="${row.traslado_chegada_viagem_id}"data-inscricao-id="${row.id}" ${isChecked} >
+         </div>
       </div>
    `;
 };
@@ -989,3 +992,4 @@ const salvarViagemChegada = async (viagemId) => {
    } catch (error) {}
 };
 </script>
+

@@ -47,10 +47,10 @@ export function useDataTable({
                // Entrega os dados ao DataTables
                callback({ data: response.data });
             }) 
-            // .catch((error) => {
+            .catch((error) => {
             //    // console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
-            //    callback({ data: [] }); // evita que a tabela quebre
-            // });
+               callback({ data: [] }); // evita que a tabela quebre
+            });
          },
          columns,
          responsive: true,
