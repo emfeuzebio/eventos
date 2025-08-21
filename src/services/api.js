@@ -89,39 +89,4 @@ api.interceptors.response.use(
    }
 );
 
-
-// api.interceptors.response.use(
-//    (response) => {
-//       stopLoading();
-//       return response;
-//    },
-//    (error) => {
-//       stopLoading();
-//       // console.log('interceptors Erro status:', error.response?.status)
-
-//       // Sendo login, ignora o tratamento se o erro veio do endpoint de login
-//       const isLoginRequest = error.config?.url?.includes('/auth/login');
-//       if (isLoginRequest) return Promise.reject(error);      
-
-//       // Se a resposta for 401-Forbbiden, redireciona para login
-//       if (error.response?.status == 401) {
-//          removeToken()
-//          redirectToLogin()
-//          return new Promise(() => {}) // evita erro no console
-//       } 
-//       // Para todos demais erros diferentes de 422, exibe o erro
-//       else if (error.response?.status != 422) {
-//          // showError("<b>Erro " + error.response?.status + "</b> " + (error.response?.data?.error || 'descrição não informada.') + "<br/> " + ( error.response?.data?.message || ''));
-
-//          const status = error.response?.status;
-//          const message = error.response?.data?.message || 'Sem message';
-//          const errorText = error.response?.data?.error || 'descrição não informada.';
-
-//          showError(`<b>Erro ${status}</b> ${errorText}<br/>${message}`);         
-//       }
-
-//       return Promise.reject(error);
-//    }
-// );
-
 export default api;
