@@ -9,6 +9,8 @@
       description="<br/>Gestão dos Traslados de Chegadas das Pessoas inscritas em Evento <br/> Ordenado pela Data-Hora de Chegada"
       endpoint="inscricao"
       columnActionsWidth="160px"
+      :pageButtons="{ btnInsertNew: false, btnRefreshTable: true }"
+      :pageExtraButtons="pageExtraButtons"
       :filters="filters"
       :columns="columns"
       :order="order"
@@ -17,6 +19,7 @@
       :extra-column-render="extraColumnRender"
       :abilities="abilities"
       @extraAction="onExtraAction"
+      @pageExtraButtonsActions="onpageExtraButtonsActions"
    >
       <template #form="{ form, errors }">
          <!-- {{ form.value.estados }} -->
@@ -451,6 +454,7 @@
 import { ref, toRaw, computed } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
+import { useGlobalError } from '@/composables/useGlobalError';
 import { useToast } from '@/composables/useToast';
 import { formatToBrDateTime } from '@/utils/dateFormat';
 import api from '@/services/api';
@@ -461,6 +465,7 @@ import DataTablesLib from 'datatables.net-bs5';
 import { useCurrentEventStore } from '@/stores/currentEvent';
 const currentEventStore = useCurrentEventStore();
 const currentEvent = computed(() => currentEventStore.currentEvent);
+const globalEventoId = computed(() => currentEventStore.currentEvent?.id || '');
 // const currentEventId = currentEvent.value?.id ?? '';
 // console.log('currentEventId:', currentEventId);
 
@@ -469,6 +474,7 @@ const entity = 'inscricao';
 // const entity = 'inscricao';
 
 const { showToast } = useToast(); // Toasts de Alerta
+const { showError } = useGlobalError(); // Modal de Erros
 
 // recuperas as Autorizações (abilities) do JWT
 const { can } = useAbilities();
@@ -626,6 +632,53 @@ const defaultValues = {
    email: 'nome@mail.com',
    ativo: 'SIM',
 };
+
+/**
+ * BASE Crud - Page Buttons são o Botões Extras no canto superior direito
+ */
+// const pageExtraButtons = [{}]; // sem extra buttons
+const pageExtraButtons = computed(() => [
+   {
+      label: '<i class="fa fa-print"></i> Traslados Aero PDF',
+      action: 'printRelTrasladosAero',
+      class: 'btn btn-sm btn-outline-info me-1',
+   },
+]);
+
+/**
+ * CAPTURA as ações click dos pega Buttons e chama as funções necessárias
+ */
+const onpageExtraButtonsActions = async ({ label, action }) => {
+   // console.log('onpageExtraButtonsActions: ', label, action);
+
+   // Vamos chamar a função necessária para este evento
+   if (action === 'printRelTrasladosAero') {
+      printRelTrasladosAero();
+   }
+};
+
+async function printRelTrasladosAero() {
+   // try {
+   const response = await api.get(
+      `/inscricao/reltraslados/${globalEventoId.value}`,
+      {
+         responseType: 'blob',
+      }
+   );
+
+   const blob = new Blob([response.data], { type: 'application/pdf' });
+   const url = window.URL.createObjectURL(blob);
+   window.open(url, '_blank');
+   window.URL.revokeObjectURL(url); // Liberar URL da memória
+
+   showToast({
+      title: 'Sucesso',
+      message: `Relatório gerado com sucesso.`,
+   });
+   // } catch (error) {
+   //    showError('Erro ao gerar o relatório: ' + error.response?.data.message);
+   // }
+}
 
 /**
  * ESPECIALIZAÇÃO CRUD: Renderiza uma coluna extra na tabela de dados
@@ -992,4 +1045,3 @@ const salvarViagemChegada = async (viagemId) => {
    } catch (error) {}
 };
 </script>
-

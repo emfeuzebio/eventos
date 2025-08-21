@@ -10,7 +10,7 @@
       description="Gerenciamento os Tipos de Quartos de Hotel"
       endpoint="quartotipo"
       columnActionsWidth="160px"
-      :pageButtons="pageButtons"
+      :pageExtraButtons="pageExtraButtons"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
@@ -18,7 +18,7 @@
       :extra-column-render="extraColumnRender"
       :abilities="abilities"
       @extraAction="onExtraAction"
-      @pageButtonsActions="onPageButtonsActions"
+      @pageExtraButtonsActions="onpageExtraButtonsActions"
    >
       <template #form="{ form, errors }">
          <!-- {{ rotas }} -->
@@ -191,8 +191,8 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
 /**
  * BASE Crud - Page Buttons são o Botões Extras no canto superior direito
  */
-const pageButtons = [{}]; // nessse caso sem filtros
-// const pageButtons = computed(() => [
+const pageExtraButtons = [{}]; // nessse caso sem filtros
+// const pageExtraButtons = computed(() => [
 //    {
 //       label: 'Print1',
 //       action: 'pageButtom1',
@@ -205,8 +205,8 @@ const pageButtons = [{}]; // nessse caso sem filtros
 //    },
 // ]);
 
-const onPageButtonsActions = async ({ label, action }) => {
-   // console.log('onPageButtonsActions: ', label, action);
+const onpageExtraButtonsActions = async ({ label, action }) => {
+   // console.log('onpageExtraButtonsActions: ', label, action);
 
    if (action === 'pageButtom2') {
       // Vamos chamar a função necessária para este evento

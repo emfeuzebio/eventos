@@ -55,11 +55,14 @@
 
                <!-- Coluna 3: Botões -->
                <div class="col-md-6 text-end">
-                  <span v-for="buttom in props.pageButtons" :key="buttom.label">
+                  <span
+                     v-for="buttom in props.pageExtraButtons"
+                     :key="buttom.label"
+                  >
                      <CButton
                         :class="buttom.class"
                         @click="
-                           onClickPageButtonsActions(
+                           onClickpageExtraButtonsActions(
                               buttom.label,
                               buttom.action
                            )
@@ -71,11 +74,15 @@
 
                   <CButton
                      class="btn btn-sm btn-outline-success me-1"
-                     v-if="props.abilities.includes(props.endpoint + '.store')"
+                     v-if="
+                        props.pageButtons.btnInsertNew &&
+                        props.abilities.includes(props.endpoint + '.store')
+                     "
                      @click="form.insertNewModal"
                      ><i class="fa fa-plus"></i> Inserir Novo</CButton
                   >
                   <CButton
+                     v-if="props.pageButtons.btnRefreshTable"
                      class="btn btn-sm btn-outline-secondary"
                      @click="refreshTable"
                      ><i class="fa fa-refresh"></i> Recarregar
@@ -181,8 +188,13 @@ const props = defineProps({
    endpoint: String,
    columnActionsWidth: String,
    pageButtons: {
-      type: Object,
-      default: () => [{}],
+      default: () => ({
+         btnInsertNew: true,
+         btnRefreshTable: true,
+      }),
+   },
+   pageExtraButtons: {
+      default: () => ({}),
    },
    defaultValues: {
       type: Object,
@@ -213,7 +225,7 @@ const props = defineProps({
    // canInsert: Boolean,
    // canUpdate: Boolean,
    // canDelete: Boolean,
-   canPrint: Boolean,
+   // canPrint: Boolean,
    onSaved: Function,
    afterSave: Function,
 });
@@ -233,8 +245,13 @@ props.filters.forEach((filtro) => {
 });
 // console.log('Filtros aplicados à Página:',filtros);
 
-// controe dos pageButtons
+// controe dos pageButtons (InsertNew e Refresh)
 // console.log('Ref para os pageButtons da Página:', props.pageButtons);
+
+// controe dos pageExtraButtons
+// console.log('Ref para os pageExtraButtons da Página:', props.pageExtraButtons);
+
+// console.log('Ref para os Buttons das Linhas:', props.buttons);
 
 // Estados e ações
 const alert = ref({ type: '', message: '' });
@@ -253,17 +270,17 @@ const emit = defineEmits([
    'delete',
    'custom',
    'extraAction',
-   'pageButtonsActions',
+   'pageExtraButtonsActions',
    'afterSave',
 ]);
 
-const onClickPageButtonsActions = (label, action) => {
+const onClickpageExtraButtonsActions = (label, action) => {
    // showToast({
    //    title: 'Ação',
    //    message: 'Clicou no page Buttom ' + label + ', Ação: ' + action,
    // });
 
-   emit('pageButtonsActions', {
+   emit('pageExtraButtonsActions', {
       label: label,
       action: action,
    });

@@ -7,7 +7,8 @@
       description="Gestão das Inscrições que solicitaram Hospedagem, inscritas no Evento selecionado acima"
       endpoint="inscricao"
       columnActionsWidth="450px"
-      :pageButtons="pageButtons"
+      :pageButtons="{ insertNewModal: false, refreshTable: true }"
+      :pageExtraButtons="pageExtraButtons"
       :filters="filters"
       :columns="columns"
       :order="order"
@@ -15,9 +16,8 @@
       :buttons="buttons"
       :extra-column-render="extraColumnRender"
       :abilities="abilities"
-      :canPrint="canPrint"
       @extraAction="onExtraAction"
-      @pageButtonsActions="onPageButtonsActions"
+      @pageExtraButtonsActions="onpageExtraButtonsActions"
    >
       <template #form="{ form, errors }">
          <!-- {{ form.value.estados }} -->
@@ -865,10 +865,10 @@ function formatValidationErrors(errors) {
 /**
  * BASE Crud - Page Buttons são o Botões Extras no canto superior direito
  */
-// const pageButtons = [{}]; // nessse caso sem filtros
-const pageButtons = computed(() => [
+// const pageExtraButtons = [{}]; // sem extra buttons
+const pageExtraButtons = computed(() => [
    {
-      label: '<i class="fa fa-print"></i> Hóspedes',
+      label: '<i class="fa fa-print"></i> Hóspedes PDF',
       action: 'printRelHospedagemDoEvento',
       class: 'btn btn-sm btn-outline-info me-1',
    },
@@ -882,8 +882,8 @@ const pageButtons = computed(() => [
 /**
  * CAPTURA as ações click dos pega Buttons e chama as funções necessárias
  */
-const onPageButtonsActions = async ({ label, action }) => {
-   // console.log('onPageButtonsActions: ', label, action);
+const onpageExtraButtonsActions = async ({ label, action }) => {
+   // console.log('onpageExtraButtonsActions: ', label, action);
 
    // Vamos chamar a função necessária para este evento
    if (action === 'printRelHospedagemDoEvento') {
@@ -914,11 +914,7 @@ async function printRelHospedagemDoEvento() {
          message: `Relatório gerado com sucesso.`,
       });
    } catch (error) {
-      showToast({
-         title: 'Alerta de Erro',
-         message: 'Erro ao gerar o relatório: ' + error.response?.data.message,
-         color: 'danger',
-      });
+      showError('Erro ao gerar o relatório: ' + error.response?.data.message);
    }
 }
 
