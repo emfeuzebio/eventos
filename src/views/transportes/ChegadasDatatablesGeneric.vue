@@ -508,9 +508,9 @@ const columns = [
       // esta coluna existe apenas para ordenação correta pela Data Hora chegada
       // abaixo adicionamos o 'T' entre a Data e a Hora para ficar no formato ISO-8601
       // e a ordenção ficar perfeita, senão o DataTables consideraria como uma String
+      visible: false,
       title: 'DH Chegada',
       data: 'chegada_data_hora',
-      visible: false,
       render: (data, type) => {
          if (type === 'sort' && data) {
             // converte '2025-08-19 14:30:00' para '2025-08-19T14:30:00'
