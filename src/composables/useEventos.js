@@ -240,6 +240,17 @@ export function useEventos(ativo = true) {
       }
    };
 
+   const marcarTrasladoPartida = async (id, dados) => {
+      try {
+         error.value = null;
+         await api.put(`/inscricao/marcarpartida/${id}`, dados);
+         return true;
+      } catch (err) {
+         error.value = err;
+         return false;
+      }
+   };
+
    const marcarHotelCheckin = async (id, dados) => {
       try {
          error.value = null;
@@ -263,7 +274,7 @@ export function useEventos(ativo = true) {
    };
 
    const fetchServicosDoEvento = async (eventoId) => {
-      console.log('fetchServicosDoEvento:', eventoId);
+      // console.log('fetchServicosDoEvento:', eventoId);
 
       try {
          error.value = null;
@@ -314,7 +325,8 @@ export function useEventos(ativo = true) {
 
       getInscricao,           // recupera uma Inscrição 
 
-      marcarTrasladoChegada,  // marca a Viagem
+      marcarTrasladoChegada,  // marcar que a Pessoa "trasladou" na Viagem de Chegada
+      marcarTrasladoPartida,  // marcar que a Pessoa "trasladou" na Viagem de Partida
       marcarHotelCheckin,
       marcarHotelCheckout,
       error,

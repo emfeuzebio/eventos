@@ -61,10 +61,33 @@ const { abilities } = useAbilities();
 const columns = [
    { title: 'ID', data: 'id' },
    {
-      title: 'Data Viagem',
+      // esta coluna existe apenas para ordenação correta pela Data Hora chegada
+      // abaixo adicionamos o 'T' entre a Data e a Hora para ficar no formato ISO-8601
+      // e a ordenção ficar perfeita, senão o DataTables consideraria como uma String
+      visible: false,
+      title: 'DH Viagem',
+      data: 'data_hora',
+      render: (data, type) => {
+         if (type === 'sort' && data) {
+            // converte '2025-08-19 14:30:00' para '2025-08-19T14:30:00'
+            return data.replace(' ', 'T');
+         }
+         return data || '';
+      },
+   },
+   {
+      title: 'Data Hora da Viagem',
       data: 'data_hora',
       render: (data) => formatToBrDateTime(`${data}`),
       className: 'text-center',
+      width: '200px',
+   },
+   { title: 'Nome da Rota', data: 'rota.nome', class: 'fw-bold' },
+   {
+      title: 'Veículo',
+      data: 'veiculo.descricao',
+      render: (data) => (data != null ? data : ''),
+      className: 'text-left',
    },
    {
       title: 'Pessoas',
@@ -79,13 +102,6 @@ const columns = [
       },
       className: 'text-center',
    },
-   {
-      title: 'Veículo',
-      data: 'veiculo.descricao',
-      render: (data) => `${data} `,
-      className: 'text-left',
-   },
-   { title: 'Nome da Rota', data: 'rota.nome', class: 'fw-bold' },
 ];
 
 const currentEventId = computed(() => currentEvent.value?.id ?? '');

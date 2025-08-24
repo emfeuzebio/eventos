@@ -293,7 +293,12 @@ const routes = [
             {
               path: '/transportes/chegadas',
               name: 'Gestão de Chegadas',
-              component: () => import('@/views/transportes/ChegadasDatatablesGeneric.vue'),
+              component: () => import('@/views/transportes/GestaoChegadasDt.vue'),
+            },
+            {
+              path: '/transportes/partidas',
+              name: 'Gestão de Partidas',
+              component: () => import('@/views/transportes/GestaoPartidasDt.vue'),
             },
             {
               path: '/transportes/rotas',

@@ -364,6 +364,11 @@ export default [
       },
       {
         component: 'CNavItem',
+        name: 'Gestão de Partidas',
+        to: '/transportes/partidas',
+      },
+      {
+        component: 'CNavItem',
         name: 'Veículos e Motoristas',
         to: '/transportes/rotasG',
       },

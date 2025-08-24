@@ -801,6 +801,18 @@ const filters = computed(() => [
       ],
    },
    {
+      label: 'Meio',
+      field: 'chegada_meio_transp',
+      type: 'select',
+      // default: 'Aéreo',
+      options: [
+         { value: 'aereo', label: 'Aéreo' },
+         { value: 'rodov', label: 'Rodoviário' },
+         { value: 'rodop', label: 'Rodo Particular' },
+         { value: 'ninfo', label: 'Não Informado' },
+      ],
+   },
+   {
       label: 'Ativa',
       field: 'ativo',
       type: 'select',
