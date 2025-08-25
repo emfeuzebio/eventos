@@ -124,16 +124,15 @@ const filters = computed(() => {
          ],
       },
       {
-      label: 'Ativa',
-      field: 'ativo',
-      // default: 'SIM',
-      type: 'select',
-      options: [
-         { value: 'SIM', label: 'SIM' },
-         { value: 'NÃO', label: 'NÃO' },
-      ],
-   },
-
+         label: 'Ativa',
+         field: 'ativo',
+         // default: 'SIM',
+         type: 'select',
+         options: [
+            { value: 'SIM', label: 'SIM' },
+            { value: 'NÃO', label: 'NÃO' },
+         ],
+      },
    ];
 });
 

@@ -76,11 +76,11 @@ const columns = [
       },
    },
    {
-      title: 'Data Hora da Viagem',
+      title: 'Data-Hora Viagem',
       data: 'data_hora',
       render: (data) => formatToBrDateTime(`${data}`),
       className: 'text-center',
-      width: '200px',
+      width: '190px',
    },
    { title: 'Nome da Rota', data: 'rota.nome', class: 'fw-bold' },
    {
@@ -158,6 +158,16 @@ const filters = computed(() => [
       })),
    },
    {
+      label: 'Tipo de Rota',
+      field: 'tipo',
+      // default: 'Chegada',
+      type: 'select',
+      options: [
+         { value: 'Chegada', label: 'Chegada' },
+         { value: 'Partida', label: 'Partida' },
+      ],
+   },
+   {
       label: 'Veículo',
       field: 'veiculo_id',
       type: 'select',
@@ -174,6 +184,7 @@ const filters = computed(() => [
       title="Lista de Viagens "
       description="Gerenciamento de Viagens"
       endpoint="viagem"
+      columnActionsWidth="150px"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"

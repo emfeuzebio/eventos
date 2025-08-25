@@ -9,256 +9,7 @@ export default [
       text: 'NEW',
     },
   },
-  // {
-  //   component: 'CNavTitle',
-  //   name: 'Theme',
-  // },
-  // {
-  //   component: 'CNavItem',
-  //   name: 'Colors',
-  //   to: '/theme/colors',
-  //   icon: 'cil-drop',
-  // },
-  // {
-  //   component: 'CNavItem',
-  //   name: 'Typography',
-  //   to: '/theme/typography',
-  //   icon: 'cil-pencil',
-  // },
-  // {
-  //   component: 'CNavTitle',
-  //   name: 'Components',
-  // },
-  // // {
-  // //   component: 'CNavGroup',
-  // //   name: 'Base',
-  // //   to: '/base',
-  // //   icon: 'cil-puzzle',
-  // //   items: [
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Accordion',
-  // //       to: '/base/accordion',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Breadcrumbs',
-  // //       to: '/base/breadcrumbs',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Cards',
-  // //       to: '/base/cards',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Calendar',
-  // //       href: 'https://coreui.io/vue/docs/components/calendar.html',
-  // //       external: true,
-  // //       badge: {
-  // //         color: 'danger',
-  // //         text: 'PRO',
-  // //       },
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Carousels',
-  // //       to: '/base/carousels',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Collapses',
-  // //       to: '/base/collapses',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'List Groups',
-  // //       to: '/base/list-groups',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Navs & Tabs',
-  // //       to: '/base/navs',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Paginations',
-  // //       to: '/base/paginations',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Placeholders',
-  // //       to: '/base/placeholders',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Popovers',
-  // //       to: '/base/popovers',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Progress',
-  // //       to: '/base/progress',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Smart Pagination',
-  // //       href: 'https://coreui.io/vue/docs/components/smart-pagination.html',
-  // //       badge: {
-  // //         color: 'danger',
-  // //         text: 'PRO',
-  // //       },
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Smart Table',
-  // //       external: true,
-  // //       href: 'https://coreui.io/vue/docs/components/smart-table.html',
-  // //       badge: {
-  // //         color: 'danger',
-  // //         text: 'PRO',
-  // //       },
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Spinners',
-  // //       to: '/base/spinners',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Tables',
-  // //       to: '/base/tables',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Tabs',
-  // //       to: '/base/tabs',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Tooltips',
-  // //       to: '/base/tooltips',
-  // //     },
-  // //     {
-  // //       component: 'CNavItem',
-  // //       name: 'Virtual Scroller',
-  // //       href: 'https://coreui.io/vue/docs/components/virtual-scroller.html',
-  // //       external: true,
-  // //       badge: {
-  // //         color: 'danger',
-  // //         text: 'PRO',
-  // //       },
-  // //     }
-  // //   ],
-  // // },
-  // {
-  //   component: 'CNavGroup',
-  //   name: 'Buttons',
-  //   to: '/buttons',
-  //   icon: 'cil-cursor',
-  //   items: [
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Buttons',
-  //       to: '/buttons/standard-buttons',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Button Groups',
-  //       to: '/buttons/button-groups',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Loading Button',
-  //       href: 'https://coreui.io/vue/docs/components/loading-button.html',
-  //       external: true,
-  //       badge: {
-  //         color: 'danger',
-  //         text: 'PRO',
-  //       },
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Dropdowns',
-  //       to: '/buttons/dropdowns',
-  //     },
-  //   ],
-  // },
-  // {
-  //   component: 'CNavGroup',
-  //   name: 'Forms',
-  //   to: '/forms',
-  //   icon: 'cil-notes',
-  //   items: [
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Form Control',
-  //       to: '/forms/form-control',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Select',
-  //       to: '/forms/select',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Checks & Radios',
-  //       to: '/forms/checks-radios',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Range',
-  //       to: '/forms/range',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Range Slider',
-  //       href: 'https://coreui.io/vue/docs/forms/range-slider.html',
-  //       external: true,
-  //       badge: {
-  //         color: 'danger',
-  //         text: 'PRO',
-  //       },
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Input Group',
-  //       to: '/forms/input-group',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Floating Labels',
-  //       to: '/forms/floating-labels',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Date Picker',
-  //       href: 'https://coreui.io/vue/docs/forms/date-picker.html',
-  //       external: true,
-  //       badge: {
-  //         color: 'danger',
-  //         text: 'PRO',
-  //       },
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Date Range Picker',
-  //       href: 'https://coreui.io/vue/docs/forms/date-range-picker.html',
-  //       badge: {
-  //         color: 'danger',
-  //         text: 'PRO',
-  //       },
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Rating',
-  //       href: 'https://coreui.io/vue/docs/forms/rating.html',
-  //       external: true,
-  //       badge: {
-  //         color: 'danger',
-  //         text: 'PRO',
-  //       },
-  //     },
+  
   //     {
   //       component: 'CNavItem',
   //       name: 'Time Picker',
@@ -274,20 +25,7 @@ export default [
   //       name: 'Layout',
   //       to: '/forms/layout',
   //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Validation',
-  //       to: '/forms/validation',
-  //     },
-  //   ],
-  // },
-  // {
-  //   component: 'CNavItem',
-  //   name: 'Charts',
-  //   to: '/charts',
-  //   icon: 'cil-chart-pie',inscri
-  // },
-  // {
+  
   //   component: 'CNavGroup',
   //   name: 'Icons',
   //   to: '/icons',
@@ -329,26 +67,46 @@ export default [
     items: [
       {
         component: 'CNavItem',
-        name: 'Eventos',
-        to: '/inscricoes/eventos',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Eventos e Serviços',
-        to: '/inscricoes/eventosservicos',
+        name: 'Inscrições',
+        to: '/inscricoes/inscricoes',
       },
       {
         component: 'CNavItem',
         name: 'Pessoas',
         to: '/inscricoes/pessoa',
       },
-      {
-        component: 'CNavItem',
-        name: 'Inscrições',
-        to: '/inscricoes/inscricoes',
-      },
     ],
   },  
+
+  // Hospedagem
+  {
+    component: 'CNavGroup',
+    name: 'Hospedagem',
+    to: '/hospedagem',
+    icon: 'cil-layers',
+    items: [
+      {
+        component: 'CNavItem',
+        name: 'Gestão de Hospedagem',
+        to: '/hospedagem/ghospedagem',
+      },
+      // {
+      //   component: 'CNavItem',
+      //   name: 'Hotéis v1',
+      //   to: '/hospedagem/hoteis1',
+      // },
+      {
+        component: 'CNavItem',
+        name: 'Hotéis e Quartos',
+        to: '/hospedagem/hoteis2',
+      },
+      {
+        component: 'CNavItem',
+        name: 'Tipos de Quarto',
+        to: '/hospedagem/quartoTipos',
+      },
+    ],
+  },
 
   // Transportes
   {
@@ -385,35 +143,25 @@ export default [
     ],
   },
 
-  // Hospedagem
+  // Eventos
   {
     component: 'CNavGroup',
-    name: 'Hospedagem',
-    to: '/hospedagem',
-    icon: 'cil-layers',
+    name: 'Eventos',
+    to: '/eventos',
+    icon: 'cil-envelope-open',
     items: [
       {
         component: 'CNavItem',
-        name: 'Gestão de Hospedagem',
-        to: '/hospedagem/ghospedagem',
-      },
-      // {
-      //   component: 'CNavItem',
-      //   name: 'Hotéis v1',
-      //   to: '/hospedagem/hoteis1',
-      // },
-      {
-        component: 'CNavItem',
-        name: 'Hotéis e Quartos',
-        to: '/hospedagem/hoteis2',
+        name: 'Eventos',
+        to: '/inscricoes/eventos',
       },
       {
         component: 'CNavItem',
-        name: 'Tipos de Quarto',
-        to: '/hospedagem/quartoTipos',
+        name: 'Eventos e Serviços',
+        to: '/inscricoes/eventosservicos',
       },
     ],
-  },
+  },  
 
   // Cadastros
   {

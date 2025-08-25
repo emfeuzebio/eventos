@@ -639,7 +639,7 @@ const defaultValues = {
 // const pageExtraButtons = [{}]; // sem extra buttons
 const pageExtraButtons = computed(() => [
    {
-      label: '<i class="fa fa-print"></i> Traslados Aero PDF',
+      label: '<i class="fa fa-print"></i> Traslados PDF',
       action: 'printRelTrasladosAero',
       class: 'btn btn-sm btn-outline-info me-1',
    },

@@ -277,7 +277,7 @@ const defaultValues = {
 const pageExtraButtons = computed(() => [
    {
       label: '<i class="fa fa-print"></i> Traslados PDF',
-      action: 'printRelTrasladosAero',
+      action: 'printRelTrasladosPartida',
       class: 'btn btn-sm btn-outline-info me-1',
    },
 ]);
@@ -289,12 +289,12 @@ const onpageExtraButtonsActions = async ({ label, action }) => {
    // console.log('onpageExtraButtonsActions: ', label, action);
 
    // Vamos chamar a função necessária para este evento
-   if (action === 'printRelTrasladosAero') {
-      printRelTrasladosAero();
+   if (action === 'printRelTrasladosPartida') {
+      printRelTrasladosPartida();
    }
 };
 
-async function printRelTrasladosAero() {
+async function printRelTrasladosPartida() {
    const response = await api.get(
       `/inscricao/reltraslados/${globalEventoId.value}`,
       {
