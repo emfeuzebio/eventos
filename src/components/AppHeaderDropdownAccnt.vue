@@ -158,7 +158,7 @@
 </template>
 
 <script setup>
-import { ref, watchEffect } from 'vue';
+import { ref, watchEffect, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '@/services/api';
 import {
@@ -166,7 +166,6 @@ import {
    getUserNameFromToken,
    logout as doLogout,
 } from '@/services/authService';
-import avatar from '@/assets/images/avatars/8.jpg';
 
 import { useUserStore } from '@/stores/userStore';
 const userStore = useUserStore();
@@ -180,6 +179,14 @@ watchEffect(() => {
    userName.value = token ? getUserNameFromToken() : '';
 });
 
+// Computed para avatar (com fallback para null)
+const avatar = computed(() => {
+   return userStore.photo
+      ? urlFotos.value + userStore.photo
+      : urlFotos.value + 'storage/users/avatar.jpg';
+});
+
+const urlFotos = ref('https://acl4.fazcomphp.com.br/');
 const previewFoto = ref(userStore.photo || null);
 
 // Modal visibilidade
@@ -190,7 +197,7 @@ const abrirEditarConta = () => {
       email: userStore.email,
       photo: null,
    };
-   previewFoto.value = userStore.photo || null;
+   previewFoto.value = urlFotos.value + userStore.photo || null;
    editarContaModal.value = true;
 };
 
@@ -207,7 +214,7 @@ const form = ref({
 
 const erros = ref({});
 
-const defaultPhoto = 'https://www.gravatar.com/avatar?d=mp';
+const defaultPhoto = urlFotos.value + 'avatar.jpg';
 
 // Salvar dados
 const salvarConta = async () => {
