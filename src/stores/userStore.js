@@ -8,6 +8,8 @@ export const useUserStore = defineStore('user', {
   state: () => ({
     token: null,
     name: null,
+    email: null,
+    phone: null,
     photo: null,
     systemId: null,
     systems: [],
@@ -34,6 +36,7 @@ export const useUserStore = defineStore('user', {
       this.userId = decoded.user_id || null
       this.name = decoded.user_name
       this.photo = decoded.user_photo || null
+      this.phone = decoded.user_phone || null
       this.roles = decoded.user_roles || []
       this.abilities = decoded.user_abilities || []
       this.profiles = decoded.user_profiles || []
@@ -45,6 +48,7 @@ export const useUserStore = defineStore('user', {
       this.userId = null
       this.name = null
       this.photo = null
+      this.phone = null
       this.roles = []
       this.abilities = []
       this.profiles = []

@@ -91,17 +91,44 @@
             <label class="form-label fw-bold">Nome</label>
             <CFormInput
                v-model="form.nome"
-               :class="{ 'is-invalid': !!erros.nome }"
+               :class="{ 'is-invalid': !!userFormErros.nome }"
             />
-            <div class="form-error" v-if="erros.nome">{{ erros.nome }}</div>
+            <div class="form-error" v-if="userFormErros.nome">
+               {{ userFormErros.nome[0] }}
+            </div>
+            <div class="form-text">
+               Informe o Nome do Usuário com no mínimo 6 caracteres.
+            </div>
          </div>
 
          <!-- Email (somente leitura) -->
          <div class="mb-3">
             <label class="form-label fw-bold">Email</label>
-            <CFormInput type="email" v-model="form.email" readonly plaintext />
+            <CFormInput
+               type="email"
+               v-model="form.email"
+               :class="{ 'is-invalid': !!userFormErros.email }"
+            />
+            <div class="form-error" v-if="userFormErros.email">
+               {{ userFormErros.email[0] }}
+            </div>
             <div class="form-text">
                Este é seu e-mail de login e não pode ser alterado aqui.
+            </div>
+         </div>
+
+         <div class="mb-3">
+            <label class="form-label fw-bold">Telefone</label>
+            <CFormInput
+               type="phone"
+               v-model="form.phone"
+               :class="{ 'is-invalid': !!userFormErros.phone }"
+            />
+            <div class="form-error" v-if="userFormErros.phone">
+               {{ userFormErros.phone[0] }}
+            </div>
+            <div class="form-text">
+               Informe o Telefone do Usuário no formato (XX) XXXXX-XXXX.
             </div>
          </div>
 
@@ -161,6 +188,9 @@
 import { ref, watchEffect, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '@/services/api';
+import { useToast } from '@/composables/useToast';
+import { useGlobalError } from '@/composables/useGlobalError';
+import axios from 'axios';
 import {
    getToken,
    getUserNameFromToken,
@@ -170,9 +200,14 @@ import {
 import { useUserStore } from '@/stores/userStore';
 const userStore = useUserStore();
 
+const { showError } = useGlobalError(); // Modal de Erros
+const { showToast } = useToast(); // Toasts de Alerta
+
 const itemsCount = 42;
 const router = useRouter();
-const userName = ref(getUserNameFromToken());
+// const userName = ref(getUserNameFromToken());
+
+const userName = computed(() => userStore.name);
 
 watchEffect(() => {
    const token = getToken();
@@ -191,10 +226,12 @@ const previewFoto = ref(userStore.photo || null);
 
 // Modal visibilidade
 const editarContaModal = ref(false);
+const userFormErros = ref({});
 const abrirEditarConta = () => {
    form.value = {
       nome: userStore.name,
       email: userStore.email,
+      phone: userStore.phone,
       photo: null,
    };
    previewFoto.value = urlFotos.value + userStore.photo || null;
@@ -224,38 +261,39 @@ const salvarConta = async () => {
       erros.value.nome = 'Nome é obrigatório.';
    }
 
-   //  console.log('Form:', form.value.nome);
-
    if (Object.keys(erros.value).length > 0) {
-      console.log('Erros:', erros.value);
       return;
    }
 
-   const payload = new FormData();
-   payload.append('name', form.value.nome);
-   if (form.value.photo instanceof File) {
-      payload.append('photo', form.value.photo);
-   } else {
-      console.warn('Foto não é um arquivo válido:', form.value.photo);
-   }
-
-   //  for (const pair of payload.entries()) {
-   //     console.log(pair[0], pair[1]);
-   //  }
-
    try {
-      const { data } = await api.post('/me', payload); // ou .put dependendo da API
+      // const { data } = await api.post('/me', payload); // ou .put dependendo da API
       // await api.post('/me', payload); // ou .put dependendo da API
 
-      console.log('Data:', data);
+      const token = getToken();
+
+      // Salva a photo via axios diretamente (axios suporta multipart/form-data nativamente)
+      const { data } = await axios.post(
+         'https://acl4.fazcomphp.com.br/api/user/update',
+         { name: form.value.nome, email: form.value.email },
+         {
+            headers: {
+               'Content-Type': 'multipart/form-data',
+               Authorization: `Bearer ${token}`,
+            },
+         }
+      );
+
+      // console.log('Data:', data);
+
+      // Atualiza a foto se necessário
+      await salvarNovaFoto();
 
       // Atualiza o store com os dados da resposta
-      // userStore.$patch({
-      //    name: data.name,
-      //    email: data.email,
-      //    photo: data.photo,
-      //    roles: data.roles, // se vier
-      // });
+      userStore.$patch({
+         name: data.name,
+         email: data.email,
+         phone: data.phone,
+      });
 
       showToast({
          title: 'Sucesso',
@@ -265,8 +303,44 @@ const salvarConta = async () => {
       fecharEditarConta();
    } catch (error) {
       if (error.response?.status === 422) {
-         quatosFormErros.value = error.response.data.errors || {};
+         userFormErros.value = error.response.data.errors || {};
+      } else {
+         showError('<b>Erro</b>: ' + error.response?.data.error);
+         // showError('<b>Erro</b>: ' + error.response?.data.message);
       }
+   }
+};
+
+const salvarNovaFoto = async () => {
+   // Verifica se foi selecionada uma nova imagem
+   if (!(form.value.photo instanceof File)) {
+      // showError('<b>salvarNovaFoto</b>: ' + 'Nenhuma nova foto selecionada.');
+      return; // Nada a fazer se não for um novo arquivo
+   }
+
+   const payload = new FormData();
+   payload.append('photo', form.value.photo);
+
+   try {
+      const token = getToken();
+
+      const { data } = await axios.post(
+         'https://acl4.fazcomphp.com.br/api/user/updatephoto',
+         payload,
+         {
+            headers: {
+               'Content-Type': 'multipart/form-data',
+               Authorization: `Bearer ${token}`,
+            },
+         }
+      );
+
+      // Atualiza apenas a foto no store
+      userStore.$patch({
+         photo: data.photo,
+      });
+   } catch (error) {
+      showError('<b>Erro</b>: ' + error.response?.data.error);
    }
 };
 
