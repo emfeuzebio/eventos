@@ -43,6 +43,10 @@
             <CIcon icon="cil-pencil" /> Editar Conta
          </CDropdownItem>
 
+         <CDropdownItem @click="abrirAlterarSenha">
+            <CIcon icon="cil-lock-locked" /> Alterar Senha
+         </CDropdownItem>
+
          <CDropdownItem>
             <CIcon icon="cil-user" /> Perfis de Acesso
             <div>
@@ -182,6 +186,120 @@
          </CButton>
       </CModalFooter>
    </CModal>
+
+   <!-- Alterar a Senha do Usuário -->
+   <CModal
+      :visible="alterarSenhaModal"
+      @close="fecharAlterarSenha"
+      size="md"
+      backdrop="static"
+   >
+      <CModalHeader class="bg-primary text-white fw-bold">
+         Alterar a Senha do Usuário
+      </CModalHeader>
+
+      <CModalBody>
+         <form autocomplete="off">
+            <!-- Campo de Senha Atual -->
+            <div class="mb-3 position-relative">
+               <label class="form-label fw-bold">Senha Atual</label>
+               <CFormInput
+                  v-model="formAlterarSenha.senhaAtual"
+                  :type="mostrarSenhaAtual ? 'text' : 'password'"
+                  placeholder="Digite sua senha atual"
+                  autocomplete="new-password"
+               />
+               <CButton
+                  icon="bi-eye"
+                  color="secondary"
+                  size="sm"
+                  style="right: 10px; top: 35px"
+                  class="position-absolute"
+                  @click="toggleMostrarSenhaAtual"
+               >
+                  Ver
+               </CButton>
+               <div class="form-error" v-if="formAlterarSenhaErros.senhaAtual">
+                  {{ formAlterarSenhaErros.senhaAtual[0] }}
+               </div>
+               <div class="form-text">
+                  É obrigatório informar sua senha atual
+               </div>
+            </div>
+
+            <!-- Nova Senha -->
+            <div class="mb-3 position-relative">
+               <label class="form-label fw-bold">Nova Senha</label>
+               <CFormInput
+                  v-model="formAlterarSenha.novaSenha"
+                  :type="mostrarNovaSenha ? 'text' : 'password'"
+                  placeholder="Digite uma nova senha"
+                  autocomplete="new-password"
+               />
+               <CButton
+                  icon="bi-eye"
+                  color="secondary"
+                  size="sm"
+                  style="right: 10px; top: 35px"
+                  class="position-absolute"
+                  @click="toggleMostrarNovaSenha"
+               >
+                  Ver
+               </CButton>
+               <div class="form-error" v-if="formAlterarSenhaErros.novaSenha">
+                  {{ formAlterarSenhaErros.novaSenha[0] }}
+               </div>
+               <div class="form-text">
+                  A senha deve conter no <b>mínimo 6</b> caracteres, uma
+                  <b>letra maiúscula</b>, <b>um número</b> e um
+                  <b>caractere especial</b>.
+               </div>
+            </div>
+
+            <!-- Confirmar Nova Senha -->
+            <div class="mb-3 position-relative">
+               <label class="form-label fw-bold">Confirmar Nova Senha</label>
+               <CFormInput
+                  v-model="formAlterarSenha.confirmarSenha"
+                  :type="mostrarConfirmarSenha ? 'text' : 'password'"
+                  placeholder="Confirme a nova senha"
+                  autocomplete="new-password"
+               />
+               <CButton
+                  icon="bi-eye"
+                  color="secondary"
+                  size="sm"
+                  style="right: 10px; top: 35px"
+                  class="position-absolute"
+                  @click="toggleMostrarConfirmarSenha"
+               >
+                  Ver
+               </CButton>
+               <div
+                  class="form-error"
+                  v-if="formAlterarSenhaErros.confirmarSenha"
+               >
+                  {{ formAlterarSenhaErros.confirmarSenha[0] }}
+               </div>
+               <div class="form-text">Repita a Nova Senha</div>
+            </div>
+         </form>
+      </CModalBody>
+
+      <CModalFooter>
+         <CButton color="secondary" size="sm" @click="fecharAlterarSenha">
+            Cancelar
+         </CButton>
+         <CButton
+            color="primary"
+            size="sm"
+            @click="salvarNovaSenha"
+            :disabled="!isFormValido"
+         >
+            Salvar
+         </CButton>
+      </CModalFooter>
+   </CModal>
 </template>
 
 <script setup>
@@ -226,7 +344,113 @@ const previewFoto = ref(userStore.photo || null);
 
 // Modal visibilidade
 const editarContaModal = ref(false);
+const alterarSenhaModal = ref(false);
+
 const userFormErros = ref({});
+
+// Estado do formulário e erros
+const formAlterarSenha = ref({
+   senhaAtual: '',
+   novaSenha: '',
+   confirmarSenha: '',
+});
+
+const formAlterarSenhaErros = ref({
+   senhaAtual: [],
+   novaSenha: [],
+   confirmarSenha: [],
+});
+
+// Controle de visibilidade das senhas
+const mostrarSenhaAtual = ref(false);
+const mostrarNovaSenha = ref(false);
+const mostrarConfirmarSenha = ref(false);
+
+// Funções para alternar visibilidade das senhas
+const toggleMostrarSenhaAtual = () => {
+   mostrarSenhaAtual.value = !mostrarSenhaAtual.value;
+};
+const toggleMostrarNovaSenha = () => {
+   mostrarNovaSenha.value = !mostrarNovaSenha.value;
+};
+const toggleMostrarConfirmarSenha = () => {
+   mostrarConfirmarSenha.value = !mostrarConfirmarSenha.value;
+};
+
+// Validação do Formulário
+const isFormValido = computed(() => {
+   return (
+      formAlterarSenha.value.senhaAtual.length >= 6 &&
+      senhaValida.value &&
+      formAlterarSenha.value.novaSenha === formAlterarSenha.value.confirmarSenha
+   );
+});
+
+// Validação de Senha
+const senhaValida = computed(() => {
+   const senhaRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
+   return senhaRegex.test(formAlterarSenha.value.novaSenha);
+});
+
+// Fechar o modal
+const fecharAlterarSenha = () => {
+   // emit('update:alterarSenhaModal', false);
+   alterarSenhaModal.value = false;
+};
+
+const abrirAlterarSenha = () => {
+   formAlterarSenha.value = {
+      senhaAtual: '',
+      novaSenha: '',
+      confirmarSenha: '',
+   };
+   alterarSenhaModal.value = true;
+};
+
+// Função de Alteração de Senha
+const salvarNovaSenha = async () => {
+   if (!isFormValido.value) return;
+
+   try {
+      // Chamada API para alterar a senha (exemplo)
+      // await axios.post('/api/alterar-senha', form.value);
+      const token = getToken();
+
+      // Salva a photo via axios diretamente (axios suporta multipart/form-data nativamente)
+      const { data } = await axios.post(
+         'https://acl4.fazcomphp.com.br/api/user/changepassword',
+         {
+            senhaAtual: formAlterarSenha.value.senhaAtual,
+            novaSenha: formAlterarSenha.value.novaSenha,
+            novaSenha_confirmation: formAlterarSenha.value.confirmarSenha,
+         },
+         {
+            headers: {
+               Authorization: `Bearer ${token}`,
+            },
+         }
+      );
+
+      showToast({
+         title: 'Sucesso',
+         message: `Senha do Usuário atualizada com sucesso.`,
+      });
+
+      fecharAlterarSenha();
+   } catch (error) {
+      if (error.response?.status === 422) {
+         formAlterarSenhaErros.value = error.response.data.errors || {};
+      } else {
+         const errorMessage =
+            error.response?.data?.error || error.response?.data?.message || '';
+         showError(`<b>Erro</b>: ${errorMessage}`);
+      }
+   }
+};
+
+//  ----------------------------------------
+
 const abrirEditarConta = () => {
    form.value = {
       nome: userStore.name,
@@ -252,6 +476,47 @@ const form = ref({
 const erros = ref({});
 
 const defaultPhoto = urlFotos.value + 'avatar.jpg';
+
+const APAGARalterarSenha = async () => {
+   erros.value = {};
+
+   if (form.value.senhaAtual.length < 6) {
+      erros.value.senhaAtual =
+         'A Senha Atual deve ter pelo menos 6 caractéres.';
+   }
+
+   if (form.value.novaSenha.length < 6) {
+      erros.value.novaSenha = 'A Senha Atual deve ter pelo menos 6 caractéres.';
+   }
+
+   try {
+      const token = getToken();
+
+      // Salva a photo via axios diretamente (axios suporta multipart/form-data nativamente)
+      const { data } = await axios.post(
+         'https://acl4.fazcomphp.com.br/api/user/alterarsenha',
+         { senhaAtual: form.value.senhaAtual, novaSenha: form.value.novaSenha },
+         {
+            headers: {
+               Authorization: `Bearer ${token}`,
+            },
+         }
+      );
+
+      showToast({
+         title: 'Sucesso',
+         message: `Senha do Usuário atualizada com sucesso.`,
+      });
+
+      fecharAlterarSenha();
+   } catch (error) {
+      if (error.response?.status === 422) {
+         userFormErros.value = error.response.data.errors || {};
+      } else {
+         showError('<b>Erro</b>: ' + error.response?.data.error);
+      }
+   }
+};
 
 // Salvar dados
 const salvarConta = async () => {
