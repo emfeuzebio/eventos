@@ -93,31 +93,17 @@
          <!-- Nome -->
          <div class="mb-3">
             <label class="form-label fw-bold">Nome</label>
-            <CFormInput
+            <input
+               ref="primeiroInput"
                v-model="form.nome"
+               class="form-control"
                :class="{ 'is-invalid': !!userFormErros.nome }"
             />
             <div class="form-error" v-if="userFormErros.nome">
                {{ userFormErros.nome[0] }}
             </div>
-            <div class="form-text">
+            <div class="form-text ms-2">
                Informe o Nome do Usuário com no mínimo 6 caracteres.
-            </div>
-         </div>
-
-         <!-- Email (somente leitura) -->
-         <div class="mb-3">
-            <label class="form-label fw-bold">Email</label>
-            <CFormInput
-               type="email"
-               v-model="form.email"
-               :class="{ 'is-invalid': !!userFormErros.email }"
-            />
-            <div class="form-error" v-if="userFormErros.email">
-               {{ userFormErros.email[0] }}
-            </div>
-            <div class="form-text">
-               Este é seu e-mail de login e não pode ser alterado aqui.
             </div>
          </div>
 
@@ -131,29 +117,49 @@
             <div class="form-error" v-if="userFormErros.phone">
                {{ userFormErros.phone[0] }}
             </div>
-            <div class="form-text">
+            <div class="form-text ms-2">
                Informe o Telefone do Usuário no formato (XX) XXXXX-XXXX.
+            </div>
+         </div>
+
+         <!-- Email (somente leitura) -->
+         <div class="mb-3">
+            <label class="form-label fw-bold">Email</label>
+            <CFormInput
+               type="email"
+               v-model="form.email"
+               :class="{
+                  'is-invalid': !!userFormErros.email,
+               }"
+               readonly
+               disabled
+            />
+            <div class="form-error" v-if="userFormErros.email">
+               {{ userFormErros.email[0] }}
+            </div>
+            <div class="form-text ms-2" style="color: brown">
+               O E-mail é seu login e não pode ser alterado.
             </div>
          </div>
 
          <!-- Foto (upload) -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Foto de Perfil</label>
+            <label class="form-label fw-bold mb-0">Foto de Perfil</label>
+            <div class="mb-1">
+               <CAvatar
+                  class="img-preview mt-2 mb-2"
+                  :src="previewFoto || defaultPhoto"
+                  size="lg"
+               />
+            </div>
             <input
                type="file"
                accept="image/*"
                class="form-control"
                @change="onSelecionarFoto"
             />
-            <div class="form-text">Selecione uma imagem para o seu perfil.</div>
-
-            <div class="mt-3">
-               <strong>Prévia:</strong><br />
-               <CAvatar
-                  class="img-preview mt-2"
-                  :src="previewFoto || defaultPhoto"
-                  size="lg"
-               />
+            <div class="form-text ms-2">
+               Selecione a imagem desejeda para o seu perfil.
             </div>
          </div>
 
@@ -164,13 +170,13 @@
                <CBadge
                   v-for="(role, index) in userStore.roles"
                   :key="index"
-                  color="info"
-                  class="me-1"
+                  color="success"
+                  class="ms-3"
                >
-                  {{ role }}
+                  {{ index + 1 }}. {{ role }}
                </CBadge>
             </div>
-            <div class="form-text">
+            <div class="form-text ms-1">
                Acima estão listados seus Perfil(is) de Acesso. <br />
                Sendo necessário alterar, solicite ao Administrador.
             </div>
@@ -203,11 +209,11 @@
             <!-- Campo de Senha Atual -->
             <div class="mb-3 position-relative">
                <label class="form-label fw-bold">Senha Atual</label>
-               <CFormInput
+               <input
+                  ref="primeiroInput"
                   v-model="formAlterarSenha.senhaAtual"
                   :type="mostrarSenhaAtual ? 'text' : 'password'"
-                  placeholder="Digite sua senha atual"
-                  autocomplete="new-password"
+                  class="form-control"
                />
                <CButton
                   icon="bi-eye"
@@ -303,9 +309,8 @@
 </template>
 
 <script setup>
-import { ref, watchEffect, computed } from 'vue';
+import { ref, watchEffect, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
-import api from '@/services/api';
 import { useToast } from '@/composables/useToast';
 import { useGlobalError } from '@/composables/useGlobalError';
 import axios from 'axios';
@@ -345,6 +350,16 @@ const previewFoto = ref(userStore.photo || null);
 // Modal visibilidade
 const editarContaModal = ref(false);
 const alterarSenhaModal = ref(false);
+
+// Foco no campo número quando o modal é aberto
+const primeiroInput = ref(null);
+
+const focoNoPrimeiroInput = async () => {
+   await nextTick(); // Espera a renderização do DOM ser concluída
+   setTimeout(() => {
+      primeiroInput.value?.focus(); // Aplica o foco após a renderização
+   }, 200); // delay para garantir que o modal foi totalmente exibido
+};
 
 const userFormErros = ref({});
 
@@ -406,6 +421,7 @@ const abrirAlterarSenha = () => {
       confirmarSenha: '',
    };
    alterarSenhaModal.value = true;
+   focoNoPrimeiroInput();
 };
 
 // Função de Alteração de Senha
@@ -460,6 +476,7 @@ const abrirEditarConta = () => {
    };
    previewFoto.value = urlFotos.value + userStore.photo || null;
    editarContaModal.value = true;
+   focoNoPrimeiroInput();
 };
 
 const fecharEditarConta = () => {
@@ -477,47 +494,6 @@ const erros = ref({});
 
 const defaultPhoto = urlFotos.value + 'avatar.jpg';
 
-const APAGARalterarSenha = async () => {
-   erros.value = {};
-
-   if (form.value.senhaAtual.length < 6) {
-      erros.value.senhaAtual =
-         'A Senha Atual deve ter pelo menos 6 caractéres.';
-   }
-
-   if (form.value.novaSenha.length < 6) {
-      erros.value.novaSenha = 'A Senha Atual deve ter pelo menos 6 caractéres.';
-   }
-
-   try {
-      const token = getToken();
-
-      // Salva a photo via axios diretamente (axios suporta multipart/form-data nativamente)
-      const { data } = await axios.post(
-         'https://acl4.fazcomphp.com.br/api/user/alterarsenha',
-         { senhaAtual: form.value.senhaAtual, novaSenha: form.value.novaSenha },
-         {
-            headers: {
-               Authorization: `Bearer ${token}`,
-            },
-         }
-      );
-
-      showToast({
-         title: 'Sucesso',
-         message: `Senha do Usuário atualizada com sucesso.`,
-      });
-
-      fecharAlterarSenha();
-   } catch (error) {
-      if (error.response?.status === 422) {
-         userFormErros.value = error.response.data.errors || {};
-      } else {
-         showError('<b>Erro</b>: ' + error.response?.data.error);
-      }
-   }
-};
-
 // Salvar dados
 const salvarConta = async () => {
    erros.value = {};
@@ -531,9 +507,6 @@ const salvarConta = async () => {
    }
 
    try {
-      // const { data } = await api.post('/me', payload); // ou .put dependendo da API
-      // await api.post('/me', payload); // ou .put dependendo da API
-
       const token = getToken();
 
       // Salva a photo via axios diretamente (axios suporta multipart/form-data nativamente)
