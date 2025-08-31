@@ -50,11 +50,14 @@
          <CDropdownItem>
             <CIcon :icon="cilShieldAlt" /> Perfis de Acesso
             <div>
-               <div class="small text-muted ms-3">
-                  <div v-if="userStore.roles.length">
-                     <span v-html="userStore.roles.join('<br />')"></span>
-                  </div>
+               <div v-if="userStore.roles.length">
+                  <ol>
+                     <li v-for="(role, index) in userStore.roles" :key="index">
+                        {{ role }}
+                     </li>
+                  </ol>
                </div>
+               <div v-else class="text-muted ms-3">Nenhum Perfil de Acesso</div>
             </div>
          </CDropdownItem>
          <CDropdownDivider />
