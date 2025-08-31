@@ -48,7 +48,17 @@ export function useDataTable({
                callback({ data: response.data });
             }) 
             .catch((error) => {
-            //    // console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
+               // Verifica se o erro foi 401 Unauthorized
+               if (error.response && error.response.status === 401) {
+                  // Exemplo: remove token, redireciona para login
+                  localStorage.removeItem('token'); // ou conforme você usa
+                  window.location.href = '/login'; // ou: router.push('/login')
+               } else {
+                  // Outro erro qualquer
+                  console.error('Erro ao carregar dados da tabela:', error);
+               }
+
+               // console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
                callback({ data: [] }); // evita que a tabela quebre
             });
          },
