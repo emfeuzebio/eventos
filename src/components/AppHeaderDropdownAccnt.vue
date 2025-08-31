@@ -36,7 +36,7 @@
          </CDropdownHeader>
 
          <CDropdownItem>
-            <CIcon icon="cil-user" /> <strong>{{ userName }}</strong>
+            <CIcon :icon="cilUser" /> <strong>{{ userName }}</strong>
          </CDropdownItem>
 
          <CDropdownItem @click="abrirEditarConta">
@@ -44,15 +44,15 @@
          </CDropdownItem>
 
          <CDropdownItem @click="abrirAlterarSenha">
-            <CIcon icon="cil-lock-locked" /> Alterar Senha
+            <CIcon :icon="cibOpenAccess" /> Alterar Senha
          </CDropdownItem>
 
          <CDropdownItem>
-            <CIcon icon="cil-user" /> Perfis de Acesso
+            <CIcon :icon="cilShieldAlt" /> Perfis de Acesso
             <div>
-               <div class="small text-muted">
+               <div class="small text-muted ms-3">
                   <div v-if="userStore.roles.length">
-                     {{ userStore.roles.join(', ') }}
+                     <span v-html="userStore.roles.join('<br />')"></span>
                   </div>
                </div>
             </div>
@@ -73,7 +73,7 @@
          <CDropdownDivider />
          <!-- <CDropdownItem> <CIcon icon="cil-shield-alt" /> Lock Account </CDropdownItem> -->
          <CDropdownItem @click="logout">
-            <CIcon icon="cil-lock-locked" /> Sair
+            <CIcon :icon="cilExitToApp" /> Sair
          </CDropdownItem>
       </CDropdownMenu>
    </CDropdown>
@@ -86,7 +86,7 @@
       backdrop="static"
    >
       <CModalHeader class="bg-primary text-white fw-bold">
-         Editar Conta do Usuário
+         Editar Conta do Usuário {{ userName }}
       </CModalHeader>
 
       <CModalBody>
@@ -201,7 +201,7 @@
       backdrop="static"
    >
       <CModalHeader class="bg-primary text-white fw-bold">
-         Alterar a Senha do Usuário
+         Alterar a Senha do Usuário {{ userName }}
       </CModalHeader>
 
       <CModalBody>
@@ -216,14 +216,13 @@
                   class="form-control"
                />
                <CButton
-                  icon="bi-eye"
-                  color="secondary"
+                  color="ligth"
                   size="sm"
                   style="right: 10px; top: 35px"
                   class="position-absolute"
                   @click="toggleMostrarSenhaAtual"
                >
-                  Ver
+                  <CIcon :icon="cilLowVision" />
                </CButton>
                <div class="form-error" v-if="formAlterarSenhaErros.senhaAtual">
                   {{ formAlterarSenhaErros.senhaAtual[0] }}
@@ -243,14 +242,13 @@
                   autocomplete="new-password"
                />
                <CButton
-                  icon="bi-eye"
-                  color="secondary"
+                  color="ligth"
                   size="sm"
                   style="right: 10px; top: 35px"
                   class="position-absolute"
                   @click="toggleMostrarNovaSenha"
                >
-                  Ver
+                  <CIcon :icon="cilLowVision" />
                </CButton>
                <div class="form-error" v-if="formAlterarSenhaErros.novaSenha">
                   {{ formAlterarSenhaErros.novaSenha[0] }}
@@ -272,14 +270,13 @@
                   autocomplete="new-password"
                />
                <CButton
-                  icon="bi-eye"
-                  color="secondary"
+                  color="ligth"
                   size="sm"
                   style="right: 10px; top: 35px"
                   class="position-absolute"
                   @click="toggleMostrarConfirmarSenha"
                >
-                  Ver
+                  <CIcon :icon="cilLowVision" />
                </CButton>
                <div
                   class="form-error"
@@ -314,6 +311,7 @@ import { useRouter } from 'vue-router';
 import { useToast } from '@/composables/useToast';
 import { useGlobalError } from '@/composables/useGlobalError';
 import axios from 'axios';
+import { CIcon } from '@coreui/icons-vue';
 import {
    getToken,
    getUserNameFromToken,
@@ -321,6 +319,25 @@ import {
 } from '@/services/authService';
 
 import { useUserStore } from '@/stores/userStore';
+import {
+   cibBlackberry,
+   cibOpenAccess,
+   cibSuperuser,
+   cilAccountLogout,
+   cilBraille,
+   cilBuilding,
+   cilCropRotate,
+   cilExitToApp,
+   cilEyedropper,
+   cilHospital,
+   cilLockLocked,
+   cilLowVision,
+   cilMoodBad,
+   cilMoon,
+   cilSearch,
+   cilShieldAlt,
+   cilUser,
+} from '@coreui/icons';
 const userStore = useUserStore();
 
 const { showError } = useGlobalError(); // Modal de Erros

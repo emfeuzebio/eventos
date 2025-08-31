@@ -132,6 +132,7 @@ const handleRegister = async () => {
             email: email.value,
             password: password.value,
             password_confirmation: password_confirmation.value,
+            active: 'N',
             system_id: appId, // Id do Site de Eventos VITE_APP_ID
          }
       );

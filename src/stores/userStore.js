@@ -31,7 +31,7 @@ export const useUserStore = defineStore('user', {
 
       // this.token = decoded || null // Não é necessário atribuir o token decodificado, pois já temos o token original
       this.token = token || null
-      this.systemId = decoded.systemId || null
+      this.systemId = decoded.system_id || null
       this.systems = decoded.user_systems || []
       this.userId = decoded.user_id || null
       this.name = decoded.user_name
