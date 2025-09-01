@@ -364,7 +364,7 @@ const avatar = computed(() => {
       : urlFotos.value + 'storage/users/avatar.jpg';
 });
 
-const urlFotos = ref('https://acl4.fazcomphp.com.br/storage/');
+const urlFotos = ref('https://acl4.fazcomphp.com.br/');
 const previewFoto = ref(userStore.photo || null);
 
 // Modal visibilidade
