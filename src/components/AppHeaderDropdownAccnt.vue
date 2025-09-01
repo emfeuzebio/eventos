@@ -1,7 +1,15 @@
 <template>
    <CDropdown placement="bottom-end" variant="nav-item">
       <CDropdownToggle class="py-0 pe-0" :caret="false">
-         <CAvatar :src="avatar" size="md" />
+         <img
+            :src="avatar"
+            id="avatar"
+            style="border-radius: 15px;"
+            size="md"
+            width="40"
+            height="50"
+            onerror="this.src='https://acl4.fazcomphp.com.br/storage/users/avatar.jpg'"
+         />
       </CDropdownToggle>
       <CDropdownMenu class="pt-0">
          <!-- 
@@ -341,6 +349,8 @@ import {
    cilShieldAlt,
    cilUser,
 } from '@coreui/icons';
+
+
 const userStore = useUserStore();
 
 const { showError } = useGlobalError(); // Modal de Erros

@@ -107,6 +107,9 @@ const handleReset = async () => {
                       autocomplete="new-password"
                       v-model="password"
                     />
+                    <div class="form-text">
+                      A senha deve conter no mínimo 6 caracteres, uma letra maiúscula, um número e um caractere especial.
+                    </div>
                   </CInputGroup>
                   <CInputGroup class="mb-4">
                     <CInputGroupText>
