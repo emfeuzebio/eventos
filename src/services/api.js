@@ -56,7 +56,7 @@ api.interceptors.response.use(
     if (isLoginRequest) return Promise.reject(error);
 
     // Redireciona para login se não autorizado (evita showError nesse caso)
-    if (status === 401 || res.message == 'Token has expired') {
+    if (status === 401) {
       removeToken();
       redirectToLogin();
       return new Promise(() => {}); // bloqueia execução posterior silenciosamente

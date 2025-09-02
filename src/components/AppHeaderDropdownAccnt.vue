@@ -4,7 +4,7 @@
          <img
             :src="avatar"
             id="avatar"
-            style="border-radius: 15px;"
+            style="border-radius: 20px"
             size="md"
             width="40"
             height="50"
@@ -101,35 +101,60 @@
       </CModalHeader>
 
       <CModalBody>
-         <!-- Nome -->
+         <!-- Foto (upload) -->
          <div class="mb-3">
-            <label class="form-label fw-bold">Nome</label>
-            <input
-               ref="primeiroInput"
-               v-model="form.nome"
-               class="form-control"
-               :class="{ 'is-invalid': !!userFormErros.nome }"
-            />
-            <div class="form-error" v-if="userFormErros.nome">
-               {{ userFormErros.nome[0] }}
-            </div>
-            <div class="form-text ms-2">
-               Informe o Nome do Usuário com no mínimo 6 caracteres.
-            </div>
-         </div>
+            <label class="form-label fw-bold mb-0 ms-3">Foto de Perfil</label>
 
-         <div class="mb-3">
-            <label class="form-label fw-bold">Telefone</label>
-            <CFormInput
-               type="phone"
-               v-model="form.phone"
-               :class="{ 'is-invalid': !!userFormErros.phone }"
-            />
-            <div class="form-error" v-if="userFormErros.phone">
-               {{ userFormErros.phone[0] }}
+            <div class="row align-items-center">
+               <!-- Coluna da Esquerda - Preview da Foto -->
+               <div class="col-md-4 text-center mb-3 mb-md-0">
+                  <CAvatar
+                     class="img-preview mt-2 mb-2"
+                     :src="previewFoto || defaultPhoto"
+                     size="xl"
+                  />
+               </div>
+
+               <!-- Coluna da Direita - Botões -->
+               <div class="col-md-5">
+                  <div class="d-grid gap-2">
+                     <!-- Botão para Selecionar Nova Foto -->
+                     <CButton
+                        color="primary"
+                        size="sm"
+                        @click="$refs.fileInput.click()"
+                        class="mb-2"
+                     >
+                        <CIcon icon="cil-pencil" class="me-1" />
+                        Selecionar Nova Foto
+                     </CButton>
+
+                     <!-- Botão para Remover Foto (só aparece se tiver foto) -->
+                     <CButton
+                        v-if="previewFoto && previewFoto !== defaultPhoto"
+                        color="danger"
+                        size="sm"
+                        @click="removerFoto"
+                        variant="outline"
+                     >
+                        <CIcon icon="cil-task" class="me-1" />
+                        Remover Foto
+                     </CButton>
+                  </div>
+               </div>
             </div>
-            <div class="form-text ms-2">
-               Informe o Telefone do Usuário no formato (XX) XXXXX-XXXX.
+
+            <!-- Input de arquivo (hidden) -->
+            <input
+               ref="fileInput"
+               type="file"
+               accept="image/*"
+               class="d-none"
+               @change="onSelecionarFoto"
+            />
+
+            <div class="form-text ms-2 mt-2">
+               Selecione a imagem desejada para o seu perfil.
             </div>
          </div>
 
@@ -148,40 +173,53 @@
             <div class="form-error" v-if="userFormErros.email">
                {{ userFormErros.email[0] }}
             </div>
-            <div class="form-text ms-2" style="color: brown">
+            <div class="form-text ms-2" color="success">
                O E-mail é seu login e não pode ser alterado.
             </div>
          </div>
 
-         <!-- Foto (upload) -->
+         <!-- Nome -->
          <div class="mb-3">
-            <label class="form-label fw-bold mb-0">Foto de Perfil</label>
-            <div class="mb-1">
-               <CAvatar
-                  class="img-preview mt-2 mb-2"
-                  :src="previewFoto || defaultPhoto"
-                  size="lg"
-               />
-            </div>
+            <label class="form-label fw-bold">Nome</label>
             <input
-               type="file"
-               accept="image/*"
+               ref="primeiroInput"
+               v-model="form.nome"
                class="form-control"
-               @change="onSelecionarFoto"
+               :class="{ 'is-invalid': !!userFormErros.nome }"
             />
+            <div class="form-error" v-if="userFormErros.nome">
+               {{ userFormErros.nome[0] }}
+            </div>
             <div class="form-text ms-2">
-               Selecione a imagem desejeda para o seu perfil.
+               Informe o Nome do Usuário com no mínimo 6 caracteres.
+            </div>
+         </div>
+
+         <!-- Telefone -->
+         <div class="mb-3">
+            <label class="form-label fw-bold">Telefone</label>
+            <CFormInput
+               type="phone"
+               v-model="form.phone"
+               :class="{ 'is-invalid': !!userFormErros.phone }"
+            />
+            <div class="form-error" v-if="userFormErros.phone">
+               {{ userFormErros.phone[0] }}
+            </div>
+            <div class="form-text ms-2">
+               Informe o Telefone do Usuário no formato (XX) XXXXX-XXXX.
             </div>
          </div>
 
          <!-- Perfis de Acesso -->
          <div class="mb-3">
             <label class="form-label fw-bold">Perfis de Acesso</label>
-            <div>
+            <div class="col-md-5">
                <CBadge
                   v-for="(role, index) in userStore.roles"
                   :key="index"
-                  color="success"
+                  color="primary"
+                  variant="outline"
                   class="ms-3"
                >
                   {{ index + 1 }}. {{ role }}
@@ -321,10 +359,12 @@ import { ref, watchEffect, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from '@/composables/useToast';
 import { useGlobalError } from '@/composables/useGlobalError';
+import { redirectToLogin } from '@/utils/routerHelper';
 import axios from 'axios';
 import { CIcon } from '@coreui/icons-vue';
 import {
    getToken,
+   removeToken,
    getUserNameFromToken,
    logout as doLogout,
 } from '@/services/authService';
@@ -350,7 +390,6 @@ import {
    cilUser,
 } from '@coreui/icons';
 
-
 const userStore = useUserStore();
 
 const { showError } = useGlobalError(); // Modal de Erros
@@ -370,7 +409,7 @@ watchEffect(() => {
 // Computed para avatar (com fallback para null)
 const avatar = computed(() => {
    return userStore.photo
-      ? urlFotos.value + userStore.photo
+      ? urlFotos.value + 'storage/' + userStore.photo
       : urlFotos.value + 'storage/users/avatar.jpg';
 });
 
@@ -504,7 +543,16 @@ const abrirEditarConta = () => {
       phone: userStore.phone,
       photo: null,
    };
-   previewFoto.value = urlFotos.value + userStore.photo || null;
+
+   previewFoto.value = userStore.photo
+      ? urlFotos.value + 'storage/' + userStore.photo
+      : defaultPhoto;
+
+   // console.log('userStore.photo', userStore.photo);
+   // console.log('urlFotos', urlFotos.value);
+   // console.log('defaultPhoto', defaultPhoto);
+   // console.log('previewFoto', previewFoto.value);
+
    editarContaModal.value = true;
    focoNoPrimeiroInput();
 };
@@ -522,7 +570,7 @@ const form = ref({
 
 const erros = ref({});
 
-const defaultPhoto = urlFotos.value + 'avatar.jpg';
+const defaultPhoto = urlFotos.value + 'storage/users/avatar.jpg';
 
 // Salvar dados
 const salvarConta = async () => {
@@ -542,7 +590,11 @@ const salvarConta = async () => {
       // Salva a photo via axios diretamente (axios suporta multipart/form-data nativamente)
       const { data } = await axios.post(
          'https://acl4.fazcomphp.com.br/api/user/update',
-         { name: form.value.nome, email: form.value.email },
+         {
+            name: form.value.nome,
+            email: form.value.email,
+            phone: form.value.phone,
+         },
          {
             headers: {
                'Content-Type': 'multipart/form-data',
@@ -572,10 +624,44 @@ const salvarConta = async () => {
    } catch (error) {
       if (error.response?.status === 422) {
          userFormErros.value = error.response.data.errors || {};
-      } else {
-         showError('<b>Erro</b>: ' + error.response?.data.error);
-         // showError('<b>Erro</b>: ' + error.response?.data.message);
       }
+      // else {
+      //    showError('<b>Erro</b>: ' + error.response?.data.error);
+      //    // showError('<b>Erro</b>: ' + error.response?.data.message);
+      // }
+   }
+};
+
+const removerFoto = async () => {
+   try {
+      const token = getToken();
+
+      // Para REMOVER a foto (envie como JSON, não como FormData)
+      const { data } = await axios.post(
+         'https://acl4.fazcomphp.com.br/api/user/updatephoto',
+         { photo: null },
+         {
+            headers: {
+               'Content-Type': 'application/json',
+               Authorization: `Bearer ${token}`,
+            },
+         }
+      );
+
+      // Atualiza apenas a foto no store
+      userStore.$patch({
+         photo: data.photo,
+      });
+
+      // Atualiza o preview para a foto padrão
+      previewFoto.value = urlFotos.value + 'storage/users/avatar.jpg';
+   } catch (error) {
+      if (error.response?.status === 401) {
+         removeToken();
+         redirectToLogin();
+         // router.push('/pages/login');
+      }
+      showError('<b>Erro ao remover foto.</b>: ' + error.response?.data.error);
    }
 };
 
@@ -639,13 +725,5 @@ const logout = async () => {
    } catch (error) {
       console.error('Erro durante logout:', error);
    }
-};
-
-const goToProfile = () => {
-   router.push('/profile');
-};
-
-const goToSettings = () => {
-   router.push('/settings');
 };
 </script>
