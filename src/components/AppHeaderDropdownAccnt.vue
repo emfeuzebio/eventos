@@ -47,11 +47,11 @@
             <CIcon :icon="cilUser" /> <strong>{{ userName }}</strong>
          </CDropdownItem>
 
-         <CDropdownItem @click="abrirEditarConta">
+         <CDropdownItem @click="abrirEditarConta" class="cursor-pointer-item">
             <CIcon icon="cil-pencil" /> Editar Conta
          </CDropdownItem>
 
-         <CDropdownItem @click="abrirAlterarSenha">
+         <CDropdownItem @click="abrirAlterarSenha" class="cursor-pointer-item">
             <CIcon :icon="cibOpenAccess" /> Alterar Senha
          </CDropdownItem>
 
@@ -185,10 +185,10 @@
                ref="primeiroInput"
                v-model="form.nome"
                class="form-control"
-               :class="{ 'is-invalid': !!userFormErros.nome }"
+               :class="{ 'is-invalid': !!userFormErros.name	}"
             />
-            <div class="form-error" v-if="userFormErros.nome">
-               {{ userFormErros.nome[0] }}
+            <div class="form-error" v-if="userFormErros.name">
+               {{ userFormErros.name	[0] }}
             </div>
             <div class="form-text ms-2">
                Informe o Nome do Usuário com no mínimo 6 caracteres.
@@ -359,6 +359,7 @@ import { ref, watchEffect, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from '@/composables/useToast';
 import { useGlobalError } from '@/composables/useGlobalError';
+import { useGlobalLoading } from '@/stores/loading';
 import { redirectToLogin } from '@/utils/routerHelper';
 import axios from 'axios';
 import { CIcon } from '@coreui/icons-vue';
@@ -392,6 +393,7 @@ import {
 
 const userStore = useUserStore();
 
+const { startLoading, stopLoading } = useGlobalLoading();
 const { showError } = useGlobalError(); // Modal de Erros
 const { showToast } = useToast(); // Toasts de Alerta
 
@@ -430,6 +432,7 @@ const focoNoPrimeiroInput = async () => {
    }, 200); // delay para garantir que o modal foi totalmente exibido
 };
 
+const loading = ref(false);
 const userFormErros = ref({});
 
 // Estado do formulário e erros
@@ -495,6 +498,7 @@ const abrirAlterarSenha = () => {
 
 // Função de Alteração de Senha
 const salvarNovaSenha = async () => {
+   startLoading();
    if (!isFormValido.value) return;
 
    try {
@@ -527,22 +531,31 @@ const salvarNovaSenha = async () => {
       if (error.response?.status === 422) {
          formAlterarSenhaErros.value = error.response.data.errors || {};
       } else {
-         const errorMessage =
-            error.response?.data?.error || error.response?.data?.message || '';
+         const errorMessage = error.response?.data?.error || error.response?.data?.message || '';
          showError(`<b>Erro</b>: ${errorMessage}`);
       }
+   } finally {
+      stopLoading();
    }
 };
 
 //  ----------------------------------------
 
 const abrirEditarConta = () => {
+   startLoading();
    form.value = {
       nome: userStore.name,
       email: userStore.email,
       phone: userStore.phone,
       photo: null,
    };
+
+   // userFormErros.value = {
+   //    name: [],
+   //    phone: userStore.phone,
+   // };
+
+   userFormErros.value = {};
 
    previewFoto.value = userStore.photo
       ? urlFotos.value + 'storage/' + userStore.photo
@@ -555,6 +568,7 @@ const abrirEditarConta = () => {
 
    editarContaModal.value = true;
    focoNoPrimeiroInput();
+   stopLoading();
 };
 
 const fecharEditarConta = () => {
@@ -574,6 +588,7 @@ const defaultPhoto = urlFotos.value + 'storage/users/avatar.jpg';
 
 // Salvar dados
 const salvarConta = async () => {
+   startLoading();
    erros.value = {};
 
    if (!form.value.nome) {
@@ -603,8 +618,6 @@ const salvarConta = async () => {
          }
       );
 
-      // console.log('Data:', data);
-
       // Atualiza a foto se necessário
       await salvarNovaFoto();
 
@@ -622,13 +635,17 @@ const salvarConta = async () => {
 
       fecharEditarConta();
    } catch (error) {
-      if (error.response?.status === 422) {
+      if (error.response?.status === 401) {
+         removeToken();
+         redirectToLogin();
+         // router.push('/pages/login');
+      } else if (error.response?.status === 422) {
          userFormErros.value = error.response.data.errors || {};
+      } else {
+         showError('<b>Erro</b>: ' + error.response?.data.error + ' ' + error.response?.data.message);
       }
-      // else {
-      //    showError('<b>Erro</b>: ' + error.response?.data.error);
-      //    // showError('<b>Erro</b>: ' + error.response?.data.message);
-      // }
+   } finally {
+      stopLoading();
    }
 };
 
@@ -727,3 +744,13 @@ const logout = async () => {
    }
 };
 </script>
+
+<style scoped>
+.cursor-pointer-item {
+  cursor: pointer !important;
+}
+
+.cursor-pointer-item * {
+  cursor: inherit !important;
+}
+</style>

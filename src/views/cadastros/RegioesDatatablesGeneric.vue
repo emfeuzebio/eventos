@@ -100,18 +100,18 @@ const zapFormData = ref({});
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
-   console.log(
-      'onExtraAction ID:',
-      id,
-      'row:',
-      row,
-      'action:',
-      action,
-      'dataset:',
-      dataset,
-      'target: (por ora não usado)',
-      target
-   );
+   // console.log(
+   //    'onExtraAction ID:',
+   //    id,
+   //    'row:',
+   //    row,
+   //    'action:',
+   //    action,
+   //    'dataset:',
+   //    dataset,
+   //    'target: (por ora não usado)',
+   //    target
+   // );
 
    if (action === 'zap') {
       // console.log('ZAP: ', row, action, dataset, target);

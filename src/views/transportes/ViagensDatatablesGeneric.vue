@@ -17,7 +17,7 @@ import { useCurrentEventStore } from '@/stores/currentEvent';
 const currentEventStore = useCurrentEventStore();
 const currentEvent = computed(() => currentEventStore.currentEvent);
 const eventStore = useCurrentEventStore();
-console.log('Eventos Corrente:', currentEvent.value?.id || 'Não selecionado');
+// console.log('Eventos Corrente:', currentEvent.value?.id || 'Não selecionado');
 
 import { useEventos } from '@/composables/useEventos';
 const {
@@ -118,8 +118,6 @@ const defaultValues = {
 };
 
 // carrega listas de estidades da API para popular listas: <selects> os filtros
-// fetchRotas(eventStore.currentEvent?.id);
-// fetchEventos();
 fetchVeiculos();
 if (eventStore.currentEvent?.id) {
    fetchRotas(eventStore.currentEvent.id); // somente carregar as rotas se o evento já estiver definido

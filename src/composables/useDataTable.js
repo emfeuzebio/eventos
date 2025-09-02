@@ -55,7 +55,7 @@ export function useDataTable({
                   window.location.href = '/login'; // ou: router.push('/login')
                } else {
                   // Outro erro qualquer
-                  console.error('Erro ao carregar dados da tabela:', error);
+                  // console.error('Erro ao carregar dados da tabela:', error);
                }
 
                // console.error('DataTables NÃO conseguiu carregar os dados. Verifique o erro na requisição GET anterior');
