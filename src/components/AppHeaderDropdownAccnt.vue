@@ -95,6 +95,9 @@
       @close="fecharEditarConta"
       size="md"
       backdrop="static"
+      scrollable
+      responsive
+      v-autofocus-first
    >
       <CModalHeader class="bg-primary text-white fw-bold">
          Editar Conta do Usuário {{ userName }}
@@ -185,10 +188,10 @@
                ref="primeiroInput"
                v-model="form.nome"
                class="form-control"
-               :class="{ 'is-invalid': !!userFormErros.name	}"
+               :class="{ 'is-invalid': !!userFormErros.name }"
             />
             <div class="form-error" v-if="userFormErros.name">
-               {{ userFormErros.name	[0] }}
+               {{ userFormErros.name[0] }}
             </div>
             <div class="form-text ms-2">
                Informe o Nome do Usuário com no mínimo 6 caracteres.
@@ -531,7 +534,8 @@ const salvarNovaSenha = async () => {
       if (error.response?.status === 422) {
          formAlterarSenhaErros.value = error.response.data.errors || {};
       } else {
-         const errorMessage = error.response?.data?.error || error.response?.data?.message || '';
+         const errorMessage =
+            error.response?.data?.error || error.response?.data?.message || '';
          showError(`<b>Erro</b>: ${errorMessage}`);
       }
    } finally {
@@ -637,12 +641,17 @@ const salvarConta = async () => {
    } catch (error) {
       if (error.response?.status === 401) {
          removeToken();
+         router.push('/pages/login');
          redirectToLogin();
-         // router.push('/pages/login');
       } else if (error.response?.status === 422) {
          userFormErros.value = error.response.data.errors || {};
       } else {
-         showError('<b>Erro</b>: ' + error.response?.data.error + ' ' + error.response?.data.message);
+         showError(
+            '<b>Erro</b>: ' +
+               error.response?.data.error +
+               ' ' +
+               error.response?.data.message
+         );
       }
    } finally {
       stopLoading();
@@ -650,6 +659,8 @@ const salvarConta = async () => {
 };
 
 const removerFoto = async () => {
+   startLoading();
+
    try {
       const token = getToken();
 
@@ -675,10 +686,18 @@ const removerFoto = async () => {
    } catch (error) {
       if (error.response?.status === 401) {
          removeToken();
+         router.push('/pages/login');
          redirectToLogin();
-         // router.push('/pages/login');
+      } else {
+         showError(
+            '<b>Erro</b>: ' +
+               error.response?.data.error +
+               ' ' +
+               error.response?.data.message
+         );
       }
-      showError('<b>Erro ao remover foto.</b>: ' + error.response?.data.error);
+   } finally {
+      stopLoading();
    }
 };
 
@@ -689,12 +708,12 @@ const salvarNovaFoto = async () => {
       return; // Nada a fazer se não for um novo arquivo
    }
 
+   startLoading();
    const payload = new FormData();
    payload.append('photo', form.value.photo);
 
    try {
       const token = getToken();
-
       const { data } = await axios.post(
          'https://acl4.fazcomphp.com.br/api/user/updatephoto',
          payload,
@@ -711,7 +730,20 @@ const salvarNovaFoto = async () => {
          photo: data.photo,
       });
    } catch (error) {
-      showError('<b>Erro</b>: ' + error.response?.data.error);
+      if (error.response?.status === 401) {
+         removeToken();
+         router.push('/pages/login');
+         redirectToLogin();
+      } else {
+         showError(
+            '<b>Erro</b>: ' +
+               error.response?.data.error +
+               ' ' +
+               error.response?.data.message
+         );
+      }
+   } finally {
+      stopLoading();
    }
 };
 
@@ -747,10 +779,10 @@ const logout = async () => {
 
 <style scoped>
 .cursor-pointer-item {
-  cursor: pointer !important;
+   cursor: pointer !important;
 }
 
 .cursor-pointer-item * {
-  cursor: inherit !important;
+   cursor: inherit !important;
 }
 </style>
