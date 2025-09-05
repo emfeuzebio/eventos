@@ -1,292 +1,493 @@
-export default [
-  {
-    component: 'CNavItem',
-    name: 'Dashboard',
-    to: '/dashboard',
-    icon: 'cil-speedometer',
-    badge: {
-      color: 'primary',
-      text: 'NEW',
-    },
-  },
+import { jwtDecode } from 'jwt-decode';
+import simulatedMenus from '@/data/menus.json'; // Ajuste o caminho conforme necessário
+
+// Função para simular a resposta da API (para testes)
+function getSimulatedMenus() {
+  return {
+    "menus": [
+      {
+        "id": 1,
+        "menu_id": null,
+        "name": "Dashboard",
+        "icon": "cil-speedometer",
+        "route": "/dashboard",
+        "position": 1,
+        "active": "Y",
+        "badge": {
+          "color": "primary",
+          "text": "NEW"
+        }
+      },
+      {
+        "id": 2,
+        "menu_id": null,
+        "name": "Negócio",
+        "icon": null,
+        "route": null,
+        "position": 2,
+        "active": "Y"
+      },
+      {
+        "id": 3,
+        "menu_id": null,
+        "name": "Inscrições",
+        "icon": "cil-envelope-open",
+        "route": "/inscricoes",
+        "position": 3,
+        "active": "Y"
+      },
+      {
+        "id": 4,
+        "menu_id": 3,
+        "name": "Inscrições",
+        "icon": null,
+        "route": "/inscricoes/inscricoes",
+        "position": 1,
+        "active": "Y"
+      },
+      {
+        "id": 5,
+        "menu_id": 3,
+        "name": "Pessoas",
+        "icon": null,
+        "route": "/inscricoes/pessoa",
+        "position": 2,
+        "active": "Y"
+      },
+      {
+        "id": 6,
+        "menu_id": null,
+        "name": "Hospedagem",
+        "icon": "cil-layers",
+        "route": "/hospedagem",
+        "position": 4,
+        "active": "Y"
+      },
+      {
+        "id": 7,
+        "menu_id": 6,
+        "name": "Gestão de Hospedagem",
+        "icon": null,
+        "route": "/hospedagem/ghospedagem",
+        "position": 1,
+        "active": "Y"
+      },
+      {
+        "id": 8,
+        "menu_id": 6,
+        "name": "Hotéis e Quartos",
+        "icon": null,
+        "route": "/hospedagem/hoteis2",
+        "position": 2,
+        "active": "Y"
+      },
+      {
+        "id": 9,
+        "menu_id": 6,
+        "name": "Tipos de Quarto",
+        "icon": null,
+        "route": "/hospedagem/quartoTipos",
+        "position": 3,
+        "active": "Y"
+      },
+      {
+        "id": 10,
+        "menu_id": null,
+        "name": "Transportes",
+        "icon": "cil-layers",
+        "route": "/transportes",
+        "position": 5,
+        "active": "Y"
+      },
+      {
+        "id": 11,
+        "menu_id": 10,
+        "name": "Gestão de Chegadas",
+        "icon": null,
+        "route": "/transportes/chegadas",
+        "position": 1,
+        "active": "Y"
+      },
+      {
+        "id": 12,
+        "menu_id": 10,
+        "name": "Gestão de Partidas",
+        "icon": null,
+        "route": "/transportes/partidas",
+        "position": 2,
+        "active": "Y"
+      },
+      {
+        "id": 13,
+        "menu_id": 10,
+        "name": "Veículos e Motoristas",
+        "icon": null,
+        "route": "/transportes/rotasG",
+        "position": 3,
+        "active": "Y"
+      },
+      {
+        "id": 14,
+        "menu_id": 10,
+        "name": "Rotas",
+        "icon": null,
+        "route": "/transportes/rotas",
+        "position": 4,
+        "active": "Y"
+      },
+      {
+        "id": 15,
+        "menu_id": 10,
+        "name": "Viagens",
+        "icon": null,
+        "route": "/transportes/viagens",
+        "position": 5,
+        "active": "Y"
+      },
+      {
+        "id": 16,
+        "menu_id": null,
+        "name": "Eventos",
+        "icon": "cil-envelope-open",
+        "route": "/eventos",
+        "position": 6,
+        "active": "Y"
+      },
+      {
+        "id": 17,
+        "menu_id": 16,
+        "name": "Eventos",
+        "icon": null,
+        "route": "/inscricoes/eventos",
+        "position": 1,
+        "active": "Y"
+      },
+      {
+        "id": 18,
+        "menu_id": 16,
+        "name": "Eventos e Serviços",
+        "icon": null,
+        "route": "/inscricoes/eventosservicos",
+        "position": 2,
+        "active": "Y"
+      },
+      {
+        "id": 19,
+        "menu_id": null,
+        "name": "Cadastros",
+        "icon": "cil-list",
+        "route": "/cadastros",
+        "position": 7,
+        "active": "Y"
+      },
+      {
+        "id": 20,
+        "menu_id": 19,
+        "name": "Minha Organização",
+        "icon": null,
+        "route": "/cadastros/organizacoes",
+        "position": 1,
+        "active": "Y"
+      },
+      {
+        "id": 21,
+        "menu_id": 19,
+        "name": "Entidades",
+        "icon": null,
+        "route": "/cadastros/entidades",
+        "position": 2,
+        "active": "Y"
+      },
+      {
+        "id": 22,
+        "menu_id": 19,
+        "name": "Funções/Papéis",
+        "icon": null,
+        "route": "/cadastros/funcoes",
+        "position": 3,
+        "active": "Y"
+      },
+      {
+        "id": 23,
+        "menu_id": 19,
+        "name": "Estados da Federação",
+        "icon": null,
+        "route": "/cadastros/estados",
+        "position": 4,
+        "active": "Y"
+      },
+      {
+        "id": 24,
+        "menu_id": 19,
+        "name": "Regiões do País",
+        "icon": null,
+        "route": "/cadastros/regioes",
+        "position": 5,
+        "active": "Y"
+      },
+      {
+        "id": 25,
+        "menu_id": null,
+        "name": "Exploração",
+        "icon": null,
+        "route": null,
+        "position": 8,
+        "active": "Y"
+      },
+      {
+        "id": 26,
+        "menu_id": null,
+        "name": "Notifications",
+        "icon": "cil-bell",
+        "route": "/notifications",
+        "position": 9,
+        "active": "Y"
+      },
+      {
+        "id": 27,
+        "menu_id": 26,
+        "name": "Alerts",
+        "icon": null,
+        "route": "/notifications/alerts",
+        "position": 1,
+        "active": "Y"
+      },
+      {
+        "id": 28,
+        "menu_id": 26,
+        "name": "Badges",
+        "icon": null,
+        "route": "/notifications/badges",
+        "position": 2,
+        "active": "Y"
+      },
+      {
+        "id": 29,
+        "menu_id": 26,
+        "name": "Modals",
+        "icon": null,
+        "route": "/notifications/modals",
+        "position": 3,
+        "active": "Y"
+      },
+      {
+        "id": 30,
+        "menu_id": 26,
+        "name": "Toasts",
+        "icon": null,
+        "route": "/notifications/toasts",
+        "position": 4,
+        "active": "Y"
+      },
+      {
+        "id": 31,
+        "menu_id": null,
+        "name": "Extras",
+        "icon": null,
+        "route": null,
+        "position": 10,
+        "active": "Y"
+      },
+      {
+        "id": 32,
+        "menu_id": null,
+        "name": "Pages",
+        "icon": "cil-star",
+        "route": "/pages",
+        "position": 11,
+        "active": "Y"
+      },
+      {
+        "id": 33,
+        "menu_id": 32,
+        "name": "Login",
+        "icon": null,
+        "route": "/pages/login",
+        "position": 1,
+        "active": "Y"
+      },
+      {
+        "id": 34,
+        "menu_id": 32,
+        "name": "Login System",
+        "icon": null,
+        "route": "/pages/loginsystem",
+        "position": 2,
+        "active": "Y"
+      },
+      {
+        "id": 35,
+        "menu_id": 32,
+        "name": "Register",
+        "icon": null,
+        "route": '/pages/register',
+        "position": 3,
+        "active": "Y"
+      },
+      {
+        "id": 36,
+        "menu_id": 32,
+        "name": "Forgot Password",
+        "icon": null,
+        "route": "/pages/forgotpassword",
+        "position": 4,
+        "active": "Y"
+      },
+      {
+        "id": 37,
+        "menu_id": 32,
+        "name": "Reset Password",
+        "icon": null,
+        "route": "/pages/resetpassword",
+        "position": 5,
+        "active": "Y"
+      },
+      {
+        "id": 38,
+        "menu_id": 32,
+        "name": "Error 404",
+        "icon": null,
+        "route": "/pages/404",
+        "position": 6,
+        "active": "Y"
+      },
+      {
+        "id": 39,
+        "menu_id": 32,
+        "name": "Error 500",
+        "icon": null,
+        "route": "/pages/500",
+        "position": 7,
+        "active": "Y"
+      }
+    ]
+  }
+}
+
+// Função para converter a estrutura da API para formato CoreUI
+function convertToCoreUIFormat(menus) {
+  const coreUiNavItems = [];
+  const menuMap = new Map();
   
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Time Picker',
-  //       href: 'https://coreui.io/vue/docs/forms/time-picker.html',
-  //       external: true,
-  //       badge: {
-  //         color: 'danger',
-  //         text: 'PRO',
-  //       },
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Layout',
-  //       to: '/forms/layout',
-  //     },
+  // Primeiro, mapear todos os menus por ID
+  menus.forEach(menu => {
+    menuMap.set(menu.id, menu);
+  });
   
-  //   component: 'CNavGroup',
-  //   name: 'Icons',
-  //   to: '/icons',
-  //   icon: 'cil-star',
-  //   items: [
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'CoreUI Icons',
-  //       to: '/icons/coreui-icons',
-  //       badge: {
-  //         color: 'info',
-  //         text: 'NEW',
-  //       },
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Brands',
-  //       to: '/icons/brands',
-  //     },
-  //     {
-  //       component: 'CNavItem',
-  //       name: 'Flags',
-  //       to: '/icons/flags',
-  //     },
-  //   ],
-  // },
-
-  {
-    component: 'CNavTitle',
-    name: 'Negócio',
-  },
-
-  // Inscrições
-  {
-    component: 'CNavGroup',
-    name: 'Inscrições',
-    to: '/inscricoes',
-    icon: 'cil-envelope-open',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'Inscrições',
-        to: '/inscricoes/inscricoes',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Pessoas',
-        to: '/inscricoes/pessoa',
-      },
-    ],
-  },  
-
-  // Hospedagem
-  {
-    component: 'CNavGroup',
-    name: 'Hospedagem',
-    to: '/hospedagem',
-    icon: 'cil-layers',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'Gestão de Hospedagem',
-        to: '/hospedagem/ghospedagem',
-      },
-      // {
-      //   component: 'CNavItem',
-      //   name: 'Hotéis v1',
-      //   to: '/hospedagem/hoteis1',
-      // },
-      {
-        component: 'CNavItem',
-        name: 'Hotéis e Quartos',
-        to: '/hospedagem/hoteis2',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Tipos de Quarto',
-        to: '/hospedagem/quartoTipos',
-      },
-    ],
-  },
-
-  // Transportes
-  {
-    component: 'CNavGroup',
-    name: 'Transportes',
-    to: '/transportes',
-    icon: 'cil-layers',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'Gestão de Chegadas',
-        to: '/transportes/chegadas',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Gestão de Partidas',
-        to: '/transportes/partidas',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Veículos e Motoristas',
-        to: '/transportes/rotasG',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Rotas',
-        to: '/transportes/rotas',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Viagens',
-        to: '/transportes/viagens',
-      },
-    ],
-  },
-
-  // Eventos
-  {
-    component: 'CNavGroup',
-    name: 'Eventos',
-    to: '/eventos',
-    icon: 'cil-envelope-open',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'Eventos',
-        to: '/inscricoes/eventos',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Eventos e Serviços',
-        to: '/inscricoes/eventosservicos',
-      },
-    ],
-  },  
-
-  // Cadastros
-  {
-    component: 'CNavGroup',
-    name: 'Cadastros',
-    to: '/cadastros',
-    icon: 'cil-list',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'Minha Organização',
-        to: '/cadastros/organizacoes',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Entidades',
-        to: '/cadastros/entidades',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Funções/Papéis',
-        to: '/cadastros/funcoes',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Estados da Federação',
-        to: '/cadastros/estados',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Regiões do País',
-        to: '/cadastros/regioes',
-      },
-    ],
-  },
-
-  {
-    component: 'CNavTitle',
-    name: 'Exploração',
-  },
-  {
-    component: 'CNavGroup',
-    name: 'Notifications',
-    to: '/notifications',
-    icon: 'cil-bell',
-    items: [
-      {
-        component: 'CNavItem',
-        name: 'Alerts',
-        to: '/notifications/alerts',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Badges',
-        to: '/notifications/badges',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Modals',
-        to: '/notifications/modals',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Toasts',
-        to: '/notifications/toasts',
-      },
-    ],
-  },
+  // Processar apenas menus raiz (menu_id = null)
+  const rootMenus = menus.filter(menu => menu.menu_id === null && menu.active === 'Y')
+                        .sort((a, b) => a.position - b.position);
   
-  // {
-  //   component: 'CNavItem',
-  //   name: 'Widgets',
-  //   to: '/widgets',
-  //   icon: 'cil-calculator',
-  //   badge: {
-  //     color: 'primary',
-  //     text: 'NEW',
-  //     shape: 'pill',
-  //   },
-  // },
-  {
-    component: 'CNavTitle',
-    name: 'Extras',
-  },
-  {
-    component: 'CNavGroup',
-    name: 'Pages',
-    to: '/pages',
-    icon: 'cil-star',
-    items: [
+  rootMenus.forEach(rootMenu => {
+    // Se não tem rota, é um título
+    if (!rootMenu.route) {
+      coreUiNavItems.push({
+        component: 'CNavTitle',
+        name: rootMenu.name
+      });
+    } 
+    // Se tem filhos, é um grupo
+    else {
+      const childMenus = menus.filter(menu => menu.menu_id === rootMenu.id && menu.active === 'Y')
+                             .sort((a, b) => a.position - b.position);
+      
+      if (childMenus.length > 0) {
+        // CNavGroup com subitens
+        const group = {
+          component: 'CNavGroup',
+          name: rootMenu.name,
+          to: rootMenu.route,
+          icon: rootMenu.icon,
+          items: childMenus.map(child => ({
+            component: 'CNavItem',
+            name: child.name,
+            to: child.route,
+            icon: child.icon
+          }))
+        };
+        
+        coreUiNavItems.push(group);
+      } else {
+        // CNavItem simples
+        const item = {
+          component: 'CNavItem',
+          name: rootMenu.name,
+          to: rootMenu.route,
+          icon: rootMenu.icon
+        };
+        
+        if (rootMenu.badge) {
+          item.badge = rootMenu.badge;
+        }
+        
+        coreUiNavItems.push(item);
+      }
+    }
+  });
+  
+  return coreUiNavItems;
+}
+
+// Função principal para obter menus
+function getMenusFromJWT() {
+  try {
+
+    // TODO
+    // Terminar aqui
+    // integrar com nosso useToken e todos demais
+    // fazer função para obter no token os menus
+
+    // Tenta obter do JWT primeiro
+    // const token = getAuthToken();
+        
+    // if (token) {
+    //   const decoded = jwtDecode(token);
+    //   if (decoded.menus) {
+    //     return convertToCoreUIFormat(decoded.menus);
+    //   }
+    // }    
+
+    // Tenta obter do localStorage
+    if (typeof localStorage !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      if (token) return token;
+    }
+
+    // Tenta obter de sessionStorage
+    if (typeof sessionStorage !== 'undefined') {
+      const token = sessionStorage.getItem('auth_token');
+      if (token) return token;
+    }
+
+    // Tenta obter do JWT primeiro
+    // const token = localStorage.getItem('auth_token') || Cookies.get('auth_token');
+    // if (token) {
+    //   const decoded = jwtDecode(token);
+    //   if (decoded.menus) {
+    //     return convertToCoreUIFormat(decoded.menus);
+    //   }
+    // }
+    
+    // Fallback para dados simulados (para desenvolvimento)
+    console.warn('Usando menus simulados - JWT não encontrado ou sem menus');
+    const simulatedData = getSimulatedMenus();
+    // return convertToCoreUIFormat(simulatedData.menus);
+    return convertToCoreUIFormat(simulatedMenus.menus);
+    
+  } catch (error) {
+    console.error('Erro ao carregar menus:', error);
+    
+    // Fallback mínimo em caso de erro
+    return [
       {
         component: 'CNavItem',
-        name: 'Login',
-        to: '/pages/login',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Login System',
-        to: '/pages/loginsystem',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Register',
-        to: '/pages/register',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Forgot Password',
-        to: '/pages/forgotpassword',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Reset Password',
-        to: '/pages/resetpassword',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Error 404',
-        to: '/pages/404',
-      },
-      {
-        component: 'CNavItem',
-        name: 'Error 500',
-        to: '/pages/500',
-      },
-    ],
-  },
-]
+        name: 'Dashboard',
+        to: '/dashboard',
+        icon: 'cil-speedometer'
+      }
+    ];
+  }
+}
+
+// Exportar os menus
+export default getMenusFromJWT();

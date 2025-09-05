@@ -1,0 +1,359 @@
+{
+      "menus": [
+        {
+          "id": 1,
+          "menu_id": null,
+          "name": "Dashboard",
+          "icon": "cil-speedometer",
+          "route": "/dashboard",
+          "position": 1,
+          "active": "Y",
+          "badge": {
+            "color": "primary",
+            "text": "NEW"
+          }
+        },
+        {
+          "id": 2,
+          "menu_id": null,
+          "name": "Negócio",
+          "icon": null,
+          "route": null,
+          "position": 2,
+          "active": "Y"
+        },
+        {
+          "id": 3,
+          "menu_id": null,
+          "name": "Inscrições",
+          "icon": "cil-envelope-open",
+          "route": "/inscricoes",
+          "position": 3,
+          "active": "Y"
+        },
+        {
+          "id": 4,
+          "menu_id": 3,
+          "name": "Inscrições",
+          "icon": null,
+          "route": "/inscricoes/inscricoes",
+          "position": 1,
+          "active": "Y"
+        },
+        {
+          "id": 5,
+          "menu_id": 3,
+          "name": "Pessoas",
+          "icon": null,
+          "route": "/inscricoes/pessoa",
+          "position": 2,
+          "active": "Y"
+        },
+        {
+          "id": 6,
+          "menu_id": null,
+          "name": "Hospedagem",
+          "icon": "cil-layers",
+          "route": "/hospedagem",
+          "position": 4,
+          "active": "Y"
+        },
+        {
+          "id": 7,
+          "menu_id": 6,
+          "name": "Gestão de Hospedagem",
+          "icon": null,
+          "route": "/hospedagem/ghospedagem",
+          "position": 1,
+          "active": "Y"
+        },
+        {
+          "id": 8,
+          "menu_id": 6,
+          "name": "Hotéis e Quartos",
+          "icon": null,
+          "route": "/hospedagem/hoteis2",
+          "position": 2,
+          "active": "Y"
+        },
+        {
+          "id": 9,
+          "menu_id": 6,
+          "name": "Tipos de Quarto",
+          "icon": null,
+          "route": "/hospedagem/quartoTipos",
+          "position": 3,
+          "active": "Y"
+        },
+        {
+          "id": 10,
+          "menu_id": null,
+          "name": "Transportes",
+          "icon": "cil-layers",
+          "route": "/transportes",
+          "position": 5,
+          "active": "Y"
+        },
+        {
+          "id": 11,
+          "menu_id": 10,
+          "name": "Gestão de Chegadas",
+          "icon": null,
+          "route": "/transportes/chegadas",
+          "position": 1,
+          "active": "Y"
+        },
+        {
+          "id": 12,
+          "menu_id": 10,
+          "name": "Gestão de Partidas",
+          "icon": null,
+          "route": "/transportes/partidas",
+          "position": 2,
+          "active": "Y"
+        },
+        {
+          "id": 13,
+          "menu_id": 10,
+          "name": "Veículos e Motoristas",
+          "icon": null,
+          "route": "/transportes/rotasG",
+          "position": 3,
+          "active": "Y"
+        },
+        {
+          "id": 14,
+          "menu_id": 10,
+          "name": "Rotas",
+          "icon": null,
+          "route": "/transportes/rotas",
+          "position": 4,
+          "active": "Y"
+        },
+        {
+          "id": 15,
+          "menu_id": 10,
+          "name": "Viagens",
+          "icon": null,
+          "route": "/transportes/viagens",
+          "position": 5,
+          "active": "Y"
+        },
+        {
+          "id": 16,
+          "menu_id": null,
+          "name": "Eventos",
+          "icon": "cil-envelope-open",
+          "route": "/eventos",
+          "position": 6,
+          "active": "Y"
+        },
+        {
+          "id": 17,
+          "menu_id": 16,
+          "name": "Eventos",
+          "icon": null,
+          "route": "/inscricoes/eventos",
+          "position": 1,
+          "active": "Y"
+        },
+        {
+          "id": 18,
+          "menu_id": 16,
+          "name": "Eventos e Serviços",
+          "icon": null,
+          "route": "/inscricoes/eventosservicos",
+          "position": 2,
+          "active": "Y"
+        },
+        {
+          "id": 19,
+          "menu_id": null,
+          "name": "Cadastros",
+          "icon": "cil-list",
+          "route": "/cadastros",
+          "position": 7,
+          "active": "Y"
+        },
+        {
+          "id": 20,
+          "menu_id": 19,
+          "name": "Minha Organização",
+          "icon": null,
+          "route": "/cadastros/organizacoes",
+          "position": 1,
+          "active": "Y"
+        },
+        {
+          "id": 21,
+          "menu_id": 19,
+          "name": "Entidades",
+          "icon": null,
+          "route": "/cadastros/entidades",
+          "position": 2,
+          "active": "Y"
+        },
+        {
+          "id": 22,
+          "menu_id": 19,
+          "name": "Funções/Papéis",
+          "icon": null,
+          "route": "/cadastros/funcoes",
+          "position": 3,
+          "active": "Y"
+        },
+        {
+          "id": 23,
+          "menu_id": 19,
+          "name": "Estados da Federação",
+          "icon": null,
+          "route": "/cadastros/estados",
+          "position": 4,
+          "active": "Y"
+        },
+        {
+          "id": 24,
+          "menu_id": 19,
+          "name": "Regiões do País",
+          "icon": null,
+          "route": "/cadastros/regioes",
+          "position": 5,
+          "active": "Y"
+        },
+        {
+          "id": 25,
+          "menu_id": null,
+          "name": "Exploração",
+          "icon": null,
+          "route": null,
+          "position": 8,
+          "active": "Y"
+        },
+        {
+          "id": 26,
+          "menu_id": null,
+          "name": "Notifications",
+          "icon": "cil-bell",
+          "route": "/notifications",
+          "position": 9,
+          "active": "Y"
+        },
+        {
+          "id": 27,
+          "menu_id": 26,
+          "name": "Alerts",
+          "icon": null,
+          "route": "/notifications/alerts",
+          "position": 1,
+          "active": "Y"
+        },
+        {
+          "id": 28,
+          "menu_id": 26,
+          "name": "Badges",
+          "icon": null,
+          "route": "/notifications/badges",
+          "position": 2,
+          "active": "Y"
+        },
+        {
+          "id": 29,
+          "menu_id": 26,
+          "name": "Modals",
+          "icon": null,
+          "route": "/notifications/modals",
+          "position": 3,
+          "active": "Y"
+        },
+        {
+          "id": 30,
+          "menu_id": 26,
+          "name": "Toasts",
+          "icon": null,
+          "route": "/notifications/toasts",
+          "position": 4,
+          "active": "Y"
+        },
+        {
+          "id": 31,
+          "menu_id": null,
+          "name": "Extras",
+          "icon": null,
+          "route": null,
+          "position": 10,
+          "active": "Y"
+        },
+        {
+          "id": 32,
+          "menu_id": null,
+          "name": "Pages",
+          "icon": "cil-star",
+          "route": "/pages",
+          "position": 11,
+          "active": "Y"
+        },
+        {
+          "id": 33,
+          "menu_id": 32,
+          "name": "Login",
+          "icon": null,
+          "route": "/pages/login",
+          "position": 1,
+          "active": "Y"
+        },
+        {
+          "id": 34,
+          "menu_id": 32,
+          "name": "Login System",
+          "icon": null,
+          "route": "/pages/loginsystem",
+          "position": 2,
+          "active": "Y"
+        },
+        {
+          "id": 35,
+          "menu_id": 32,
+          "name": "Register",
+          "icon": null,
+          "route": "/pages/register",
+          "position": 3,
+          "active": "Y"
+        },
+        {
+          "id": 36,
+          "menu_id": 32,
+          "name": "Forgot Password",
+          "icon": null,
+          "route": "/pages/forgotpassword",
+          "position": 4,
+          "active": "Y"
+        },
+        {
+          "id": 37,
+          "menu_id": 32,
+          "name": "Reset Password",
+          "icon": null,
+          "route": "/pages/resetpassword",
+          "position": 5,
+          "active": "Y"
+        },
+        {
+          "id": 38,
+          "menu_id": 32,
+          "name": "Error 404",
+          "icon": null,
+          "route": "/pages/404",
+          "position": 6,
+          "active": "Y"
+        },
+        {
+          "id": 39,
+          "menu_id": 32,
+          "name": "Error 500",
+          "icon": null,
+          "route": "/pages/500",
+          "position": 7,
+          "active": "Y"
+        }
+      ]
+    }
