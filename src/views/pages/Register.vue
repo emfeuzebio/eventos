@@ -93,6 +93,7 @@ import { useI18n } from 'vue-i18n';
 const appId = import.meta.env.VITE_APP_ID;
 const appName = import.meta.env.VITE_APP_NAME;
 const appVersion = import.meta.env.VITE_APP_VERSION;
+const aclURL = import.meta.env.VITE_API_ACL_URL; // https://facl4.azcomphp.com.br/
 
 const username = ref('');
 const email = ref('');
@@ -125,17 +126,14 @@ const handleRegister = async () => {
    error.value = null;
    try {
       // const response = await api.post('/auth/register', {
-      const response = await api.post(
-         'https://acl4.fazcomphp.com.br/api/auth/register',
-         {
-            name: username.value,
-            email: email.value,
-            password: password.value,
-            password_confirmation: password_confirmation.value,
-            active: 'N',
-            system_id: appId, // Id do Site de Eventos VITE_APP_ID
-         }
-      );
+      const response = await api.post(aclURL + 'api/auth/register', {
+         name: username.value,
+         email: email.value,
+         password: password.value,
+         password_confirmation: password_confirmation.value,
+         active: 'N',
+         system_id: appId, // Id do Site de Eventos VITE_APP_ID
+      });
 
       // console.log('Registro OK:', response)
       // TODO terminar, criar o token usuário mas mostra erro sempre a pesar do sucesso create 201

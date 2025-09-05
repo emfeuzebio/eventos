@@ -13,10 +13,8 @@ const apiURL = import.meta.env.VITE_API_BASE_URL; // https://apieventos.fazcomph
 
 const api = axios.create({
    // baseURL: import.meta.env.VITE_API_BASE_URL || 'https://sua-api.com/api',
-   // baseURL: 'https://acl4.fazcomphp.com.br/api',
 
    // caso usuário já autenticado getIssuer() retorna a URL que ele tem acesso, senão vai para URL padrão de login
-   // baseURL: ( getIssuer() ?? 'https://acl4.fazcomphp.com.br' ) + '/api/',
 
    // TODO o backend está colocando no Issuer a URL dp site, mas deve colocar a URL da API
    // como abaixo. Estou forçando abaixo, mas o backend deve corrigir isso.

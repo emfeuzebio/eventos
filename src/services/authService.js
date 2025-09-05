@@ -4,6 +4,8 @@ import { jwtDecode } from 'jwt-decode'
 import api from './api'
 import { useUserStore } from '@/stores/userStore'
 
+const aclURL = import.meta.env.VITE_API_ACL_URL; // Prod https://acl4.fazcomphp.com.br/
+
 /**
  * Armazena o token JWT
  */
@@ -39,7 +41,7 @@ export async function logout() {
     // console.log('authService.js logout()')
 
     // const response = await api.post('/auth/logout')
-    const response = await api.post('https://acl4.fazcomphp.com.br/api/auth/logout')
+    const response = await api.post(aclURL + 'api/auth/logout')
     const userStore = useUserStore()
     removeToken()
 

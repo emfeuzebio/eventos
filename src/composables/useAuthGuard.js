@@ -11,9 +11,11 @@ export async function checkAuthBeforeSensitiveAction() {
     return false
   }
 
+  const aclURL = import.meta.env.VITE_API_ACL_URL; // https://acl4.azcomphp.com.br/
+
   // Validação de Autenticação no backend (evita tokens expirados ou revogados)
   try {
-    await api.get('https://acl4.fazcomphp.com.br/api/auth/isTokenValid') // deve estar protegido com auth middleware
+    await api.get(aclURL + 'api/auth/isTokenValid') // deve estar protegido com auth middleware
     return true
   } catch (error) {
     handleExpiredToken()

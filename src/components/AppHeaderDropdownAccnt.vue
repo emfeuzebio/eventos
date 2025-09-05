@@ -8,7 +8,7 @@
             size="md"
             width="40"
             height="50"
-            onerror="this.src='https://acl4.fazcomphp.com.br/storage/users/avatar.jpg'"
+            onerror="this.src=aclURL.value"
          />
       </CDropdownToggle>
       <CDropdownMenu class="pt-0">
@@ -141,7 +141,7 @@
                         variant="outline"
                      >
                         <CIcon icon="cil-task" class="me-1" />
-                        Remover Foto
+                        Excluir Foto
                      </CButton>
                   </div>
                </div>
@@ -418,7 +418,11 @@ const avatar = computed(() => {
       : urlFotos.value + 'storage/users/avatar.jpg';
 });
 
-const urlFotos = ref('https://acl4.fazcomphp.com.br/');
+// URL da ACL do Sistema
+const aclURL = ref(import.meta.env.VITE_API_ACL_URL); // Prod https://acl4.fazcomphp.com.br/
+// const aclURL = ref('http://localhost:13000/'); // Dev http://localhost:13000/
+
+const urlFotos = ref(aclURL);
 const previewFoto = ref(userStore.photo || null);
 
 // Modal visibilidade
@@ -511,7 +515,7 @@ const salvarNovaSenha = async () => {
 
       // Salva a photo via axios diretamente (axios suporta multipart/form-data nativamente)
       const { data } = await axios.post(
-         'https://acl4.fazcomphp.com.br/api/user/changepassword',
+         aclURL.value + 'api/user/changepassword',
          {
             senhaAtual: formAlterarSenha.value.senhaAtual,
             novaSenha: formAlterarSenha.value.novaSenha,
@@ -608,7 +612,7 @@ const salvarConta = async () => {
 
       // Salva a photo via axios diretamente (axios suporta multipart/form-data nativamente)
       const { data } = await axios.post(
-         'https://acl4.fazcomphp.com.br/api/user/update',
+         aclURL.value + 'api/user/update',
          {
             name: form.value.nome,
             email: form.value.email,
@@ -666,8 +670,8 @@ const removerFoto = async () => {
 
       // Para REMOVER a foto (envie como JSON, não como FormData)
       const { data } = await axios.post(
-         'https://acl4.fazcomphp.com.br/api/user/updatephoto',
-         { photo: null },
+         aclURL.value + 'api/user/updatephoto',
+         { photo: null, removerFoto: true },
          {
             headers: {
                'Content-Type': 'application/json',
@@ -678,7 +682,12 @@ const removerFoto = async () => {
 
       // Atualiza apenas a foto no store
       userStore.$patch({
-         photo: data.photo,
+         photo: data.user.photo,
+      });
+
+      showToast({
+         title: 'Sucesso',
+         message: data.message,
       });
 
       // Atualiza o preview para a foto padrão
@@ -715,7 +724,7 @@ const salvarNovaFoto = async () => {
    try {
       const token = getToken();
       const { data } = await axios.post(
-         'https://acl4.fazcomphp.com.br/api/user/updatephoto',
+         aclURL.value + 'api/user/updatephoto',
          payload,
          {
             headers: {
@@ -727,7 +736,7 @@ const salvarNovaFoto = async () => {
 
       // Atualiza apenas a foto no store
       userStore.$patch({
-         photo: data.photo,
+         photo: data.user.photo,
       });
    } catch (error) {
       if (error.response?.status === 401) {

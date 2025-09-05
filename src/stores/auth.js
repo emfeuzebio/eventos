@@ -5,6 +5,8 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
+const aclURL = import.meta.env.VITE_API_ACL_URL;   // https://acl4.fazcomphp.com.br/
+
 export const useAuthStore = defineStore('auth', {
    state: () => ({
       token: localStorage.getItem('token') || null,
@@ -17,7 +19,7 @@ export const useAuthStore = defineStore('auth', {
    actions: {
       async login(email, password) {
          const res = await fetch(
-            'https://acl4.fazcomphp.com.br/api/auth/login',
+            aclURL + 'api/auth/login',
             {
                method: 'POST',
                headers: { 'Content-Type': 'application/json' },
@@ -43,7 +45,7 @@ export const useAuthStore = defineStore('auth', {
          this.token = null;
          this.user = null;
          const response = await api.get(
-            'https://acl4.fazcomphp.com.br/api/auth/logout'
+            aclURL + 'api/auth/logout'
          );
          localStorage.removeItem('token');
          localStorage.removeItem('user')

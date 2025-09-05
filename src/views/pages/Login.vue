@@ -125,6 +125,7 @@ import { useI18n } from 'vue-i18n';
 const appId = import.meta.env.VITE_APP_ID;
 const appName = import.meta.env.VITE_APP_NAME;
 const appVersion = import.meta.env.VITE_APP_VERSION;
+const aclURL = import.meta.env.VITE_API_ACL_URL; // Prod https://acl4.fazcomphp.com.br/
 
 const email = ref('');
 const userName = ref('');
@@ -167,14 +168,11 @@ const handleLogin = async () => {
    try {
       // 1. Obter novo token específico do sistema
       // const response = await api.post('/auth/login', {
-      const response = await api.post(
-         'https://acl4.fazcomphp.com.br/api/auth/login',
-         {
-            email: email.value,
-            password: password.value,
-            systemId: appId,
-         }
-      );
+      const response = await api.post(aclURL + 'api/auth/login', {
+         email: email.value,
+         password: password.value,
+         systemId: appId,
+      });
 
       // 2. armazena o token
       setToken(response.data.token);
