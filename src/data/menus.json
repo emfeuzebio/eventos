@@ -3,7 +3,7 @@
         {
           "id": 1,
           "menu_id": null,
-          "name": "Dashboard",
+          "name": "Dashboard JSON Dev Local",
           "icon": "cil-speedometer",
           "route": "/dashboard",
           "position": 1,

@@ -16,6 +16,7 @@ export const useUserStore = defineStore('user', {
     roles: [],
     abilities: [],
     profiles: [],
+    menus: [],
     userId: null
   }),
   actions: {
@@ -40,6 +41,7 @@ export const useUserStore = defineStore('user', {
       this.roles = decoded.user_roles || []
       this.abilities = decoded.user_abilities || []
       this.profiles = decoded.user_profiles || []
+      this.menus = decoded.user_menus || []
     },
     clear() {
       this.token = null
@@ -52,6 +54,7 @@ export const useUserStore = defineStore('user', {
       this.roles = []
       this.abilities = []
       this.profiles = []
+      this.menus = []
     },
   },
   getters: {

@@ -7,6 +7,13 @@ import { useUserStore } from '@/stores/userStore'
 const aclURL = import.meta.env.VITE_API_ACL_URL; // Prod https://acl4.fazcomphp.com.br/
 
 /**
+ * Recupera a Lista de Menus do User que estão no paylodas do token JWT
+ */
+export function getMenus() {
+  localStorage.getItem('menus')
+}
+
+/**
  * Armazena o token JWT
  */
 export function setToken(token) {
@@ -112,6 +119,19 @@ export function getUserNameFromToken() {
   } catch (e) {
     console.error('Erro ao decodificar o token:', e)
     return null
+  }
+}
+
+/**
+ * Retorna os menus concedidos ao usuário segundo seu partir de acesso
+ */
+export function getUserMenusFromToken() {
+  try {
+    const decoded = decodeToken();
+    return Array.isArray(decoded?.user_menus) ? decoded.user_menus : [];
+  } catch (e) {
+    console.error('Erro ao decodificar o token:', e);
+    return [];
   }
 }
 
