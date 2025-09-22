@@ -45,24 +45,29 @@ export function removeToken() {
  */
 export async function logout() { 
   try {
-    // console.log('authService.js logout()')
+    // Primeiro: limpar dados locais IMEDIATAMENTE
+    const userStore = useUserStore()    
 
-    // const response = await api.post('/auth/logout')
-    const response = await api.post(aclURL + 'api/auth/logout')
-    const userStore = useUserStore()
-    removeToken()
-
-    // Limpa localStorage manual (por precaução, se persistência não estiver em todos os stores)
+    // Limpar TUDO do localStorage (incluindo menus)
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     localStorage.removeItem('currentEvent')
     localStorage.removeItem('eventos')
+    localStorage.removeItem('menus') // ← ESSENCIAL: limpar menus
+    
+    // Limpar a store completamente
+    userStore.clear()    
 
-    userStore.clear()
-  } catch (e) {
-    // console.error('Erro ao revogar o token:', e)
+    // SÓ DEPOIS fazer request para logout na API
+    // (não bloquear logout por falha na API)
+    const response = await api.post(aclURL + 'api/auth/logout')
+    
+    return response    
+
+  } catch (error) {
+    console.error('Erro no logout:', error);
     return null
-  }
+  } 
 }
 
 /**

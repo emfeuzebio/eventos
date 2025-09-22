@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { jwtDecode } from 'jwt-decode';
 import { useEventosStore } from './useEventosStore'
+import { useUserStore } from '@/stores/userStore'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -18,6 +19,11 @@ export const useAuthStore = defineStore('auth', {
    },
    actions: {
       async login(email, password) {
+
+         // PRIMEIRO: limpar menus antigos
+         const userStore = useUserStore()
+         userStore.menus = []  // ← Limpar menus antes do login      
+
          const res = await fetch(
             aclURL + 'api/auth/login',
             {
