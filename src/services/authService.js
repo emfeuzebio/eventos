@@ -128,7 +128,7 @@ export function getUserNameFromToken() {
 }
 
 /**
- * Retorna os menus concedidos ao usuário segundo seu partir de acesso
+ * Retorna os menus concedidos ao usuário segundo seu perfil de acesso
  */
 export function getUserMenusFromToken() {
   try {

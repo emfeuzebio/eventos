@@ -1,10 +1,12 @@
+// src/stores/userStore.js
 import { defineStore } from 'pinia'
-import { decodeToken, getToken } from '@/services/authService'
+import { decodeToken, getToken, removeToken } from '@/services/authService'
 
 export const useUserStore = defineStore('user', {
 
   persist: true, // ou configure como { storage: localStorage, ... }
-    
+
+  // Estado do usuário
   state: () => ({
     token: null,
     name: null,
@@ -55,12 +57,16 @@ export const useUserStore = defineStore('user', {
         this.systems = decoded.user_systems || []
         this.userId = decoded.user_id || null
         this.name = decoded.user_name
+        this.email = decoded.user_email || null
         this.photo = decoded.user_photo || null
         this.phone = decoded.user_phone || null
         this.roles = decoded.user_roles || []
         this.abilities = decoded.user_abilities || []
         this.profiles = decoded.user_profiles || []
         this.menus = decoded.user_menus || []
+        this.lastUpdate = Date.now()
+
+        return true
 
       } catch (error) {
         console.error('Erro ao decodificar token:', error)
@@ -75,9 +81,9 @@ export const useUserStore = defineStore('user', {
       this.systems = []
       this.userId = null
       this.name = null
+      this.email = null
       this.photo = null
       this.phone = null
-      this.email = null
       this.roles = []
       this.abilities = []
       this.profiles = []
@@ -89,6 +95,8 @@ export const useUserStore = defineStore('user', {
 
       // REMOVER COMPLETAMENTE do localStorage - SOLUÇÃO DIRETA
       localStorage.removeItem('user')      
+
+      console.log('✅ UserStore limpa com sucesso')
 
       // Forçar atualização imediata da UI
       this.$patch({})  // Isso força a reactividade do Pinia
