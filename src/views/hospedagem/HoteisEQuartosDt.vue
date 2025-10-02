@@ -536,6 +536,7 @@ const dtConfig = {
    responsive: true,
    serverSide: false, // Se usar paginação do Laravel, mude para true
    processing: false, // para ativer o "Carregando..." do DataTables
+   renderer: 'bootstrap', // integra com Bootstrap 5 corretamente
    order: [],
    rowId: 'id',
    dataSrc: '', // se a resposta for um array simples, use ''

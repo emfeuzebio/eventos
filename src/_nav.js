@@ -1,36 +1,27 @@
-// import userMenus from '@/data/menus.json';              // carrega Menus para simular resposta JSON da API com a lista de menus
-import { getUserMenusFromToken } from '@/services/authService'; // o service extrai os Menus contidos no JWT
+// src/_nav.js
+import { getUserMenusFromToken } from '@/services/authService'
 
-// Função para converter a estrutura da API para formato CoreUI
+// Converte menus do JWT para CoreUI
 function convertToCoreUIFormat(menus) {
-  const coreUiNavItems = [];
-  const menuMap = new Map();
+  const coreUiNavItems = []
+  const menuMap = new Map()
   
-  // Primeiro, mapear todos os menus por ID
-  menus.forEach(menu => {
-    menuMap.set(menu.id, menu);
-  });
+  menus.forEach(menu => menuMap.set(menu.id, menu))
   
-  // Processar apenas menus raiz (menu_id = null)
-  const rootMenus = menus.filter(menu => menu.menu_id === null && menu.active === 'Y')
-                        .sort((a, b) => a.position - b.position);
+  const rootMenus = menus
+    .filter(menu => menu.menu_id === null && menu.active === 'Y')
+    .sort((a, b) => a.position - b.position)
   
   rootMenus.forEach(rootMenu => {
-    // Se não tem rota, é um título
     if (!rootMenu.route) {
-      coreUiNavItems.push({
-        component: 'CNavTitle',
-        name: rootMenu.name
-      });
-    } 
-    // Se tem filhos, é um grupo
-    else {
-      const childMenus = menus.filter(menu => menu.menu_id === rootMenu.id && menu.active === 'Y')
-                             .sort((a, b) => a.position - b.position);
+      coreUiNavItems.push({ component: 'CNavTitle', name: rootMenu.name })
+    } else {
+      const childMenus = menus
+        .filter(menu => menu.menu_id === rootMenu.id && menu.active === 'Y')
+        .sort((a, b) => a.position - b.position)
       
       if (childMenus.length > 0) {
-        // CNavGroup com subitens
-        const group = {
+        coreUiNavItems.push({
           component: 'CNavGroup',
           name: rootMenu.name,
           to: rootMenu.route,
@@ -39,54 +30,34 @@ function convertToCoreUIFormat(menus) {
             component: 'CNavItem',
             name: child.name,
             to: child.route,
-            icon: child.icon
-          }))
-        };
-        
-        coreUiNavItems.push(group);
+            icon: child.icon,
+          })),
+        })
       } else {
-        // CNavItem simples
         const item = {
           component: 'CNavItem',
           name: rootMenu.name,
           to: rootMenu.route,
-          icon: rootMenu.icon
-        };
-        
-        if (rootMenu.badge) {
-          item.badge = rootMenu.badge;
+          icon: rootMenu.icon,
         }
-        
-        coreUiNavItems.push(item);
+        if (rootMenu.badge) item.badge = rootMenu.badge
+        coreUiNavItems.push(item)
       }
     }
-  });
+  })
   
-  return coreUiNavItems;
+  return coreUiNavItems
 }
 
-// Função principal para obter menus
-function getMenusFromJWT() {
+// ✅ Função que retorna menus do usuário
+export function getNavMenus() {
   try {
-    const userMenus = getUserMenusFromToken();
-    // console.log('userMenus', userMenus);
-
-    // Converte para o formato do CoreUI
-    return convertToCoreUIFormat(userMenus);
-  } catch (error) {
-    console.error('Erro ao carregar menus a partir do JWT:', error);
-    
-    // Fallback. Menus mínimo em caso de erro
+    const userMenus = getUserMenusFromToken()
+    return convertToCoreUIFormat(userMenus)
+  } catch (err) {
+    console.error('Erro ao carregar menus do JWT', err)
     return [
-      {
-        component: 'CNavItem',
-        name: 'Dashboard',
-        to: '/dashboard',
-        icon: 'cil-speedometer'
-      }
-    ];
+      { component: 'CNavItem', name: 'Dashboard', to: '/dashboard', icon: 'cil-speedometer' }
+    ]
   }
 }
-
-// Exportar os menus
-export default getMenusFromJWT();

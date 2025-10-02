@@ -1,3 +1,4 @@
+// src/App.vue
 <script setup>
 import { onBeforeMount } from 'vue';
 import { useColorModes } from '@coreui/vue';
