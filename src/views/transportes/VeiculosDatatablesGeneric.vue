@@ -110,7 +110,7 @@ const filters = computed(() => [
 <template>
    <GenericCrud
       title="Cadastro de Veículos "
-      description="Gerenciamento da frota de Veículos e seus respectivos motorista"
+      description=" - Gerenciamento da frota de Veículos e seus respectivos motoristas. <br>Usuários <b>Gerentes de Transportes</b> podem incluir, editar, excluir e desativar Veículos."
       endpoint="veiculo"
       :filters="filters"
       :columns="columns"

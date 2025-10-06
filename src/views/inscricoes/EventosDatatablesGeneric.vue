@@ -6,7 +6,7 @@
       ref="crudRef"
       modalSize="lg"
       title="Cadastro de Eventos "
-      description="Gerenciamento do cadastro de Eventos"
+      description=" - Administração de Eventos. <br>A atualização dos dados é exclusiva para usuários Administradores de Eventos."
       endpoint="evento"
       :filters="filters"
       :columns="columns"

@@ -143,8 +143,8 @@ const rotaNomeInput = ref(null);
    <!-- {{ rotas }} -->
 
    <GenericCrud
-      title="Lista de Rotas de Viagens "
-      description="Gerenciamento de Rotas de Viagens"
+      title="Lista de Rotas de Viagens"
+      description=" - Gerenciamento de Rotas de Viagens. <br>Usuários <b>Gerentes de Transportes</b> podem incluir, editar, excluir e desativar Rotas."
       endpoint="rota"
       :filters="filters"
       :columns="columns"

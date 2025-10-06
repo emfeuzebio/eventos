@@ -1,9 +1,9 @@
 <template>
    <!-- DataTables principal do CRUD -->
    <GenericCrud
-      title="Lista de Eventos"
+      title="Lista de Eventos e seus Serviços"
+      description=" - Administração de Eventos e os Serviços que oferece a cada dia. <br>A atualização dos dados é exclusiva para usuários Administradores de Eventos."
       modalSize="lg"
-      description="Gerenciamento de Eventos e seus Serviços por dia"
       endpoint="evento"
       :filters="filters"
       :columns="columns"

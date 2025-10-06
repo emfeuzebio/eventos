@@ -42,13 +42,19 @@ function chamarRefresh() {
  */
 const columns = [
    { title: 'ID', data: 'id', width: '30px' },
-   { title: 'Nome do Estado', data: 'descricao', class: 'fw-bold' },
-   { title: 'Sigla', data: 'sigla' },
+   {
+      title: 'Nome do Estado',
+      data: 'descricao',
+      class: 'fw-bold',
+      width: 'auto',
+   },
+   { title: 'Sigla', data: 'sigla', className: 'text-center', width: '30px' },
    {
       title: 'Região',
       data: 'regiao.descricao',
       render: (data) => `${data} `,
       className: 'text-left',
+      width: '160px',
    },
 ];
 

@@ -240,7 +240,7 @@ const salvarRegiao = async () => {
    <GenericCrud
       ref="crudRef"
       title="Cadastro de Pessoas "
-      description="Gerenciamento do cadastro de Pessoas inscritas no Evento Atual ou em algum Evento anterior"
+      description=" - Gerenciamento do cadastro de Pessoas inscritas no Evento Atual ou em algum Evento anterior. <br>Usuários <b>Gerentes de Secretaria</b> podem incluir, editar e desativar pessoas."
       endpoint="pessoa"
       :filters="filters"
       :columns="columns"
@@ -333,5 +333,4 @@ const salvarRegiao = async () => {
          </div>
       </template>
    </GenericCrud>
-
 </template>

@@ -314,7 +314,9 @@ const salvarRegiao = async () => {
       modalSize="xxl"
       modalFullscreen="fullscreen"
       title="Cadastro de Inscrições "
-      description="Gerenciamento do cadastro de Inscrições de Pessoas em Eventos"
+      description=" - Gerenciamento do cadastro de Inscrições de Pessoas em Eventos.
+         <br>Usuários <b>Gerentes de Secretaria</b> podem incluir, editar, excluir e desativar inscrições. 
+         <br>Usuários da <b>Equipe de Secretaria</b> podem editar campos específicos das inscrições."
       endpoint="inscricao"
       :filters="filters"
       :columns="columns"
@@ -335,19 +337,12 @@ const salvarRegiao = async () => {
          <!-- {{ estados }} -->
 
          <CCard>
-            <CCardHeader
-               ><CCardTitle>Ficha de Inscrição</CCardTitle></CCardHeader
-            >
-            <CAlert color="info" style="margin: 16px"
-               >Resize your browser to show the responsive offcanvas
-               toggle.</CAlert
-            >
-
             <CCardBody>
+               <!-- Identificação da Inscrição -->
                <CAccordion :active-item-key="1" always-open>
                   <CAccordionItem :item-key="1">
                      <CAccordionHeader>
-                        <strong>Identificação da Inscrição </strong> somente
+                        <strong>Identificação da Inscrição</strong> - somente
                         poderá ser enviada com o preenchimento de todos os
                         campos e informações.</CAccordionHeader
                      >
@@ -362,7 +357,7 @@ const salvarRegiao = async () => {
                               <CFormSelect
                                  v-model="form.value.evento_id"
                                  :options="[
-                                    { value: '', label: 'Selecione' },
+                                    { value: '', label: 'Selecione o Evento' },
                                     ...eventos.map((evento) => ({
                                        value: evento.id,
                                        label: evento.sigla,
@@ -382,13 +377,13 @@ const salvarRegiao = async () => {
                         <CRow class="form-group" style="margin-top: 16px">
                            <CFormLabel
                               class="col-sm-3 form-label fw-bold text-end"
-                              >Pessoa</CFormLabel
+                              >Nome do(a) Participante</CFormLabel
                            >
                            <CCol sm="4">
                               <CFormSelect
                                  v-model="form.value.pessoa_id"
                                  :options="[
-                                    { value: '', label: 'Selecione' },
+                                    { value: '', label: 'Selecione a Pessoa' },
                                     ...pessoas.map((pessoa) => ({
                                        value: pessoa.id,
                                        label: pessoa.nome_completo,
@@ -408,13 +403,16 @@ const salvarRegiao = async () => {
                         <CRow class="form-group" style="margin-top: 16px">
                            <CFormLabel
                               class="col-sm-3 form-label fw-bold text-end"
-                              >Papel no Evento</CFormLabel
+                              >Função/Categoria de Participação</CFormLabel
                            >
                            <CCol sm="4">
                               <CFormSelect
                                  v-model="form.value.funcao_id"
                                  :options="[
-                                    { value: '', label: 'Selecione' },
+                                    {
+                                       value: '',
+                                       label: 'Selecione o Papel no Evento',
+                                    },
                                     ...funcoes.map((funcao) => ({
                                        value: funcao.id,
                                        label: funcao.sigla,
@@ -440,7 +438,10 @@ const salvarRegiao = async () => {
                               <CFormSelect
                                  v-model="form.value.modalidade"
                                  :options="[
-                                    { value: '', label: 'Selecione' },
+                                    {
+                                       value: '',
+                                       label: 'Selecione a Modalidade',
+                                    },
                                     {
                                        value: 'Presencial',
                                        label: 'Presencial',
@@ -506,128 +507,454 @@ const salvarRegiao = async () => {
                   </CAccordionItem>
                </CAccordion>
 
-               <!-- Chegada Meio Transporte -->
-
-               <!-- Dados da Chegada em uma linha -->
+               <!-- Opções de Transporte Chegada e Partida de Brasília -->
                <CAccordion
                   :active-item-key="1"
                   always-open
                   style="margin-top: 16px"
                >
-                  <CAccordionItem :item-key="1">
-                     <CAccordionHeader
-                        ><strong
-                           >Transporte Chegada e Partida de Brasília
-                        </strong>
-                        A FEB oferece traslado na chegada e retorno dos
-                        participantes (aeroporto/rodoviária – FEB/Hotel), bem
-                        como no percurso Hotel – FEB – Hotel durante os dias do
-                        evento. O traslado é oferecido somente para o hotel
-                        contratado para o evento.
-                     </CAccordionHeader>
-                     <CAccordionBody>
-                        <CRow
-                           class="form-group mx-auto"
-                           style="
-                              margin-top: 16px;
-                              width: 80%;
-                              justify-content: flex-center;
-                           "
-                        >
-                           <!-- Campo 1 -->
-                           <CCol sm="3">
-                              <CFormLabel class="form-label fw-bold text-center"
-                                 >Chegada Meio Transporte</CFormLabel
-                              >
-                              <CFormSelect
-                                 v-model="form.value.chegada_meio_transp"
-                                 :options="[
-                                    { value: '', label: 'Selecione' },
-                                    { value: 'Aéreo', label: 'Aéreo' },
-                                    {
-                                       value: 'Rodoviário',
-                                       label: 'Rodoviário',
-                                    },
-                                    {
-                                       value: 'Rodo Particular',
-                                       label: 'Rodo Particular',
-                                    },
-                                    {
-                                       value: 'Não Informado',
-                                       label: 'Não Informado',
-                                    },
-                                 ]"
-                              />
-                              <div
-                                 class="form-error"
-                                 v-if="errors.value.chegada_meio_transp"
-                              >
-                                 {{ errors.value.chegada_meio_transp[0] }}
-                              </div>
-                           </CCol>
+                  <!-- Transporte Chegada e Partida de Brasília -->
+                  <CAccordion
+                     :active-item-key="1"
+                     always-open
+                     style="margin-top: 16px"
+                  >
+                     <CAccordionItem :item-key="1">
+                        <CAccordionHeader
+                           ><strong
+                              >Transporte Chegada e Partida de Brasília
+                           </strong>
+                           A FEB oferece traslado na chegada e retorno dos
+                           participantes (aeroporto/rodoviária – FEB/Hotel), bem
+                           como no percurso Hotel – FEB – Hotel durante os dias
+                           do evento. O traslado é oferecido somente para o
+                           hotel contratado para o evento.
+                        </CAccordionHeader>
+                        <CAccordionBody>
+                           <CRow
+                              class="form-group mx-auto"
+                              style="
+                                 margin-top: 16px;
+                                 width: 80%;
+                                 justify-content: flex-center;
+                              "
+                           >
+                              <!-- Chegada Meio de Transporte -->
+                              <CCol sm="3">
+                                 <CFormLabel
+                                    class="form-label fw-bold text-center"
+                                    >Chegada Meio Transporte</CFormLabel
+                                 >
+                                 <CFormSelect
+                                    v-model="form.value.chegada_meio_transp"
+                                    :options="[
+                                       { value: '', label: 'Selecione' },
+                                       { value: 'Aéreo', label: 'Aéreo' },
+                                       {
+                                          value: 'Rodoviário',
+                                          label: 'Rodoviário',
+                                       },
+                                       {
+                                          value: 'Rodo Particular',
+                                          label: 'Rodo Particular',
+                                       },
+                                       {
+                                          value: 'Não Informado',
+                                          label: 'Não Informado',
+                                       },
+                                    ]"
+                                 />
+                                 <div
+                                    class="form-error"
+                                    v-if="errors.value.chegada_meio_transp"
+                                 >
+                                    {{ errors.value.chegada_meio_transp[0] }}
+                                 </div>
+                              </CCol>
 
-                           <!-- Cia -->
-                           <CCol sm="3">
-                              <CFormLabel class="form-label fw-bold text-center"
-                                 >Chegada Companhia + Nº</CFormLabel
-                              >
-                              <CFormInput
-                                 v-model="form.value.chegada_cia_transp"
-                                 :class="{
-                                    'is-invalid': errors.chegada_cia_transp,
-                                 }"
-                              />
-                              <div
-                                 class="form-error"
-                                 v-if="errors.value.chegada_cia_transp"
-                              >
-                                 {{ errors.value.chegada_cia_transp[0] }}
-                              </div>
-                           </CCol>
+                              <!-- Chegada Cia e Número -->
+                              <CCol sm="3">
+                                 <CFormLabel
+                                    class="form-label fw-bold text-center"
+                                    >Chegada Companhia + Nº</CFormLabel
+                                 >
+                                 <CFormInput
+                                    v-model="form.value.chegada_cia_transp"
+                                    :class="{
+                                       'is-invalid': errors.chegada_cia_transp,
+                                    }"
+                                 />
+                                 <div
+                                    class="form-error"
+                                    v-if="errors.value.chegada_cia_transp"
+                                 >
+                                    {{ errors.value.chegada_cia_transp[0] }}
+                                 </div>
+                              </CCol>
 
-                           <!-- Chegada Data/Hora -->
-                           <CCol sm="3">
-                              <CFormLabel class="form-label fw-bold text-center"
-                                 >Chegada Data/Hora</CFormLabel
-                              >
-                              <CFormInput
-                                 v-model="form.value.chegada_data_hora"
-                                 type="datetime-local"
-                                 :class="{
-                                    'is-invalid': errors.chegada_data_hora,
-                                 }"
-                              />
-                              <div
-                                 class="form-error"
-                                 v-if="errors.value.chegada_data_hora"
-                              >
-                                 {{ errors.value.chegada_data_hora[0] }}
-                              </div>
-                           </CCol>
-                        </CRow>
-                     </CAccordionBody>
-                  </CAccordionItem>
+                              <!-- Chegada Data/Hora -->
+                              <CCol sm="3">
+                                 <CFormLabel
+                                    class="form-label fw-bold text-center"
+                                    >Chegada Data/Hora</CFormLabel
+                                 >
+                                 <CFormInput
+                                    v-model="form.value.chegada_data_hora"
+                                    type="datetime-local"
+                                    :class="{
+                                       'is-invalid': errors.chegada_data_hora,
+                                    }"
+                                 />
+                                 <div
+                                    class="form-error"
+                                    v-if="errors.value.chegada_data_hora"
+                                 >
+                                    {{ errors.value.chegada_data_hora[0] }}
+                                 </div>
+                              </CCol>
+                           </CRow>
+                           <!-- PARTIDA -->
+                           <CRow
+                              class="form-group mx-auto"
+                              style="
+                                 margin-top: 16px;
+                                 width: 80%;
+                                 justify-content: flex-center;
+                              "
+                           >
+                              <!-- Partida Meio de Transporte -->
+                              <CCol sm="3">
+                                 <CFormLabel
+                                    class="form-label fw-bold text-center"
+                                    >Partida Meio Transporte</CFormLabel
+                                 >
+                                 <CFormSelect
+                                    v-model="form.value.partida_meio_transp"
+                                    :options="[
+                                       { value: '', label: 'Selecione' },
+                                       { value: 'Aéreo', label: 'Aéreo' },
+                                       {
+                                          value: 'Rodoviário',
+                                          label: 'Rodoviário',
+                                       },
+                                       {
+                                          value: 'Rodo Particular',
+                                          label: 'Rodo Particular',
+                                       },
+                                       {
+                                          value: 'Não Informado',
+                                          label: 'Não Informado',
+                                       },
+                                    ]"
+                                 />
+                                 <div
+                                    class="form-error"
+                                    v-if="errors.value.chegada_meio_transp"
+                                 >
+                                    {{ errors.value.chegada_meio_transp[0] }}
+                                 </div>
+                              </CCol>
+
+                              <!-- Partida Cia e Número -->
+                              <CCol sm="3">
+                                 <CFormLabel
+                                    class="form-label fw-bold text-center"
+                                    >Partida Companhia + Nº</CFormLabel
+                                 >
+                                 <CFormInput
+                                    v-model="form.value.partida_cia_transp"
+                                    :class="{
+                                       'is-invalid': errors.partida_cia_transp,
+                                    }"
+                                 />
+                                 <div
+                                    class="form-error"
+                                    v-if="errors.value.partida_cia_transp"
+                                 >
+                                    {{ errors.value.partida_cia_transp[0] }}
+                                 </div>
+                              </CCol>
+
+                              <!-- Chegada Data/Hora -->
+                              <CCol sm="3">
+                                 <CFormLabel
+                                    class="form-label fw-bold text-center"
+                                    >Partida Data/Hora</CFormLabel
+                                 >
+                                 <CFormInput
+                                    v-model="form.value.partida_data_hora"
+                                    type="datetime-local"
+                                    :class="{
+                                       'is-invalid': errors.partida_data_hora,
+                                    }"
+                                 />
+                                 <div
+                                    class="form-error"
+                                    v-if="errors.value.partida_data_hora"
+                                 >
+                                    {{ errors.value.partida_data_hora[0] }}
+                                 </div>
+                              </CCol>
+                           </CRow>
+                        </CAccordionBody>
+                     </CAccordionItem>
+                  </CAccordion>
                </CAccordion>
 
-               <!-- Ativo -->
-               <CRow class="form-group" style="margin-top: 16px">
-                  <CFormLabel class="col-sm-3 form-label fw-bold text-end"
-                     >Ativo?</CFormLabel
+               <!-- Opções para Refeições -->
+               <CAccordion
+                  :active-item-key="1"
+                  always-open
+                  style="margin-top: 16px"
+               >
+                  <CAccordion
+                     :active-item-key="1"
+                     always-open
+                     style="margin-top: 16px"
                   >
-                  <CCol sm="4">
-                     <CFormSelect
-                        v-model="form.value.ativo"
-                        :options="[
-                           { value: '', label: 'Selecione' },
-                           { value: 'SIM', label: 'SIM' },
-                           { value: 'NÃO', label: 'NÃO' },
-                        ]"
-                     />
-                     <div class="form-error" v-if="errors.value.ativo">
-                        {{ errors.value.ativo[0] }}
-                     </div>
-                  </CCol>
-               </CRow>
+                     <CAccordionItem :item-key="1">
+                        <CAccordionHeader
+                           ><strong>Opções para Refeições </strong>
+                           A FEB oferecerá refeição aos participantes do evento,
+                           considerando café da manhã, lanches de intervalos,
+                           almoço e jantar.
+                        </CAccordionHeader>
+                        <CAccordionBody>
+                           <CRow
+                              class="form-group mx-auto"
+                              style="
+                                 margin-top: 16px;
+                                 width: 300%;
+                                 justify-content: flex-center;
+                              "
+                           >
+                              <CCol>
+                                 <CFormLabel
+                                    class="form-label fw-bold text-left"
+                                 >
+                                    Marque a opção que deseja
+                                 </CFormLabel>
+                                 <div>
+                                    <CFormCheck
+                                       type="radio"
+                                       name="chegada_meio_transp"
+                                       value="Aéreo"
+                                       label="Farei as refeições oferecidas pela FEB. (sinalize as opções por dia no quadro abaixo, visando melhor dimensionamento da alimentação)"
+                                       v-model="form.value.chegada_meio_transp"
+                                       inline
+                                    /><br />
+                                    <CFormCheck
+                                       type="radio"
+                                       name="chegada_meio_transp"
+                                       value="Terrestre"
+                                       label="Não farei as refeições na FEB"
+                                       v-model="form.value.chegada_meio_transp"
+                                       inline
+                                    /><br />
+                                    <CFormCheck
+                                       type="radio"
+                                       name="chegada_meio_transp"
+                                       value="Marítimo"
+                                       label="Colaborarei para o custeio das refeições oferecidas pela FEB (entrar em contato com a Comissão Organizadora do evento)"
+                                       v-model="form.value.chegada_meio_transp"
+                                       inline
+                                    /><br />
+                                    <div class="d-flex align-items-center">
+                                       <div class="form-check form-switch me-3">
+                                          <input
+                                             class="form-check-input"
+                                             type="checkbox"
+                                             v-model="
+                                                form.value
+                                                   .alimentacao_vegetariana
+                                             "
+                                          />
+                                       </div>
+                                       <span class="text-dark">
+                                          Possui alguma restrição alimentar?
+                                       </span>
+                                    </div>
+                                    <br />
+                                    <div class="d-flex align-items-center">
+                                       <div class="form-check form-switch me-3">
+                                          <input
+                                             class="form-check-input"
+                                             type="checkbox"
+                                             v-model="
+                                                form.value
+                                                   .alimentacao_vegetariana
+                                             "
+                                          />
+                                       </div>
+                                       <span class="text-dark">
+                                          Adota alimentação vegetariana ou
+                                          vegana?
+                                       </span>
+                                    </div>
+                                 </div>
+
+                                 <div class="form-error"></div>
+                              </CCol>
+                           </CRow>
+                        </CAccordionBody>
+                     </CAccordionItem>
+                  </CAccordion>
+               </CAccordion>
+
+               <!-- Opções para Hospedagem -->
+               <CAccordion
+                  :active-item-key="1"
+                  always-open
+                  style="margin-top: 16px"
+               >
+                  <CAccordion
+                     :active-item-key="1"
+                     always-open
+                     style="margin-top: 16px"
+                  >
+                     <CAccordionItem :item-key="1">
+                        <CAccordionHeader
+                           ><strong>Opções para Hospedagem </strong>
+                           A FEB oferecerá hospedagem aos participantes do
+                           evento, considerando 2 vagas por Entidade Federativa
+                           Estadual, 2 vagas para os representantes do Fórum das
+                           Entidades Especializadas, Coordenadores Nacionais de
+                           Área não residentes em Brasília, Secretários
+                           Regionais, Secretários do CFN e convidados. Os demais
+                           participantes autorizados custearão as próprias
+                           despesas de hospedagem.
+                        </CAccordionHeader>
+                        <CAccordionBody>
+                           <CRow
+                              class="form-group mx-auto"
+                              style="
+                                 margin-top: 16px;
+                                 width: 300%;
+                                 justify-content: flex-center;
+                              "
+                           >
+                              <CCol>
+                                 <CFormLabel
+                                    class="form-label fw-bold text-left"
+                                 >
+                                    Marque a opção que deseja
+                                 </CFormLabel>
+                                 <div>
+                                    <CFormCheck
+                                       type="radio"
+                                       name="chegada_meio_transp"
+                                       value="Aéreo"
+                                       label="Ocuparei uma das duas vagas no quarto duplo que a FEB oferece para cada Federativa Estadual ou funções descritas acima."
+                                       v-model="form.value.chegada_meio_transp"
+                                       inline
+                                    /><br />
+                                    <CFormCheck
+                                       type="radio"
+                                       name="chegada_meio_transp"
+                                       value="Terrestre"
+                                       label="Não utilizarei hospedagem oferecida pela FEB."
+                                       v-model="form.value.chegada_meio_transp"
+                                       inline
+                                    /><br />
+                                    <CFormCheck
+                                       type="radio"
+                                       name="chegada_meio_transp"
+                                       value="Marítimo"
+                                       label="Ocuparei vaga em quarto single, custeando a diferença equivalente ao quarto duplo oferecido pela FEB, tendo sido autorizado pela comissão organizadora."
+                                       v-model="form.value.chegada_meio_transp"
+                                       inline
+                                    />
+                                 </div>
+
+                                 <div
+                                    class="form-error"
+                                    v-if="errors.value.chegada_meio_transp"
+                                 >
+                                    {{ errors.value.chegada_meio_transp[0] }}
+                                 </div>
+                              </CCol>
+                           </CRow>
+                        </CAccordionBody>
+                     </CAccordionItem>
+                  </CAccordion>
+               </CAccordion>
+
+               <!-- Opções para Serviços -->
+               <CAccordion
+                  :active-item-key="1"
+                  always-open
+                  style="margin-top: 16px"
+               >
+                  <CAccordion
+                     :active-item-key="1"
+                     always-open
+                     style="margin-top: 16px"
+                  >
+                     <CAccordionItem :item-key="1">
+                        <CAccordionHeader
+                           ><strong
+                              >Serviços solicitados por Dia de Evento
+                           </strong>
+                           Marque SIM nos serviços que você utilizará em cada
+                           dia do evento: <br />Nota 1: a hospedagem refere-se
+                           tanto para o hotel designado quanto para a hospedagem
+                           no Ed. Colmeia. <br />Nota 2: o café refere-se
+                           somente à hospedagem no Ed. Colmeia.
+                        </CAccordionHeader>
+                        <CAccordionBody>
+                           <CRow
+                              class="form-group mx-auto"
+                              style="
+                                 margin-top: 16px;
+                                 width: 300%;
+                                 justify-content: flex-center;
+                              "
+                           >
+                              <CCol>
+                                 <CFormLabel
+                                    class="form-label fw-bold text-left"
+                                 >
+                                    Marque a opção que deseja
+                                 </CFormLabel>
+                                 <div>
+                                    <CFormCheck
+                                       type="radio"
+                                       name="chegada_meio_transp"
+                                       value="Aéreo"
+                                       label="Ocuparei uma das duas vagas no quarto duplo que a FEB oferece para cada Federativa Estadual ou funções descritas acima."
+                                       v-model="form.value.chegada_meio_transp"
+                                       inline
+                                    /><br />
+                                    <CFormCheck
+                                       type="radio"
+                                       name="chegada_meio_transp"
+                                       value="Terrestre"
+                                       label="Não utilizarei hospedagem oferecida pela FEB."
+                                       v-model="form.value.chegada_meio_transp"
+                                       inline
+                                    /><br />
+                                    <CFormCheck
+                                       type="radio"
+                                       name="chegada_meio_transp"
+                                       value="Marítimo"
+                                       label="Ocuparei vaga em quarto single, custeando a diferença equivalente ao quarto duplo oferecido pela FEB, tendo sido autorizado pela comissão organizadora."
+                                       v-model="form.value.chegada_meio_transp"
+                                       inline
+                                    />
+                                 </div>
+
+                                 <div
+                                    class="form-error"
+                                    v-if="errors.value.chegada_meio_transp"
+                                 >
+                                    {{ errors.value.chegada_meio_transp[0] }}
+                                 </div>
+                              </CCol>
+                           </CRow>
+                        </CAccordionBody>
+                     </CAccordionItem>
+                  </CAccordion>
+               </CAccordion>
             </CCardBody>
          </CCard>
       </template>
