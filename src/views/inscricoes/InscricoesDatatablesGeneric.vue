@@ -850,7 +850,7 @@ const salvarRegiao = async () => {
                                     /><br />
                                     <CFormCheck
                                        type="radio"
-                                       name="chegada_meio_transp"
+                                       name="custeio_hospedagem"
                                        value="Terrestre"
                                        label="Não utilizarei hospedagem oferecida pela FEB."
                                        v-model="form.value.chegada_meio_transp"
