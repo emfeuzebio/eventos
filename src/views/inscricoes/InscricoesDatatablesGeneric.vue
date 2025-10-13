@@ -426,34 +426,63 @@
                                     <CFormCheck
                                        type="radio"
                                        name="custeio_refeicao"
+                                       id="custeio_refeicao1"
                                        value="Custeada pela FEB"
-                                       label="Farei as refeições oferecidas pela FEB. (sinalize as opções por dia no quadro abaixo, visando melhor dimensionamento da alimentação)"
-                                       v-model="form.value.custeio_refeicao"
-                                       inline
-                                    /><br />
+                                       label="Farei as refeições oferecidas pela FEB..."
+                                       :checked="
+                                          form.value.custeio_refeicao ===
+                                          'Custeada pela FEB'
+                                       "
+                                       @change="
+                                          form.value.custeio_refeicao =
+                                             'Custeada pela FEB'
+                                       "
+                                    />
                                     <CFormCheck
                                        type="radio"
                                        name="custeio_refeicao"
+                                       id="custeio_refeicao2"
                                        value="Não solicitada"
                                        label="Não farei as refeições na FEB"
-                                       v-model="form.value.custeio_refeicao"
-                                       inline
-                                    /><br />
+                                       :checked="
+                                          form.value.custeio_refeicao ===
+                                          'Não solicitada'
+                                       "
+                                       @change="
+                                          form.value.custeio_refeicao =
+                                             'Não solicitada'
+                                       "
+                                    />
                                     <CFormCheck
                                        type="radio"
                                        name="custeio_refeicao"
+                                       id="custeio_refeicao3"
                                        value="Paga pela Pessoa"
-                                       label="Colaborarei para o custeio das refeições oferecidas pela FEB (entrar em contato com a Comissão Organizadora do evento)"
-                                       v-model="form.value.custeio_refeicao"
-                                       inline
-                                    /><br />
+                                       label="Colaborarei para o custeio..."
+                                       :checked="
+                                          form.value.custeio_refeicao ===
+                                          'Paga pela Pessoa'
+                                       "
+                                       @change="
+                                          form.value.custeio_refeicao =
+                                             'Paga pela Pessoa'
+                                       "
+                                    />
                                     <div class="d-flex align-items-center">
-                                       <div class="form-check form-switch me-3">
-                                          <input
-                                             class="form-check-input"
+                                       <div class="form-check form-switch me-2">
+                                          <CFormCheck
                                              type="checkbox"
-                                             v-model="
-                                                form.value.alimentacao_restrita
+                                             class="form-check-input"
+                                             :checked="
+                                                form.value
+                                                   .alimentacao_restrita ===
+                                                'SIM'
+                                             "
+                                             @change="
+                                                form.value.alimentacao_restrita =
+                                                   $event.target.checked
+                                                      ? 'SIM'
+                                                      : 'NÃO'
                                              "
                                           />
                                        </div>
@@ -463,12 +492,22 @@
                                     </div>
                                     <br />
                                     <div class="d-flex align-items-center">
-                                       <div class="form-check form-switch me-3">
-                                          <input
-                                             class="form-check-input"
+                                       <div
+                                          class="form-check form-switch form-switch-lg"
+                                       >
+                                          <CFormCheck
                                              type="checkbox"
-                                             v-model="
-                                                form.value.alimentacao_vegevega
+                                             class="form-check-input"
+                                             :checked="
+                                                form.value
+                                                   .alimentacao_vegevega ===
+                                                'SIM'
+                                             "
+                                             @change="
+                                                form.value.alimentacao_vegevega =
+                                                   $event.target.checked
+                                                      ? 'SIM'
+                                                      : 'NÃO'
                                              "
                                           />
                                        </div>
@@ -536,30 +575,47 @@
                                        name="custeio_hospedagem"
                                        value="Custeada pela FEB"
                                        label="Ocuparei uma das duas vagas no quarto duplo que a FEB oferece para cada Federativa Estadual ou funções descritas acima."
-                                       v-model="form.value.custeio_hospedagem"
-                                       inline
+                                       :checked="
+                                          form.value.custeio_hospedagem ===
+                                          'Custeada pela FEB'
+                                       "
+                                       @change="
+                                          form.value.custeio_hospedagem =
+                                             'Custeada pela FEB'
+                                       "
                                     /><br />
                                     <CFormCheck
                                        type="radio"
                                        name="custeio_hospedagem"
                                        value="Não solicitada"
                                        label="Não utilizarei hospedagem oferecida pela FEB."
-                                       v-model="form.value.custeio_hospedagem"
-                                       inline
+                                       :checked="
+                                          form.value.custeio_hospedagem ===
+                                          'Não solicitada'
+                                       "
+                                       @change="
+                                          form.value.custeio_hospedagem =
+                                             'Não solicitada'
+                                       "
                                     /><br />
                                     <CFormCheck
                                        type="radio"
                                        name="custeio_hospedagem"
                                        value="Paga pela Pessoa"
                                        label="Ocuparei vaga em quarto single, custeando a diferença equivalente ao quarto duplo oferecido pela FEB, tendo sido autorizado pela comissão organizadora."
-                                       v-model="form.value.custeio_hospedagem"
-                                       inline
+                                       :checked="
+                                          form.value.custeio_hospedagem ===
+                                          'Paga pela Pessoa'
+                                       "
+                                       @change="
+                                          form.value.custeio_hospedagem =
+                                             'Paga pela Pessoa'
+                                       "
                                     />
                                  </div>
-
                                  <div
                                     class="form-error"
-                                    v-if="errors.value.chegada_meio_transp"
+                                    v-if="errors.value.custeio_hospedagem"
                                  >
                                     {{ errors.value.custeio_hospedagem[0] }}
                                  </div>
@@ -699,6 +755,8 @@ import { useToast } from '@/composables/useToast';
 import { formatToBrDateTime } from '@/utils/dateFormat';
 import DataTablesLib from 'datatables.net-bs5';
 
+const custeio_refeicao = reactive();
+
 import { useCurrentEventStore } from '@/stores/currentEvent';
 
 // vamos pegar o Evento Selecionado
@@ -819,10 +877,8 @@ const columns = [
 const defaultValues = {
    entidade_id: null,
    nome_completo: 'Meu Nome Completo',
-   nome_social: 'Meu Nome',
-   telefone: '(00) 90000-0000',
-   email: 'nome@mail.com',
    ativo: 'SIM',
+   // custeio_refeicao: '',
 };
 
 /**
