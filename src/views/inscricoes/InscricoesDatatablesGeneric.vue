@@ -40,7 +40,7 @@
                               class="col-sm-3 form-label fw-bold text-end"
                               >Nome do Evento</CFormLabel
                            >
-                           <CCol sm="4">
+                           <CCol sm="7">
                               <CFormSelect
                                  v-model="form.value.evento_id"
                                  :options="[
@@ -72,7 +72,7 @@
                               class="col-sm-3 form-label fw-bold text-end"
                               >Nome do(a) Pessoa Participante</CFormLabel
                            >
-                           <CCol sm="4">
+                           <CCol sm="7">
                               <CoreUIMultiselect
                                  v-model="form.value.pessoa_id"
                                  :options="[
@@ -98,7 +98,7 @@
                               class="col-sm-3 form-label fw-bold text-end"
                               >Função/Categoria de Participação</CFormLabel
                            >
-                           <CCol sm="4">
+                           <CCol sm="7">
                               <CoreUIMultiselect
                                  v-model="form.value.funcao_id"
                                  :options="[
@@ -127,7 +127,7 @@
                               class="col-sm-3 form-label fw-bold text-end"
                               >Modalidade</CFormLabel
                            >
-                           <CCol sm="4">
+                           <CCol sm="7">
                               <CFormSelect
                                  v-model="form.value.modalidade"
                                  :options="[
@@ -153,7 +153,7 @@
                               class="col-sm-3 form-label fw-bold text-end"
                               >Credenciou?</CFormLabel
                            >
-                           <CCol sm="4">
+                           <CCol sm="7">
                               <CFormSelect
                                  v-model="form.value.credenciou"
                                  :options="[
@@ -176,7 +176,7 @@
                               class="col-sm-3 form-label fw-bold text-end"
                               >Observações</CFormLabel
                            >
-                           <CCol sm="4">
+                           <CCol sm="7">
                               <CFormTextarea
                                  v-model="form.value.observacao"
                                  :class="{ 'is-invalid': errors.observacao }"
@@ -657,46 +657,6 @@
                                  justify-content: flex-center;
                               "
                            >
-                              <CCol>
-                                 <CFormLabel
-                                    class="form-label fw-bold text-left"
-                                 >
-                                    Marque a opção que deseja
-                                 </CFormLabel>
-                                 <div>
-                                    <CFormCheck
-                                       type="radio"
-                                       name="chegada_meio_transp"
-                                       value="Aéreo"
-                                       label="Ocuparei uma das duas vagas no quarto duplo que a FEB oferece para cada Federativa Estadual ou funções descritas acima."
-                                       v-model="form.value.chegada_meio_transp"
-                                       inline
-                                    /><br />
-                                    <CFormCheck
-                                       type="radio"
-                                       name="chegada_meio_transp"
-                                       value="Terrestre"
-                                       label="Não utilizarei hospedagem oferecida pela FEB."
-                                       v-model="form.value.chegada_meio_transp"
-                                       inline
-                                    /><br />
-                                    <CFormCheck
-                                       type="radio"
-                                       name="chegada_meio_transp"
-                                       value="Marítimo"
-                                       label="Ocuparei vaga em quarto single, custeando a diferença equivalente ao quarto duplo oferecido pela FEB, tendo sido autorizado pela comissão organizadora."
-                                       v-model="form.value.chegada_meio_transp"
-                                       inline
-                                    />
-                                 </div>
-
-                                 <div
-                                    class="form-error"
-                                    v-if="errors.value.chegada_meio_transp"
-                                 >
-                                    {{ errors.value.chegada_meio_transp[0] }}
-                                 </div>
-                              </CCol>
                            </CRow>
                         </CAccordionBody>
                      </CAccordionItem>
@@ -706,44 +666,6 @@
          </CCard>
       </template>
    </GenericCrud>
-
-   <!-- Extra Modal Especializado -->
-   <CModal
-      :visible="pessoaShowModal"
-      @close="pessoaShowModal = false"
-      backdrop="static"
-   >
-      <CModalHeader>
-         <strong>Editar Região</strong>
-      </CModalHeader>
-      <CModalBody>
-         <label class="form-label fw-bold mb-1 mt-0">Nome da Região</label>
-         <!-- <div class="form-text">
-            {{ pessoaFormDados.regiao.descricao }}
-         </div> -->
-
-         <CFormInput
-            v-model="pessoaFormDados.regiao.descricao"
-            :class="{ 'is-invalid': pessoaFormErros.descricao }"
-         />
-
-         <label class="form-label fw-bold mb-1 mt-0">Sigla</label>
-         <CFormInput
-            v-model="pessoaFormDados.regiao.sigla"
-            :class="{ 'is-invalid': pessoaFormErros.sigla }"
-         />
-      </CModalBody>
-      <CModalFooter>
-         <CButton
-            color="btn btn-secondary btn-sm me-1"
-            @click="pessoaShowModal = false"
-            ><i class="fa fa-times"></i> Fechar</CButton
-         >
-         <CButton color="btn btn-primary btn-sm me-1" @click="salvarRegiao"
-            >Salvar</CButton
-         >
-      </CModalFooter>
-   </CModal>
 </template>
 
 <script setup>
@@ -766,7 +688,6 @@ const currentEvent = computed(() => eventStore.getEvent);
 
 // define a Entidade Principal da View
 const entity = 'inscricao';
-// const entity = 'inscricao';
 
 const { showToast } = useToast(); // Toasts de Alerta
 
@@ -784,15 +705,12 @@ const {
    funcoes,
    fetchPessoas,
    pessoas,
-   fetchEventos,
    fetchtodosEventos,
    todosEventos,
-   eventos,
 } = useEventos();
 
 fetchtodosEventos();
-// fetchEventos();
-// fetchEntidades();
+fetchEntidades();
 fetchFuncoes();
 fetchPessoas();
 
@@ -912,24 +830,6 @@ const pessoaFormErros = ref({});
  *       lista de Categorias
  *       lista de Tipos de Eventos
  */
-// import { useEventos } from '@/composables/useEventos';
-// const {
-//    fetchEntidades,
-//    entidades,
-//    fetchFuncoes,
-//    funcoes,
-//    fetchPessoas,
-//    pessoas,
-//    fetchEventos,
-//    fetchtodosEventos,
-//    eventos,
-// } = useEventos();
-
-// fetchtodosEventos();
-// fetchEventos();
-// fetchEntidades();
-// fetchFuncoes();
-// fetchPessoas();
 
 /**
  * BASE Crud - botões padrão - aqui você pode desativer botões básicos do CRUD.
@@ -941,8 +841,6 @@ const buttons = { update: true, delete: true, show: false };
  * BASE Crud - Filtros da tabela de dados
  * Necessário que a API receba o parametro enviado no GET e aplique o filtro where requerido
  */
-//  const filters = [{}]; // nessse caso sem filtros
-
 const filters = computed(() => [
    {
       label: 'Ativa',
@@ -973,35 +871,10 @@ const filters = computed(() => [
    },
 ]);
 
-// const filters = computed(() => [
-//    {
-//       label: 'Ativo',
-//       field: 'ativo',
-//       type: 'select',
-//       options: regioes.value.map((regiao) => ({
-//          value: regiao.id,
-//          label: regiao.descricao,
-//       })),
-//    },
-// ]);
-
 /**
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
-   // console.log(
-   //    'onExtraAction ID:',
-   //    id,
-   //    'row:',
-   //    row,
-   //    'action:',
-   //    action,
-   //    'dataset:',
-   //    dataset,
-   //    'target: (por ora não usado)',
-   //    target
-   // );
-
    if (action === 'editarRegiao') {
       // console.log('ZAP: ', row, action, dataset, target);
       // vamos chamar uma função editar a action 'editarRegiao'
