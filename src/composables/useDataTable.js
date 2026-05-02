@@ -52,7 +52,7 @@ export function useDataTable({
                if (error.response && error.response.status === 401) {
                   // Exemplo: remove token, redireciona para login
                   localStorage.removeItem('token'); // ou conforme você usa
-                  window.location.href = '/login'; // ou: router.push('/login')
+                  window.location.href = '/pages/login'; // ou: router.push('/login')
                } else {
                   // Outro erro qualquer
                   // console.error('Erro ao carregar dados da tabela:', error);
