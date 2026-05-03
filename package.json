@@ -30,6 +30,7 @@
     "@coreui/utils": "^2.0.2",
     "@coreui/vue": "^5.4.1",
     "@coreui/vue-chartjs": "^3.0.0",
+    "@fortawesome/fontawesome-free": "^7.2.0",
     "@popperjs/core": "^2.11.8",
     "@vueform/multiselect": "^2.6.11",
     "axios": "^1.8.4",

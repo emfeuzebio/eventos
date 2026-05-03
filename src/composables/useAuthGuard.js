@@ -25,5 +25,5 @@ export async function checkAuthBeforeSensitiveAction() {
 
 function handleExpiredToken() {
   removeToken()
-  router.push('/pages/login')
+  router.push('pages/login')
 }

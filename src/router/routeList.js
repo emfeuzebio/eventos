@@ -8,23 +8,24 @@ const routes = [
     {
       path: '/',
       name: 'Home',
-      component: Login,
       component: DefaultLayout,
-      // redirect: '/dashboard',
-      // redirect: '/Login',
       children: [
+        {
+          path: '/',                    // ← Home (raiz) aponta para Operacional
+          name: 'Operacional',
+          component: () => import('@/views/dashboard/Operacional.vue'),
+        },        
         {
           path: '/dashboard',
           name: 'Dashboard',
-          // route level code-splitting
-          // this generates a separate chunk (about.[hash].js) for this route
           // which is lazy-loaded when the route is visited.
           component: () =>
             import(
-              // '@/views/dashboard/Dashboard.vue' */
+              '@/views/dashboard/Operacional.vue',
+              // '@/views/dashboard/Dashboard.vue',
               // '@/views/dashboard/Laboratorio.vue'
               // '@/views/dashboard/DTAjaxBasica.vue'
-              '@/views/dashboard/DTAjaxParams.vue'
+              // '@/views/dashboard/DTAjaxParams.vue'
             ),
         },
         {

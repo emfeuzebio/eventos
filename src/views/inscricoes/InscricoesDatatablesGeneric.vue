@@ -4,8 +4,8 @@
    <GenericCrud
       title="Cadastro de Inscrições "
       description=" - Gerenciamento do cadastro de Inscrições de Pessoas em Eventos.
-         <br>Usuários <b>Gerentes de Secretaria</b> podem incluir, editar, excluir e desativar inscrições. 
-         <br>Usuários da <b>Equipe de Secretaria</b> podem editar campos específicos das inscrições."
+         <br>Usuários <b>Gerentes de Recepção</b> podem incluir, editar, excluir e desativar inscrições. 
+         <br>Usuários da <b>Equipe de Recepção</b> podem editar campos específicos das inscrições."
       modalSize="xxl"
       modalFullscreen="fullscreen"
       endpoint="inscricao"

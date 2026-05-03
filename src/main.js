@@ -20,6 +20,8 @@ import CoreUIMultiselect from '@/components/CoreUIMultiselect.vue'
 import { setRouterInstance } from '@/utils/routerHelper'
 setRouterInstance(router)
 
+// Importar Font Awesome
+import '@fortawesome/fontawesome-free/css/all.min.css'
 
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
