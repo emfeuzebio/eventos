@@ -10,6 +10,7 @@ export function useForm({
    defaultValues,
    onSaved,
    afterDelete,
+   onLoaded,  // ← ADICIONAR ESTA LINHA
 }) {
    // console.log("useForm:" + fields)
    const form = ref({ ...fields });
@@ -46,6 +47,12 @@ export function useForm({
             ...toRaw(defaultValues), // copia profunda dos padrões
             ...res.data
          };         
+
+
+         // @@ Chamar callback onLoaded se existir
+         if (onLoaded) {
+            onLoaded(form.value);
+         }         
 
          isEditing.value = id ?? false; // controle se é edição ou novo registro
          formError.value = ''; // limpa o form errors
@@ -180,6 +187,7 @@ export function useForm({
       loading,
       fieldErrors,
       formError,
+      onLoaded,  // ← ADICIONAR ESTA LINHA
       load,
       confirmSave,
       insertNewModal,

@@ -272,6 +272,7 @@ const emit = defineEmits([
    'extraAction',
    'pageExtraButtonsActions',
    'afterSave',
+   'afterLoad',  // ← ADICIONAR ESTA LINHA
 ]);
 
 const onClickpageExtraButtonsActions = (label, action) => {
@@ -357,16 +358,6 @@ const { init, refreshTable } = useDataTable(
    emit
 );
 
-/**
- * defineExpose() - Expõe o método pro componente pai
- * refreshTable é uma função dentro do composable useDataTable() exposta acima.
- * Mas para expô-la para a view Pai acima desta que estamos que é filha
- * precisamos usar defineExpose()
- */
-defineExpose({
-   refreshTable,
-});
-
 // Formulário
 const form = useForm({
    endpoint: props.endpoint,
@@ -392,6 +383,21 @@ const form = useForm({
          message: 'Registro excluído com sucesso!',
       });
    },
+   // ADICIONAR A LINHA ABAIXO
+   onLoaded: (data) => {
+      emit('afterLoad', data);
+   },
+});
+
+/**
+ * defineExpose() - Expõe o método pro componente pai
+ * refreshTable é uma função dentro do composable useDataTable() exposta acima.
+ * Mas para expô-la para a view Pai acima desta que estamos que é filha
+ * precisamos usar defineExpose()
+ */
+defineExpose({
+   refreshTable,
+   form,
 });
 
 // Foca no primeiro campo do formulário quando o modal é aberto

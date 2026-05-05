@@ -16,12 +16,26 @@
       :extra-column-render="extraColumnRender"
       :columnActionsWidth="190"
       :abilities="abilities"
-      @extraAction="onExtraAction"
       ref="crudRef"
+      @extraAction="onExtraAction"
+      @afterLoad="onAfterLoad"
    >
       <template #form="{ form, errors }">
          <!-- {{ form.value.estados }} -->
          <!-- {{ estados }} -->
+         <!-- {{ form.value.id }} -->       
+
+         <!-- Debug 2: mostrar serviços carregados -->
+         <div
+            v-if="servicosOfertados?.length > 0"
+            class="alert alert-success small"
+         >
+            ✅ Serviços carregados: {{ servicosOfertados.length }} dias
+            <!-- <pre>{{ servicosOfertados }}</pre> -->
+         </div>
+         <div v-else class="alert alert-warning small">
+            ⚠️ Nenhum serviço carregado ainda. ({{ servicosOfertados }})
+         </div>
 
          <CCard>
             <CCardBody>
@@ -34,6 +48,12 @@
                         campos e informações.</CAccordionHeader
                      >
                      <CAccordionBody>
+                        <!-- DEBUG: mostrar o evento_id atual -->
+                        <div class="alert alert-secondary small">
+                           Debug: evento_id = {{ form.value.evento_id }} |
+                           Debug: inscricao_id = {{ form.value.id }} |
+                        </div>
+
                         <!-- Evento -->
                         <CRow class="form-group" style="margin-top: 16px">
                            <CFormLabel
@@ -300,6 +320,10 @@
                                     {{ errors.value.chegada_data_hora[0] }}
                                  </div>
                               </CCol>
+                              <div class="form-error">
+                                 Incluir campo swith: Necessita Traslado do
+                                 Aeroporto ou Rodoviária até o Hotel?
+                              </div>
                            </CRow>
                            <!-- PARTIDA -->
                            <CRow
@@ -383,6 +407,10 @@
                                     {{ errors.value.partida_data_hora[0] }}
                                  </div>
                               </CCol>
+                              <div class="form-error">
+                                 Incluir campo swith: Necessita Traslado do
+                                 Aeroporto ou Rodoviária até o Hotel?
+                              </div>
                            </CRow>
                         </CAccordionBody>
                      </CAccordionItem>
@@ -428,7 +456,7 @@
                                        name="custeio_refeicao"
                                        id="custeio_refeicao1"
                                        value="Custeada pela FEB"
-                                       label="Farei as refeições oferecidas pela FEB..."
+                                       label="Farei as refeições oferecidas pela FEB. (sinalize as opções por dia no quadro abaixo, visando melhor dimensionamento da alimentação)"
                                        :checked="
                                           form.value.custeio_refeicao ===
                                           'Custeada pela FEB'
@@ -458,7 +486,7 @@
                                        name="custeio_refeicao"
                                        id="custeio_refeicao3"
                                        value="Paga pela Pessoa"
-                                       label="Colaborarei para o custeio..."
+                                       label="Colaborarei para o custeio das refeições oferecidas pela FEB (entrar em contato com a Comissão Organizadora do evento)"
                                        :checked="
                                           form.value.custeio_refeicao ===
                                           'Paga pela Pessoa'
@@ -619,6 +647,9 @@
                                  >
                                     {{ errors.value.custeio_hospedagem[0] }}
                                  </div>
+                                 <div class="form-error">
+                                    Incluir campo: dividir quarto com a pessoa
+                                 </div>
                               </CCol>
                            </CRow>
                         </CAccordionBody>
@@ -632,35 +663,259 @@
                   always-open
                   style="margin-top: 16px"
                >
-                  <CAccordion
-                     :active-item-key="1"
-                     always-open
-                     style="margin-top: 16px"
-                  >
-                     <CAccordionItem :item-key="1">
-                        <CAccordionHeader
-                           ><strong
-                              >Serviços solicitados por Dia de Evento
-                           </strong>
-                           Marque SIM nos serviços que você utilizará em cada
-                           dia do evento: <br />Nota 1: a hospedagem refere-se
-                           tanto para o hotel designado quanto para a hospedagem
-                           no Ed. Colmeia. <br />Nota 2: o café refere-se
-                           somente à hospedagem no Ed. Colmeia.
-                        </CAccordionHeader>
-                        <CAccordionBody>
-                           <CRow
-                              class="form-group mx-auto"
-                              style="
-                                 margin-top: 16px;
-                                 width: 300%;
-                                 justify-content: flex-center;
-                              "
+                  <CAccordionItem :item-key="1">
+                     <CAccordionHeader>
+                        <strong>Serviços solicitados por Dia de Evento</strong>
+                        Marque SIM nos serviços que você utilizará em cada dia
+                        do evento:
+                        <br /><small class="text-muted">
+                           Nota 1: a hospedagem refere-se tanto para o hotel
+                           designado quanto para a hospedagem no Ed. Colmeia.
+                           <br />
+                           Nota 2: o café refere-se somente à hospedagem no Ed.
+                           Colmeia.
+                        </small>
+                     </CAccordionHeader>
+                     <CAccordionBody>
+
+                        <!-- Alertas -->
+                        <div
+                           v-if="inscricaoSalva"
+                           class="alert alert-info alert-dismissible fade show mb-3"
+                           role="alert"
+                        >
+                           <i class="fas fa-info-circle me-2"></i>
+                           <strong>Atenção:</strong> Salve a inscrição primeiro
+                           para marcar os serviços.
+                        </div>
+
+                        <div
+                           v-else-if="loadingServicos"
+                           class="text-center py-4"
+                        >
+                           <div
+                              class="spinner-border text-primary"
+                              role="status"
                            >
-                           </CRow>
-                        </CAccordionBody>
-                     </CAccordionItem>
-                  </CAccordion>
+                              <span class="visually-hidden">Carregando...</span>
+                           </div>
+                           <p class="mt-2 text-muted">
+                              Carregando serviços disponíveis...
+                           </p>
+                        </div>
+
+                        <!-- Tabela de Serviços -->
+                        <div v-else-if="servicosPorDia.length > 0">
+                           <div class="table-responsive">
+                              <table
+                                 class="table table-bordered table-hover align-middle text-nowrap"
+                              >
+                                 <thead class="table-light">
+                                    <tr>
+                                       <th
+                                          class="text-center"
+                                          style="min-width: 120px"
+                                       >
+                                          Data
+                                       </th>
+                                       <!-- Coluna Transporte -->
+                                       <th 
+                                          v-if="servicosOfertados.some(s => s.oferece_transporte === 'SIM')"
+                                          class="text-center"
+                                          style="min-width: 120px"
+                                       >
+                                       <i class="fas fa-truck me-1"></i> Transporte
+                                       </th>
+
+                                          <!-- Coluna Hospedagem -->
+                                          <th 
+                                          v-if="servicosOfertados.some(s => s.oferece_hospedagem === 'SIM')"
+                                          class="text-center"
+                                          style="min-width: 120px"
+                                          >
+                                          <i class="fas fa-bed me-1"></i> Hospedagem
+                                          </th>
+
+                                          <!-- Coluna Lavanderia -->
+                                          <th 
+                                          v-if="servicosOfertados.some(s => s.oferece_lavanderia === 'SIM')"
+                                          class="text-center"
+                                          style="min-width: 120px"
+                                          >
+                                          <i class="fas fa-tshirt me-1"></i> Lavanderia
+                                          </th>
+
+                                          <!-- Coluna Traslado -->
+                                          <th 
+                                          v-if="servicosOfertados.some(s => s.oferece_traslado === 'SIM')"
+                                          class="text-center"
+                                          style="min-width: 120px"
+                                          >
+                                          <i class="fas fa-bus me-1"></i> Traslado
+                                          </th>
+
+                                          <!-- Coluna Café -->
+                                          <th 
+                                          v-if="servicosOfertados.some(s => s.oferece_cafe === 'SIM')"
+                                          class="text-center"
+                                          style="min-width: 120px"
+                                          >
+                                          <i class="fas fa-mug-hot me-1"></i> Café
+                                          </th>
+
+                                          <!-- Coluna Almoço -->
+                                          <th 
+                                          v-if="servicosOfertados.some(s => s.oferece_almoco === 'SIM')"
+                                          class="text-center"
+                                          style="min-width: 120px"
+                                          >
+                                          <i class="fas fa-utensils me-1"></i> Almoço
+                                          </th>
+
+                                          <!-- Coluna Jantar -->
+                                          <th 
+                                          v-if="servicosOfertados.some(s => s.oferece_jantar === 'SIM')"
+                                          class="text-center"
+                                          style="min-width: 120px"
+                                          >
+                                          <i class="fas fa-moon me-1"></i> Jantar
+                                          </th>
+                                    </tr>
+                                 </thead>
+                                 
+                                 <tbody>
+                                    <tr
+                                       v-for="servico in servicosOrdenados"
+                                       :key="servico.data"
+                                    >
+                                       <td class="fw-bold text-center">
+                                          {{ formatarData(servico.data) }}
+                                       </td>
+
+                                       <!-- Coluna Transporte (dados) -->
+                                       <td v-if="servicosOfertados.some(s => s.oferece_transporte === 'SIM')" class="text-center">
+                                       <div class="form-check form-switch d-inline-block">
+                                          <input
+                                             type="checkbox" 
+                                             class="form-check-input"
+                                             role="switch"
+                                             :data-key="`${servico.data}_transporte`"
+                                             :checked="servico.transporte === 'SIM'"
+                                             :disabled="servico.transporte_disabled || savingServicoDaInscricao[`${servico.data}_transporte`]"
+                                             @change="toggleServico(servico.data, 'transporte', $event.target.checked)"
+                                          />
+                                          <span class="ms-1 small">{{ servico.transporte === 'SIM' ? 'SIM' : 'NÃO' }}</span>
+                                       </div>
+                                       </td>
+
+                                       <!-- Coluna Hospedagem (dados) -->
+                                       <td v-if="servicosOfertados.some(s => s.oferece_hospedagem === 'SIM')" class="text-center">
+                                       <div class="form-check form-switch d-inline-block">
+                                          <input
+                                             type="checkbox"
+                                             class="form-check-input" 
+                                             role="switch"
+                                             :data-key="`${servico.data}_hospedagem`"
+                                             :checked="servico.hospedagem === 'SIM'"
+                                             :disabled="servico.hospedagem_disabled || savingServicoDaInscricao[`${servico.data}_hospedagem`]"
+                                             @change="toggleServico(servico.data, 'hospedagem', $event.target.checked)"
+                                          />
+                                          <span class="ms-1 small">{{ servico.hospedagem === 'SIM' ? 'SIM' : 'NÃO' }}</span>
+                                       </div>
+                                       </td>
+
+                                       <!-- Coluna Lavanderia (dados) -->
+                                       <td v-if="servicosOfertados.some(s => s.oferece_lavanderia === 'SIM')" class="text-center">
+                                       <div class="form-check form-switch d-inline-block">
+                                          <input
+                                             type="checkbox"
+                                             class="form-check-input"
+                                             role="switch"
+                                             :data-key="`${servico.data}_lavanderia`"
+                                             :checked="servico.lavanderia === 'SIM'"
+                                             :disabled="servico.lavanderia_disabled || savingServicoDaInscricao[`${servico.data}_lavanderia`] "
+                                             @change="toggleServico(servico.data, 'lavanderia', $event.target.checked)"
+                                          />
+                                          <span class="ms-1 small">{{ servico.lavanderia === 'SIM' ? 'SIM' : 'NÃO' }}</span>
+                                       </div>
+                                       </td>
+
+                                       <!-- Coluna Traslado (dados) -->
+                                       <td v-if="servicosOfertados.some(s => s.oferece_traslado === 'SIM')" class="text-center">
+                                       <div class="form-check form-switch d-inline-block">
+                                          <input
+                                             type="checkbox"
+                                             class="form-check-input"
+                                             role="switch"
+                                             :data-key="`${servico.data}_traslado`"
+                                             :checked="servico.traslado === 'SIM'"
+                                             :disabled="servico.traslado_disabled || savingServicoDaInscricao[`${servico.data}_traslado`] "
+                                             @change="toggleServico(servico.data, 'traslado', $event.target.checked)"
+                                          />
+                                          <span class="ms-1 small">{{ servico.traslado === 'SIM' ? 'SIM' : 'NÃO' }}</span>
+                                       </div>
+                                       </td>
+
+                                       <!-- Coluna Café (dados) -->
+                                       <td v-if="servicosOfertados.some(s => s.oferece_cafe === 'SIM')" class="text-center">
+                                       <div class="form-check form-switch d-inline-block">
+                                          <input
+                                             type="checkbox"
+                                             class="form-check-input"
+                                             role="switch"
+                                             :data-key="`${servico.data}_cafe`"
+                                             :checked="servico.cafe === 'SIM'"
+                                             :disabled="servico.cafe_disabled || savingServicoDaInscricao[`${servico.data}_cafe`] "
+                                             @change="toggleServico(servico.data, 'cafe', $event.target.checked)"
+                                          />
+                                          <span class="ms-1 small">{{ servico.cafe === 'SIM' ? 'SIM' : 'NÃO' }}</span>
+                                       </div>
+                                       </td>
+
+                                       <!-- Coluna Almoço (dados) -->
+                                       <td v-if="servicosOfertados.some(s => s.oferece_almoco === 'SIM')" class="text-center">
+                                       <div class="form-check form-switch d-inline-block">
+                                          <input
+                                             type="checkbox"
+                                             class="form-check-input"
+                                             role="switch"
+                                             :data-key="`${servico.data}_almoco`"
+                                             :checked="servico.almoco === 'SIM'"
+                                             :disabled="servico.almoco_disabled || savingServicoDaInscricao[`${servico.data}_almoco`] "
+                                             @change="toggleServico(servico.data, 'almoco', $event.target.checked)"
+                                          />
+                                          <span class="ms-1 small">{{ servico.almoco === 'SIM' ? 'SIM' : 'NÃO' }}</span>
+                                       </div>
+                                       </td>
+
+                                       <!-- Coluna Jantar (dados) -->
+                                       <td v-if="servicosOfertados.some(s => s.oferece_jantar === 'SIM')" class="text-center">
+                                       <div class="form-check form-switch d-inline-block">
+                                          <input
+                                             type="checkbox"
+                                             class="form-check-input"
+                                             role="switch"
+                                             :data-key="`${servico.data}_jantar`"
+                                             :checked="servico.jantar === 'SIM'"
+                                             :disabled="servico.jantar_disabled || savingServicoDaInscricao[`${servico.data}_jantar`] "
+                                             @change="toggleServico(servico.data, 'jantar', $event.target.checked)"
+                                          />
+                                          <span class="ms-1 small">{{ servico.jantar === 'SIM' ? 'SIM' : 'NÃO' }}</span>
+                                       </div>
+                                       </td>                                       
+
+                                    </tr>
+                                 </tbody>
+                              </table>
+                           </div>
+                        </div>
+
+                        <div v-else class="alert alert-secondary">
+                           <i class="fas fa-info-circle me-2"></i>
+                           Nenhum serviço configurado para os dias deste evento.
+                        </div>
+                     </CAccordionBody>
+                  </CAccordionItem>
                </CAccordion>
             </CCardBody>
          </CCard>
@@ -669,7 +924,7 @@
 </template>
 
 <script setup>
-import { ref, toRaw, computed, reactive } from 'vue';
+import { ref, toRaw, computed, reactive, nextTick, watch, onMounted } from 'vue';
 import GenericCrud from '@/components/GenericCrud.vue';
 import api from '@/services/api';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
@@ -695,6 +950,7 @@ const { showToast } = useToast(); // Toasts de Alerta
 const { can } = useAbilities();
 const abilities = getAbilities(); // recupera do JWR as abilities do usuário logado
 
+const currentInscricaoId = ref(null)
 const crudRef = ref(null);
 
 import { useEventos } from '@/composables/useEventos';
@@ -713,6 +969,174 @@ fetchtodosEventos();
 fetchEntidades();
 fetchFuncoes();
 fetchPessoas();
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+import { useServicosInscricao } from '@/composables/useServicosInscricao';
+
+const {
+   servicosOfertados, // ← ref()
+   servicosDaInscricao,
+   loading: loadingServicos,
+   fetchServicosOfertados,
+   fetchServicosDaInscricao,
+} = useServicosInscricao();
+
+const onAfterLoad = async (formData) => {
+   // Opção 1 - toRaw (importe do vue)
+   // console.log('📢 afterLoad disparado!. Dados do registro aberto:', toRaw(formData))
+
+   const eventoId = currentEvent.value?.id  // Pega direto do Pinia
+   const inscricaoId = formData.id
+   currentInscricaoId.value = formData.id  // ← guarda aqui
+  
+   if (eventoId) {
+      await fetchServicosOfertados(eventoId)
+   }
+  
+   if (inscricaoId) {
+      await fetchServicosDaInscricao(inscricaoId)
+      console.log('🔍 servicosDaInscricao COMPLETO:', JSON.parse(JSON.stringify(servicosDaInscricao.value)))
+   }
+
+   // Combina os dados e monta a tabela
+   combinarServicos()
+}
+
+// servicosPorDia é derivado dos dados
+const servicosPorDia = ref([]);
+
+const combinarServicos = () => {
+  const dias = []
+  
+  // 1. Base: serviços oferecidos pelo evento
+  servicosOfertados.value.forEach(servico => {
+    dias.push({
+      data: servico.data_servico,
+      id: null,  // ← ID da linha (vem dos serviços salvos)
+      transporte: 'NÃO',
+      hospedagem: 'NÃO',
+      lavanderia: 'NÃO',
+      traslado: 'NÃO',
+      cafe: 'NÃO',
+      almoco: 'NÃO',
+      jantar: 'NÃO',
+      transporte_disabled: servico.oferece_transporte !== 'SIM',
+      hospedagem_disabled: servico.oferece_hospedagem !== 'SIM',
+      lavanderia_disabled: servico.oferece_lavanderia !== 'SIM',
+      traslado_disabled: servico.oferece_traslado !== 'SIM',
+      cafe_disabled: servico.oferece_cafe !== 'SIM',
+      almoco_disabled: servico.oferece_almoco !== 'SIM',
+      jantar_disabled: servico.oferece_jantar !== 'SIM'
+    })
+  })
+  
+  // 2. Sobrescrever com valores já salvos da inscrição
+  servicosDaInscricao.value.forEach(saved => {
+    const dataServico = saved.data_servico.split('T')[0]  // "2026-07-18"
+    const dia = dias.find(d => d.data === dataServico)
+
+    if (dia) {
+      dia.id = saved.id  // ← guarda o ID da linha
+      if (saved.transporte) dia.transporte = saved.transporte
+      if (saved.hospedagem) dia.hospedagem = saved.hospedagem
+      if (saved.lavanderia) dia.lavanderia = saved.lavanderia
+      if (saved.traslado) dia.traslado = saved.traslado
+      if (saved.cafe) dia.cafe = saved.cafe
+      if (saved.almoco) dia.almoco = saved.almoco
+      if (saved.jantar) dia.jantar = saved.jantar
+    }
+  })
+  
+  // 3. Ordenar por data
+  servicosPorDia.value = dias.sort((a, b) => new Date(a.data) - new Date(b.data))
+  console.log('📊 Tabela montada:', servicosPorDia.value)
+}
+
+const servicosOrdenados = computed(() => servicosPorDia.value)
+
+
+const savingServicoDaInscricao = ref({})
+
+const toggleServico = async (data, servico, checked) => {
+  const valor = checked ? 'SIM' : 'NÃO'
+  const dia = servicosPorDia.value.find(d => d.data === data)
+  const valorOriginal = dia[servico]
+
+  console.log(dia);
+  
+  
+  // Verificação de inscrição salva
+  if (!currentInscricaoId.value) {
+    showToast({
+      title: 'Atenção',
+      message: 'Salve a inscrição primeiro antes de marcar serviços. Depois Edite a marque os Serviços',
+      variant: 'warning'
+    })
+
+    // Forçar o switch a voltar visualmente
+    await nextTick()
+    const input = document.querySelector(`input[data-key="${data}_${servico}"]`)
+    if (input) {
+      input.checked = dia[servico] === 'SIM'
+    }
+
+    return
+  }
+  
+  // Resto do código (otimista + reversão no erro)
+  const key = `${data}_${servico}`
+  savingServicoDaInscricao.value[key] = true
+  
+  dia[servico] = valor
+  
+  try {
+
+      // Se tem ID, atualiza registro existente - PATCH
+      if (dia.id) {
+      await api.patch(`/inscricao-servicos-linha/${dia.id}`, {
+         servico: servico,
+         valor: valor
+      })
+      } else {
+      // Cria novo registro - POST
+      await api.post(`/inscricao-servicos-linha`, {
+         inscricao_id: currentInscricaoId.value,
+         data_servico: data,
+         servico: servico,
+         valor: valor
+      })
+      } 
+    
+      showToast({
+         title: 'Sucesso',
+         message: `${servico} atualizado para ${valor}`,
+         variant: 'success'
+      })
+    
+  } catch (error) {
+    dia[servico] = valorOriginal
+    
+    showToast({
+      title: 'Erro',
+      message: error.response?.data?.error || 'Erro ao atualizar serviço',
+      variant: 'danger'
+    })
+  } finally {
+    savingServicoDaInscricao.value[key] = false
+  }
+}
+
+
+
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+const formatarData = (data) => {
+  if (!data) return ''
+  return new Date(data).toLocaleDateString('pt-BR')
+}
+
 
 function chamarRefresh() {
    crudRef.value?.refreshTable();
