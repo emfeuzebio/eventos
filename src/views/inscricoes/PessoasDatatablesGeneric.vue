@@ -264,7 +264,7 @@ const salvarRegiao = async () => {
             {{ errors.value.nome_completo[0] }}
          </div>
 
-         <label class="form-label fw-bold">Nome Social</label>
+         <label class="form-label fw-bold">Nome Social (Crachá)</label>
          <CFormInput
             v-model="form.value.nome_social"
             :class="{ 'is-invalid': errors.nome_social }"
@@ -272,6 +272,20 @@ const salvarRegiao = async () => {
          <div class="form-error" v-if="errors.value.nome_social">
             {{ errors.value.nome_social[0] }}
          </div>
+
+         <label class="form-label fw-bold">Sexo</label>
+         <CFormSelect
+            v-model="form.value.sexo"
+            :options="[
+               { value: '', label: 'Selecione' },
+               { value: 'MASC', label: 'Masculino' },
+               { value: 'FEM', label: 'Feminino' },
+            ]"
+         />
+         <div class="form-error" v-if="errors.value.sexo">
+            {{ errors.value.sexo[0] }}
+         </div>
+
 
          <label class="form-label fw-bold">E-Mail</label>
          <CFormInput

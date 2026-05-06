@@ -9,6 +9,7 @@
       modalSize="xxl"
       modalFullscreen="fullscreen"
       endpoint="inscricao"
+      :pageExtraButtons="pageExtraButtons"
       :filters="filters"
       :columns="columns"
       :defaultValues="defaultValues"
@@ -19,23 +20,12 @@
       ref="crudRef"
       @extraAction="onExtraAction"
       @afterLoad="onAfterLoad"
+      @pageExtraButtonsActions="onpageExtraButtonsActions"
    >
       <template #form="{ form, errors }">
          <!-- {{ form.value.estados }} -->
          <!-- {{ estados }} -->
          <!-- {{ form.value.id }} -->       
-
-         <!-- Debug 2: mostrar serviços carregados -->
-         <div
-            v-if="servicosOfertados?.length > 0"
-            class="alert alert-success small"
-         >
-            ✅ Serviços carregados: {{ servicosOfertados.length }} dias
-            <!-- <pre>{{ servicosOfertados }}</pre> -->
-         </div>
-         <div v-else class="alert alert-warning small">
-            ⚠️ Nenhum serviço carregado ainda. ({{ servicosOfertados }})
-         </div>
 
          <CCard>
             <CCardBody>
@@ -51,7 +41,8 @@
                         <!-- DEBUG: mostrar o evento_id atual -->
                         <div class="alert alert-secondary small">
                            Debug: evento_id = {{ form.value.evento_id }} |
-                           Debug: inscricao_id = {{ form.value.id }} |
+                                  inscricao_id = {{ form.value.id }} |
+                                  Serviços carregados: {{ servicosOfertados.length }} dias
                         </div>
 
                         <!-- Evento -->
@@ -211,6 +202,28 @@
                               </div>
                            </CCol>
                         </CRow>
+
+                        <!-- Observações -->
+                        <CRow class="form-group" style="margin-top: 16px">
+                           <CFormLabel
+                              class="col-sm-3 form-label fw-bold text-end"
+                              >Necessidades Especiais?</CFormLabel
+                           >
+                           <CCol sm="7">
+                              <CFormTextarea
+                                 v-model="form.value.necessidades_especiais"
+                                 :class="{ 'is-invalid': errors.necessidades_especiais }"
+                                 rows="2"
+                                 placeholder="Descreva suas  demandas de acessibilidade para que possamos melhor lhe atender."
+                              />
+                              <div
+                                 class="form-error"
+                                 v-if="errors.value.necessidades_especiais"
+                              >
+                                 {{ errors.value.necessidades_especiais[0] }}
+                              </div>
+                           </CCol>
+                        </CRow>                        
                      </CAccordionBody>
                   </CAccordionItem>
                </CAccordion>
@@ -320,11 +333,31 @@
                                     {{ errors.value.chegada_data_hora[0] }}
                                  </div>
                               </CCol>
-                              <div class="form-error">
-                                 Incluir campo swith: Necessita Traslado do
-                                 Aeroporto ou Rodoviária até o Hotel?
-                              </div>
+
+                              <!-- Chegada Traslado -->
+                              <CCol sm="3">
+                                 <div class="text-center">
+                                    <CFormLabel class="form-label fw-bold text-center"
+                                    >Traslado na Chegada?</CFormLabel>
+                                    <div class="form-check form-switch d-inline-block">
+                                       <input
+                                          type="checkbox"
+                                          class="form-check-input"
+                                          role="switch"
+                                          :checked="form.value.chegada_traslado === 'SIM'"
+                                          @change="form.value.chegada_traslado = $event.target.checked ? 'SIM' : 'NÃO'"
+                                       />
+                                       <span class="ms-1 small">{{
+                                          form.value.chegada_traslado === 'SIM' ? 'SIM' : 'NÃO'
+                                       }}</span>
+                                    </div>
+                                 </div>
+                                 <div class="form-error" v-if="errors.value?.chegada_traslado">
+                                    {{ errors.value.chegada_traslado[0] }}
+                                 </div>
+                              </CCol>                              
                            </CRow>
+
                            <!-- PARTIDA -->
                            <CRow
                               class="form-group mx-auto"
@@ -367,7 +400,7 @@
                                  </div>
                               </CCol>
 
-                              <!-- Partida Cia e Número -->
+                              <!-- Partida Companhia + Nº + Data/Hora -->
                               <CCol sm="3">
                                  <CFormLabel
                                     class="form-label fw-bold text-center"
@@ -387,7 +420,7 @@
                                  </div>
                               </CCol>
 
-                              <!-- Chegada Data/Hora -->
+                              <!-- Partida Data / Hora -->
                               <CCol sm="3">
                                  <CFormLabel
                                     class="form-label fw-bold text-center"
@@ -407,10 +440,29 @@
                                     {{ errors.value.partida_data_hora[0] }}
                                  </div>
                               </CCol>
-                              <div class="form-error">
-                                 Incluir campo swith: Necessita Traslado do
-                                 Aeroporto ou Rodoviária até o Hotel?
-                              </div>
+
+                              <!-- Partida Traslado -->
+                              <CCol sm="3">
+                                 <div class="text-center">
+                                    <CFormLabel class="form-label fw-bold text-center"
+                                    >Traslado na Partida?</CFormLabel>
+                                    <div class="form-check form-switch d-inline-block">
+                                       <input
+                                          type="checkbox"
+                                          class="form-check-input"
+                                          role="switch"
+                                          :checked="form.value.partida_traslado === 'SIM'"
+                                          @change="form.value.partida_traslado = $event.target.checked ? 'SIM' : 'NÃO'"
+                                       />
+                                       <span class="ms-1 small">{{
+                                          form.value.partida_traslado === 'SIM' ? 'SIM' : 'NÃO'
+                                       }}</span>
+                                    </div>
+                                 </div>
+                                 <div class="form-error" v-if="errors.value?.partida_traslado">
+                                    {{ errors.value.partida_traslado[0] }}
+                                 </div>
+                              </CCol>
                            </CRow>
                         </CAccordionBody>
                      </CAccordionItem>
@@ -583,75 +635,75 @@
                            despesas de hospedagem.
                         </CAccordionHeader>
                         <CAccordionBody>
-                           <CRow
-                              class="form-group mx-auto"
-                              style="
-                                 margin-top: 16px;
-                                 width: 300%;
-                                 justify-content: flex-center;
-                              "
-                           >
-                              <CCol>
-                                 <CFormLabel
-                                    class="form-label fw-bold text-left"
-                                 >
+                           <CRow class="form-group" style="margin-top: 16px">
+                              <CCol sm="12">
+                                 <CFormLabel class="form-label fw-bold text-left">
                                     Marque a opção que deseja
                                  </CFormLabel>
+                                 
                                  <div>
                                     <CFormCheck
                                        type="radio"
                                        name="custeio_hospedagem"
                                        value="Custeada pela FEB"
                                        label="Ocuparei uma das duas vagas no quarto duplo que a FEB oferece para cada Federativa Estadual ou funções descritas acima."
-                                       :checked="
-                                          form.value.custeio_hospedagem ===
-                                          'Custeada pela FEB'
-                                       "
-                                       @change="
-                                          form.value.custeio_hospedagem =
-                                             'Custeada pela FEB'
-                                       "
+                                       :checked="form.value.custeio_hospedagem === 'Custeada pela FEB'"
+                                       @change="form.value.custeio_hospedagem = 'Custeada pela FEB'"
                                     /><br />
+                                    
                                     <CFormCheck
                                        type="radio"
                                        name="custeio_hospedagem"
                                        value="Não solicitada"
                                        label="Não utilizarei hospedagem oferecida pela FEB."
-                                       :checked="
-                                          form.value.custeio_hospedagem ===
-                                          'Não solicitada'
-                                       "
-                                       @change="
-                                          form.value.custeio_hospedagem =
-                                             'Não solicitada'
-                                       "
+                                       :checked="form.value.custeio_hospedagem === 'Não solicitada'"
+                                       @change="form.value.custeio_hospedagem = 'Não solicitada'"
                                     /><br />
+                                    
                                     <CFormCheck
                                        type="radio"
                                        name="custeio_hospedagem"
                                        value="Paga pela Pessoa"
                                        label="Ocuparei vaga em quarto single, custeando a diferença equivalente ao quarto duplo oferecido pela FEB, tendo sido autorizado pela comissão organizadora."
-                                       :checked="
-                                          form.value.custeio_hospedagem ===
-                                          'Paga pela Pessoa'
-                                       "
-                                       @change="
-                                          form.value.custeio_hospedagem =
-                                             'Paga pela Pessoa'
-                                       "
+                                       :checked="form.value.custeio_hospedagem === 'Paga pela Pessoa'"
+                                       @change="form.value.custeio_hospedagem = 'Paga pela Pessoa'"
                                     />
                                  </div>
-                                 <div
-                                    class="form-error"
-                                    v-if="errors.value.custeio_hospedagem"
-                                 >
+                                 
+                                 <div class="form-error" v-if="errors.value.custeio_hospedagem">
                                     {{ errors.value.custeio_hospedagem[0] }}
                                  </div>
-                                 <div class="form-error">
-                                    Incluir campo: dividir quarto com a pessoa
+                                 
+                                 <!-- Divisor visual -->
+                                 <hr class="my-3" />
+                                 
+                                 <!-- Select para dividir quarto -->
+                                 <CFormLabel class="form-label fw-bold">
+                                    Compartilhar o quarto com (opcional)
+                                 </CFormLabel>
+                                 
+                                 <div class="d-block" style="max-width: 500px">
+                                 <CoreUIMultiselect
+                                    v-model="form.value.hotel_pessoa_indicada_id"
+                                    :options="[
+                                       { value: '', label: 'Selecione a pessoa' },
+                                       ...pessoas.map((pessoa) => ({
+                                          value: pessoa.id,
+                                          label: pessoa.nome_completo,
+                                       })),
+                                    ]"
+                                    style="max-width: 500px"
+                                 /></div>
+                                 
+                                 <div class="form-error" v-if="errors.value?.hotel_pessoa_indicada_id">
+                                    {{ errors.value.hotel_pessoa_indicada_id[0] }}
                                  </div>
+                                 
+                                 <small class="text-muted">
+                                    Aqui você pode indicar a pessoa com quem deseja compartilhar o quarto (opcional)
+                                 </small>
                               </CCol>
-                           </CRow>
+                           </CRow>                           
                         </CAccordionBody>
                      </CAccordionItem>
                   </CAccordion>
@@ -1010,9 +1062,12 @@ const combinarServicos = () => {
   
   // 1. Base: serviços oferecidos pelo evento
   servicosOfertados.value.forEach(servico => {
+    // Extrai apenas a data (YYYY-MM-DD) sem timezone
+    const dataServico = servico.data_servico.split('T')[0]
+    
     dias.push({
-      data: servico.data_servico,
-      id: null,  // ← ID da linha (vem dos serviços salvos)
+      data: dataServico,
+      id: null,
       transporte: 'NÃO',
       hospedagem: 'NÃO',
       lavanderia: 'NÃO',
@@ -1032,18 +1087,19 @@ const combinarServicos = () => {
   
   // 2. Sobrescrever com valores já salvos da inscrição
   servicosDaInscricao.value.forEach(saved => {
-    const dataServico = saved.data_servico.split('T')[0]  // "2026-07-18"
+    // Extrai apenas a data (YYYY-MM-DD) sem timezone
+    const dataServico = saved.data_servico.split('T')[0]
     const dia = dias.find(d => d.data === dataServico)
 
     if (dia) {
-      dia.id = saved.id  // ← guarda o ID da linha
-      if (saved.transporte) dia.transporte = saved.transporte
-      if (saved.hospedagem) dia.hospedagem = saved.hospedagem
-      if (saved.lavanderia) dia.lavanderia = saved.lavanderia
-      if (saved.traslado) dia.traslado = saved.traslado
-      if (saved.cafe) dia.cafe = saved.cafe
-      if (saved.almoco) dia.almoco = saved.almoco
-      if (saved.jantar) dia.jantar = saved.jantar
+      dia.id = saved.id
+      dia.transporte = saved.transporte || 'NÃO'
+      dia.hospedagem = saved.hospedagem || 'NÃO'
+      dia.lavanderia = saved.lavanderia || 'NÃO'
+      dia.traslado = saved.traslado || 'NÃO'
+      dia.cafe = saved.cafe || 'NÃO'
+      dia.almoco = saved.almoco || 'NÃO'
+      dia.jantar = saved.jantar || 'NÃO'
     }
   })
   
@@ -1052,8 +1108,8 @@ const combinarServicos = () => {
   console.log('📊 Tabela montada:', servicosPorDia.value)
 }
 
-const servicosOrdenados = computed(() => servicosPorDia.value)
 
+const servicosOrdenados = computed(() => servicosPorDia.value)
 
 const savingServicoDaInscricao = ref({})
 
@@ -1062,9 +1118,6 @@ const toggleServico = async (data, servico, checked) => {
   const dia = servicosPorDia.value.find(d => d.data === data)
   const valorOriginal = dia[servico]
 
-  console.log(dia);
-  
-  
   // Verificação de inscrição salva
   if (!currentInscricaoId.value) {
     showToast({
@@ -1083,35 +1136,46 @@ const toggleServico = async (data, servico, checked) => {
     return
   }
   
-  // Resto do código (otimista + reversão no erro)
   const key = `${data}_${servico}`
-  savingServicoDaInscricao.value[key] = true
-  
+  savingServicoDaInscricao.value[key] = true 
   dia[servico] = valor
   
   try {
+    let response
 
-      // Se tem ID, atualiza registro existente - PATCH
-      if (dia.id) {
-      await api.patch(`/inscricao-servicos-linha/${dia.id}`, {
-         servico: servico,
-         valor: valor
+    // Se tem ID, atualiza registro existente - PATCH
+    if (dia.id) {
+      response = await api.patch(`/inscricao-servicos-linha/${dia.id}`, {
+        servico: servico,
+        valor: valor
       })
-      } else {
+    } else {
       // Cria novo registro - POST
-      await api.post(`/inscricao-servicos-linha`, {
-         inscricao_id: currentInscricaoId.value,
-         data_servico: data,
-         servico: servico,
-         valor: valor
+      response = await api.post(`/inscricao-servicos-linha`, {
+        inscricao_id: currentInscricaoId.value,
+        data_servico: data,
+        servico: servico,
+        valor: valor
       })
-      } 
+      
+      // Atualiza o ID do dia com o retorno do backend
+      if (response.data.id) {
+        dia.id = response.data.id
+      }
+    }
     
-      showToast({
-         title: 'Sucesso',
-         message: `${servico} atualizado para ${valor}`,
-         variant: 'success'
-      })
+    // Verificar se o backend excluiu o registro (todos NÃO)
+    if (response.data.deleted) {
+      // Recarregar a tabela para remover a linha
+      await fetchServicosDaInscricao(currentInscricaoId.value)
+      combinarServicos()
+    }
+    
+    showToast({
+      title: 'Sucesso',
+      message: `${servico} atualizado para ${valor}`,
+      variant: 'success'
+    })
     
   } catch (error) {
     dia[servico] = valorOriginal
@@ -1126,7 +1190,51 @@ const toggleServico = async (data, servico, checked) => {
   }
 }
 
+// +++ Relatório +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+/**
+ * BASE Crud - Page Buttons são o Botões Extras no canto superior direito
+ */
+// const pageExtraButtons = [{}]; // sem extra buttons
+const pageExtraButtons = computed(() => [
+   {
+      label: '<i class="fa fa-print"></i> Inscrições PDF',
+      action: 'printRelInscricoes',
+      class: 'btn btn-sm btn-outline-info me-1',
+   },
+]);
+
+/**
+ * CAPTURA as ações click dos pega Buttons e chama as funções necessárias
+ */
+const onpageExtraButtonsActions = async ({ label, action }) => {
+   // console.log('onpageExtraButtonsActions: ', label, action);
+
+   // Vamos chamar a função necessária para este evento
+   if (action === 'printRelInscricoes') {
+      printRelInscricoes();
+   }
+};
+
+async function printRelInscricoes() {
+   const response = await api.get(
+      `/inscricao/relinscricoes/${currentEvent.value?.id}`,
+      {
+         params: { orderby: 'chegada' },
+         responseType: 'blob',
+      }
+   );
+
+   const blob = new Blob([response.data], { type: 'application/pdf' });
+   const url = window.URL.createObjectURL(blob);
+   window.open(url, '_blank');
+   window.URL.revokeObjectURL(url); // Liberar URL da memória
+
+   showToast({
+      title: 'Sucesso',
+      message: `Relatório gerado com sucesso.`,
+   });
+}
 
 
 
@@ -1134,9 +1242,11 @@ const toggleServico = async (data, servico, checked) => {
 
 const formatarData = (data) => {
   if (!data) return ''
-  return new Date(data).toLocaleDateString('pt-BR')
+  // Apenas reorganiza a string YYYY-MM-DD para DD/MM/YYYY
+  const partes = data.split('-')
+  if (partes.length !== 3) return data
+  return `${partes[2]}/${partes[1]}/${partes[0]}`
 }
-
 
 function chamarRefresh() {
    crudRef.value?.refreshTable();
