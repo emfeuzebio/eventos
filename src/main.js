@@ -5,8 +5,6 @@ import piniaPersist from 'pinia-plugin-persistedstate'
 
 import App from './App.vue'
 import router from '@/router/router' 
- './router'
-
 import CoreuiVue from '@coreui/vue'
 import CIcon from '@coreui/icons-vue'
 import { iconsSet as icons } from '@/assets/icons'

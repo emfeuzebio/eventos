@@ -17,27 +17,11 @@
          <!-- {{ form.value }} -->
 
          <label class="form-label fw-bold">Evento</label>
-         <CFormSelect
-            v-model="form.value.evento_id"
-            :disabled="form.value.ativo === 'NÃO'"
-            :options="[
-               // ...((glbventosAtivos || []).filter(ev => hotelTemQuartos ? ev.id === 1 : true
-               // ...((glbventosAtivos || []).filter(ev => form.value.ativo === 'NÃO' ? ev.id === form.value.evento_id : true
-               ...(todosEventos || [])
-                  .filter(
-                     (ev) =>
-                        form.value.ativo === 'SIM' ? ev.ativo === 'SIM' : true
-                     // ...((todosEventos    || []).filter(ev => true
-                  )
-                  .map((ev) => ({
-                     value: ev.id,
-                     label: ev.nome,
-                  })),
-            ]"
+         <CFormInput
+            :value="currentEvent?.nome"
+            disabled
          />
-         <div class="form-error" v-if="errors.value.evento_id">
-            {{ errors.value.evento_id[0] }}
-         </div>
+         <input type="hidden" v-model="form.value.evento_id" />         
 
          <label class="form-label fw-bold">Nome do Hotel</label>
          <CFormInput
@@ -59,7 +43,7 @@
             {{ errors.value.sigla[0] }}
          </div>
 
-         <label class="form-label fw-bold">Endereço Completo</label>
+         <label class="form-label fw-bold">Endereço Completo xx</label>
          <CFormTextarea
             v-model="form.value.endereco"
             :class="{ 'is-invalid': errors.endereco }"
@@ -346,7 +330,7 @@ const { showError } = useGlobalError(); // Modal de Erros
 import { useCurrentEventStore } from '@/stores/currentEvent';
 const currentEventStore = useCurrentEventStore();
 const currentEvent = computed(() => currentEventStore.currentEvent);
-const glbventosAtivos = computed(() => eventosStore.ativos);
+// const glbventosAtivos = computed(() => eventosStore.ativos);
 // console.log('Eventos Ativos:', glbventosAtivos);
 
 // carrega listas de estidades da API para popular listas: <selects> os filtros
@@ -397,6 +381,7 @@ const defaultValues = {
    capacidade: '1',
    custeado: 'SIM',
    disponivel: 'SIM',
+   ativo: 'SIM',
 };
 
 /**
@@ -428,8 +413,8 @@ const extraColumnRender = (row) => {
 // carrega listas de entidades da API para popular listas: <selects> os filtros
 // Agora a Lista de Eventos Ativos sõa carregado única vez após o login e ficam na Store
 import { useEventosStore } from '@/stores/useEventosStore';
-import { isNullOrUndef } from 'chart.js/helpers';
-import { sassNull } from 'sass';
+// import { isNullOrUndef } from 'chart.js/helpers';
+// import { sassNull } from 'sass';
 const eventosStore = useEventosStore();
 
 /**
@@ -445,7 +430,7 @@ const deleteModalVisible = ref(false); // controle do modal de exclusão
 
 const editarQuartoModal = ref(false);
 const quartoSelecionado = ref(null);
-const hotelTemQuartos = ref(false);
+// const hotelTemQuartos = ref(false);
 
 // Foco no campo número quando o modal é aberto
 const numeroFoco = ref(null);
@@ -456,12 +441,12 @@ const focoNoNumero = async () => {
 };
 
 const eventStore = useCurrentEventStore();
-const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
+// const globalEventoId = computed(() => eventStore.currentEvent?.id || '');
 // console.log('Evento ID:', globalEventoId.value);
 
 // filtros externos (você pode mudar conforme o seu contexto)
 const externalFilters = ref({
-   hotel_id: '1', // exemplo
+   hotel_id: null, // exemplo
    ativo: 'SIM', // exemplo
 });
 
@@ -618,7 +603,7 @@ const novoQuartoDoHotel = async () => {
       return;
    }
 
-   fetchQuartoTipos();
+   await fetchQuartoTipos();
 
    // inicializa o objeto com dados padrão
    quartoSelecionado.value = {
@@ -645,7 +630,7 @@ const editarQuartoDoHotel = async (quarto) => {
       return;
    }
 
-   fetchQuartoTipos();
+   await fetchQuartoTipos();
 
    quartoSelecionado.value = { ...quarto };
    quatosFormErros.value = {}; // limpa erros antigos
@@ -821,20 +806,20 @@ const gerarRelatorio = async (hotelId) => {
    }
 };
 
-const abrirRelatorioHotel = async (hotelId) => {
-   try {
-      // const response = await api.get(`/hotel/relatoriourl/${hotelId}`);
-      const response = await api.get(`/hotel/relatoriourl/${hotelId}/link`);
-      const signedUrl = response.data.url;
-      window.open(signedUrl, '_blank');
-   } catch (error) {
-      showToast({
-         title: 'Erro',
-         message: 'Não foi possível abrir o relatório.',
-         variant: 'danger',
-      });
-   }
-};
+// const abrirRelatorioHotel = async (hotelId) => {
+//    try {
+//       // const response = await api.get(`/hotel/relatoriourl/${hotelId}`);
+//       const response = await api.get(`/hotel/relatoriourl/${hotelId}/link`);
+//       const signedUrl = response.data.url;
+//       window.open(signedUrl, '_blank');
+//    } catch (error) {
+//       showToast({
+//          title: 'Erro',
+//          message: 'Não foi possível abrir o relatório.',
+//          variant: 'danger',
+//       });
+//    }
+// };
 
 // filtro da página - usar quando não há filtros
 // const filters = [{}]; // nessse caso sem filtros

@@ -243,6 +243,7 @@ import EasyDataTable from 'vue3-easy-data-table';
 import 'vue3-easy-data-table/dist/style.css';
 
 import { useEventos } from '@/composables/useEventos';
+
 const {
    eventos,
    fetchEventos,
@@ -300,6 +301,7 @@ const defaultValues = {
    capacidade: '1',
    custeado: 'SIM',
    disponivel: 'SIM',
+   ativo: 'SIM', 
 };
 
 /**

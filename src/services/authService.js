@@ -40,10 +40,41 @@ export function removeToken() {
   localStorage.removeItem('token')
 }
 
+export async function logout() { 
+  try {
+    const userStore = useUserStore()    
+
+    // Limpar tokens
+    removeAllTokens()
+    
+    // Limpar localStorage
+    localStorage.removeItem('user')
+    localStorage.removeItem('currentEvent')
+    localStorage.removeItem('eventos')
+    localStorage.removeItem('menus')
+    
+    // Limpar a store completamente
+    userStore.clear()    
+
+    // Tenta fazer logout na API (não bloqueia)
+    try {
+      await api.post(aclURL + 'api/auth/logout')
+    } catch (e) {
+      console.warn('Erro no logout da API:', e)
+    }
+    
+    return null
+
+  } catch (error) {
+    console.error('Erro no logout:', error);
+    return null
+  } 
+}
+
 /**
  * Faz logout: revoga o token na API + limpa token + limpa store
  */
-export async function logout() { 
+export async function APAGARlogout() { 
   try {
     // Primeiro: limpar dados locais IMEDIATAMENTE
     const userStore = useUserStore()    
@@ -160,4 +191,80 @@ export async function selectSystem(systemId) {
   return await api.post('/auth/selectSystem', {
     systemId: systemId,
   })
+}
+
+// ==============================================
+// REFRESH TOKEN
+// ==============================================
+
+/**
+ * Armazena o refresh token
+ */
+export function setRefreshToken(refreshToken) {
+  localStorage.setItem('refresh_token', refreshToken)
+}
+
+/**
+ * Retorna o refresh token do localStorage
+ */
+export function getRefreshToken() {
+  return localStorage.getItem('refresh_token')
+}
+
+/**
+ * Remove o refresh token
+ */
+export function removeRefreshToken() {
+  localStorage.removeItem('refresh_token')
+}
+
+/**
+ * Tenta renovar o token usando o refresh token
+ * Retorna o novo token ou null em caso de erro
+ */
+export async function refreshAccessToken() {
+  const refreshToken = getRefreshToken()
+  
+  if (!refreshToken) {
+    console.warn('Refresh token não encontrado')
+    return null
+  }
+
+  try {
+    // Cria uma instância separada do axios para evitar loop no interceptor
+    const axiosInstance = axios.create({
+      baseURL: api.defaults.baseURL,
+      headers: { 'Content-Type': 'application/json' }
+    })
+
+    const response = await axiosInstance.post('/auth/refresh', {
+      refresh_token: refreshToken
+    })
+
+    const newToken = response.data.token
+    const newRefreshToken = response.data.refresh_token
+
+    if (newToken) {
+      setToken(newToken)
+      
+      if (newRefreshToken) {
+        setRefreshToken(newRefreshToken)
+      }
+      
+      return newToken
+    }
+
+    return null
+  } catch (error) {
+    console.error('Erro ao renovar token:', error)
+    return null
+  }
+}
+
+/**
+ * Remove token e refresh token (logout)
+ */
+export function removeAllTokens() {
+  removeToken()
+  removeRefreshToken()
 }
