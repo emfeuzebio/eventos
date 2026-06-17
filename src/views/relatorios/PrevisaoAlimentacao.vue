@@ -10,8 +10,7 @@
 
     <!-- Botão para gerar PDF -->
     <CButton
-      color="success"
-      size="lg"
+      class="'btn btn-lg btn-outline-info me-1"
       @click="gerarPDF"
       :disabled="loading"
     >
@@ -87,13 +86,21 @@ const dadosResumo = ref(null);
 // Verificar permissão
 const podeAcessar = computed(() => {
   const abilities = getAbilities();
-  return abilities.includes('relatorio.alimentacao');
+  console.log('Abilities do usuário:', abilities);
+  // return abilities.includes('relatorio.alimentacao');
+  // return abilities.includes('inscricao.rel.alimentacao.prev'); // incluida a autotirization no ACL4
+  return abilities.includes('inscricao.update');
 });
 
 // Gerar PDF
 const gerarPDF = async () => {
   if (!currentEvent.value?.id) {
     erro.value = 'Nenhum evento selecionado.';
+    return;
+  }
+
+  if (!podeAcessar.value) {
+    erro.value = 'Acesso Negado. Seu Perfil de Acesso não permite gerar este relatório.';
     return;
   }
 
@@ -114,7 +121,7 @@ const gerarPDF = async () => {
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `previsao_alimentacao_${currentEvent.value.sigla || 'evento'}.pdf`;
+    link.download = `${currentEvent.value.sigla || 'evento'}_previsao_alimentacao.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -147,7 +154,8 @@ if (!podeAcessar.value) {
 </script>
 
 <style scoped>
-.btn-success {
-  min-width: 200px;
-}
+  .btn-success {
+    min-width: 200px;
+  }
 </style>
+

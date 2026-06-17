@@ -368,10 +368,10 @@ const routes = [
               return h(resolveComponent('router-view'))
             },
           },
-          redirect: '/inscricoes/relatorios/alimentacao',
+          redirect: '/relatorios/alimentacao',
           children: [
             {
-              path: '/inscricoes/relatorios/alimentacao',
+              path: '/relatorios/alimentacao',
               name: 'Previsão de Alimentação',
               component: () => import('@/views/relatorios/PrevisaoAlimentacao.vue'),
             },
