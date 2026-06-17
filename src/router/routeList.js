@@ -359,6 +359,36 @@ const routes = [
           ],
         },
 
+        // Relatórios
+        {
+          path: '/relatorios',
+          name: 'Relatórios',
+          component: {
+            render() {
+              return h(resolveComponent('router-view'))
+            },
+          },
+          redirect: '/inscricoes/relatorios/alimentacao',
+          children: [
+            {
+              path: '/inscricoes/relatorios/alimentacao',
+              name: 'Previsão de Alimentação',
+              component: () => import('@/views/relatorios/PrevisaoAlimentacao.vue'),
+            },
+            // futuros relatórios aqui
+            // {
+            //   path: '/relatorios/bilhetes',
+            //   name: 'Bilhetes Refeitório',
+            //   component: () => import('@/views/relatorios/BilhetesRefeitorio.vue'),
+            // },
+            // {
+            //   path: '/relatorios/custos',
+            //   name: 'Custos Alimentação',
+            //   component: () => import('@/views/relatorios/CustosAlimentacao.vue'),
+            // },
+          ],
+        },        
+
         // Cadastros
         {
           path: '/cadastros',
