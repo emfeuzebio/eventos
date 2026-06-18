@@ -375,6 +375,11 @@ const routes = [
               name: 'Previsão de Alimentação',
               component: () => import('@/views/relatorios/PrevisaoAlimentacao.vue'),
             },
+            {
+              path: '/relatorios/etiquetas-inscricao',
+              name: 'Etiquetas de Inscrição',
+              component: () => import('@/views/relatorios/EtiquetasInscricao.vue'),
+            },            
             // futuros relatórios aqui
             // {
             //   path: '/relatorios/bilhetes',
@@ -526,8 +531,7 @@ const routes = [
 
   export default routes
 
-  /*
+ /*
 
-    localhost:3000/#/pages/resetpassword/?token=j5kwlJMts3JziUKzjaY0Qw657tZpkQHy55YBFDCcKKEjk0aMaWgrfTVyc8p3j2YY?email=emfeuzebio72%40gmail.com
+ */
 
-  */

@@ -86,7 +86,7 @@ const dadosResumo = ref(null);
 // Verificar permissão
 const podeAcessar = computed(() => {
   const abilities = getAbilities();
-  console.log('Abilities do usuário:', abilities);
+  // console.log('Abilities do usuário:', abilities);
   // return abilities.includes('relatorio.alimentacao');
   // return abilities.includes('inscricao.rel.alimentacao.prev'); // incluida a autotirization no ACL4
   return abilities.includes('inscricao.update');
