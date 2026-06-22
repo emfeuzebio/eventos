@@ -379,7 +379,12 @@ const routes = [
               path: '/relatorios/etiquetas-inscricao',
               name: 'Etiquetas de Inscrição',
               component: () => import('@/views/relatorios/EtiquetasInscricao.vue'),
-            },            
+            },   
+            {
+              path: '/relatorios/etiquetas-customizadas',
+              name: 'Etiqueta Customizada para Crachá',
+              component: () => import('@/views/relatorios/EtiquetaCustomizada.vue'),
+            },                     
             // futuros relatórios aqui
             // {
             //   path: '/relatorios/bilhetes',
