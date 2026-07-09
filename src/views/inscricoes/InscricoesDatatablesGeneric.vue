@@ -1198,6 +1198,11 @@ const toggleServico = async (data, servico, checked) => {
 // const pageExtraButtons = [{}]; // sem extra buttons
 const pageExtraButtons = computed(() => [
    {
+      label: '<i class="fa fa-print"></i> Pessoas PDF',
+      action: 'printRelPessoasInscritas',
+      class: 'btn btn-sm btn-outline-info me-1',
+   },
+   {
       label: '<i class="fa fa-print"></i> Inscrições PDF',
       action: 'printRelInscricoes',
       class: 'btn btn-sm btn-outline-info me-1',
@@ -1214,7 +1219,31 @@ const onpageExtraButtonsActions = async ({ label, action }) => {
    if (action === 'printRelInscricoes') {
       printRelInscricoes();
    }
+
+   if (action === 'printRelPessoasInscritas') {
+      printRelPessoasInscritas();
+   }
 };
+
+async function printRelPessoasInscritas() {
+   const response = await api.get(
+      `/inscricao/relpessoasinscritas/${currentEvent.value?.id}`,
+      {
+         params: { orderby: 'chegada' },
+         responseType: 'blob',
+      }
+   );
+
+   const blob = new Blob([response.data], { type: 'application/pdf' });
+   const url = window.URL.createObjectURL(blob);
+   window.open(url, '_blank');
+   window.URL.revokeObjectURL(url); // Liberar URL da memória
+
+   showToast({
+      title: 'Sucesso',
+      message: `Relatório gerado com sucesso.`,
+   });
+}
 
 async function printRelInscricoes() {
    const response = await api.get(
