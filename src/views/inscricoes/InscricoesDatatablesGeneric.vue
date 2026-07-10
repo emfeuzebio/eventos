@@ -982,6 +982,7 @@ import api from '@/services/api';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { useToast } from '@/composables/useToast';
 import { formatToBrDateTime } from '@/utils/dateFormat';
+import { useGlobalError } from '@/composables/useGlobalError';
 import DataTablesLib from 'datatables.net-bs5';
 
 const custeio_refeicao = reactive();
@@ -992,6 +993,8 @@ import { useCurrentEventStore } from '@/stores/currentEvent';
 const eventStore = useCurrentEventStore();
 const currentEvent = computed(() => eventStore.getEvent);
 // console.log('Inscrição currentEvent:', currentEvent.value);
+
+const { showError } = useGlobalError(); // Modal de Erros
 
 // define a Entidade Principal da View
 const entity = 'inscricao';
@@ -1283,6 +1286,24 @@ function chamarRefresh() {
    crudRef.value?.refreshTable();
 }
 
+function podeAtualizarInscricao(row) {
+
+      // TODAS Somente se Inscrição Ativa
+      if (row.ativo != 'SIM') {
+         showError('Somente <b>Inscrições ATIVAS</b> podem ser atualizadas.');
+         return false;
+      }
+
+      // TODAS Somente se Evento Ativo
+      if (!row.evento || row.evento.ativo !== 'SIM') {
+         showError('Somente <b>Inscrições de Eventos ATIVOS</b> podem ser atualizadas.');
+         // showToast({title: 'Alerta!', message: 'Somente <b>Inscrições de Eventos ATIVOS</b> podem ser atualizadas.', color: 'danger'});
+         return false;
+      }
+
+      return true;
+}
+
 /**
  * BASE Crud - colunas da tabela de dados
  */
@@ -1329,15 +1350,17 @@ const columns = [
          const canMarcarTrasladoChegada = abilities.includes('inscricao.update') ? '': 'disabled';
          const isTrasladoChegada = row.traslado_chegada_executou	=== 'SIM' ? 'checked' : '';
 
-         return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>
-                  <br/>
-                  <div class="text-left">         
-                     <div class="form-check form-switch d-inline-block">
-                        <label style="font-size: 12px; font-weight: bold;">Trasladou?</label>
-                        <input class="form-check-input" ${canMarcarTrasladoChegada} data-custom-action="alternarTrasladoChegada" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isTrasladoChegada} >
-                     </div>
-                  </div>
-         `;
+         const checks = (row.chegada_traslado != 'SIM' ? '' : 
+            `<br/>
+             <div class="text-left">         
+               <div class="form-check form-switch d-inline-block">
+                  <label style="font-size: 12px; font-weight: bold;">Trasladou?</label>
+                  <input class="form-check-input" ${canMarcarTrasladoChegada} data-custom-action="alternarTrasladoChegada" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isTrasladoChegada} >
+               </div>
+             </div>
+            `);
+
+         return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>` + checks;
       },
       className: 'text-left',
       width: '180px',
@@ -1355,15 +1378,17 @@ const columns = [
          const canMarcarTrasladoPartida = abilities.includes('inscricao.update') ? '': 'disabled';
          const isTrasladoPartida = row.traslado_partida_executou	=== 'SIM' ? 'checked' : '';
 
-         return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>
-                  <br/>
-                  <div class="text-left">         
-                     <div class="form-check form-switch d-inline-block">
-                        <label style="font-size: 12px; font-weight: bold;">Trasladou?</label>
-                        <input class="form-check-input" ${canMarcarTrasladoPartida} data-custom-action="alternarTrasladoPartida" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isTrasladoPartida} >
-                     </div>
-                  </div>
-         `;
+         const checks = (row.chegada_traslado != 'SIM' ? '' : 
+         `<br/>
+            <div class="text-left">         
+               <div class="form-check form-switch d-inline-block">
+                  <label style="font-size: 12px; font-weight: bold;">Trasladou?</label>
+                  <input class="form-check-input" ${canMarcarTrasladoPartida} data-custom-action="alternarTrasladoPartida" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isTrasladoPartida} >
+               </div>
+            </div>
+         `);
+
+         return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>` + checks;
       },
       className: 'text-left',
       width: '180px',
@@ -1376,9 +1401,10 @@ const columns = [
       render: function (data, type, row) {
          const canAlternarHotel = abilities.includes('inscricao.update') ? '': 'disabled';
          const isHotelCheckin = row.hotel_checkin  === 'SIM' ? 'checked' : '';
-         const isHotelCheckout = row.hotel_checkout	=== 'SIM' ? 'checked' : '';
+         const isHotelCheckout = row.hotel_checkout === 'SIM' ? 'checked' : '';
 
-         return `<span class="">Hospedagem</span> <br/> <small class="text-muted"></small>
+         const checks = (!row.hotel_quarto_id ? '' : 
+          `<span class="">Hospedagem</span> <br/> <small class="text-muted"></small>
                   <br/>
                   <div class="text-left">         
                      <div class="form-check form-switch d-inline-block">
@@ -1393,7 +1419,9 @@ const columns = [
                         <input class="form-check-input" ${canAlternarHotel} data-custom-action="alternarHotelCheckout" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isHotelCheckout} >
                      </div>
                   </div>
-         `;         
+         `);         
+
+         return checks;
       },
    },
    {
@@ -1503,6 +1531,22 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       const inscricaoId = row.id;
       const isChecked = target[0].checked ? 'SIM' : 'NÃO';
 
+      if (!row.evento || row.evento.ativo !== 'SIM') {
+         showError('Somente <b>Inscrições de Eventos ATIVOS</b> podem ser atualizadas.');
+         return false;
+      }
+
+      // Somente se Inscrição NÃO solicitou traslado de chegada
+      if (  row.credenciou == 'SIM' 
+         || row.traslado_chegada_executou == 'SIM' 
+         || row.traslado_partida_executou == 'SIM' 
+         || row.hotel_checkin == 'SIM' 
+         || row.hotel_checkout == 'SIM' ) {
+         showError('Somente <b>Inscrições SEM NENHUM Check Point marcado</b> podem ser Desativadas, desmarque-os antes');
+         return;
+      }
+
+
       try {
          const response = await api.put(`/inscricao/alternarinscricaoativa/${inscricaoId}`, {
             ativo: isChecked,
@@ -1533,6 +1577,11 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
    if (action == 'alternarCredenciamento') {
       const inscricaoId = row.id;
       const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      // valida regras gerais para atualizar um inscrição: Evento e Inscrição ativos
+      if(!podeAtualizarInscricao(row)) {
+         return;
+      };
 
       try {
          const response = await api.put(`/inscricao/alternarcredenciamento/${inscricaoId}`, {
@@ -1565,6 +1614,17 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       const inscricaoId = row.id;
       const isChecked = target[0].checked ? 'SIM' : 'NÃO';
 
+      // valida regras gerais para atualizar um inscrição: Evento e Inscrição ativos
+      if(!podeAtualizarInscricao(row)) {
+         return;
+      };      
+      
+      // Somente se Inscrição solicitou traslado de chegada
+      if (row.chegada_traslado != 'SIM') {
+         showError('Somente <b>Inscrições com Traslado de CHEGADA Solicitado</b> podem ser atualizadas.');
+         return;
+      }
+
       try {
          const response = await api.put(`/inscricao/marcarchegada/${inscricaoId}`, {
             traslado_chegada_executou: isChecked,
@@ -1592,10 +1652,20 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       chamarRefresh();
    }
 
-   // TODO erro na API nesse metodo
    if (action == 'alternarTrasladoPartida') {
       const inscricaoId = row.id;
       const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      // valida regras gerais para atualizar um inscrição: Evento e Inscrição ativos
+      if(!podeAtualizarInscricao(row)) {
+         return;
+      };      
+
+      // Somente se Inscrição solicitou traslado de partida
+      if (row.partida_traslado != 'SIM') {
+         showError('Somente <b>Inscrições com Traslado de PARTIDA Solicitado</b> podem ser atualizadas.');
+         return;
+      }
 
       try {
          const response = await api.put(`/inscricao/marcarpartida/${inscricaoId}`, {
@@ -1628,6 +1698,23 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
       const inscricaoId = row.id;
       const isChecked = target[0].checked ? 'SIM' : 'NÃO';
 
+      // valida regras gerais para atualizar um inscrição: Evento e Inscrição ativos
+      if(!podeAtualizarInscricao(row)) {
+         return;
+      };
+
+      // Somente se Inscrição já credenciou
+      if (row.credenciou != 'SIM' ) {
+         showError('Somente <b>Inscrições com Credenciamento Efetuado</b> podem ser atualizadas.');
+         return;
+      }
+
+      // Somente se Inscrição já tem Hotel definido
+      if (!row.hotel_quarto_id) {
+         showError('Somente <b>Inscrições com Quarto de HOTEL definido</b> podem ser atualizadas.');
+         return;
+      }
+
       try {
          const response = await api.put(`/inscricao/marcarcheckin/${inscricaoId}`, {
             hotel_checkin: isChecked,
@@ -1658,6 +1745,29 @@ const onExtraAction = async ({ id, row, action, dataset, target }) => {
    if (action == 'alternarHotelCheckout') {
       const inscricaoId = row.id;
       const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      // valida regras gerais para atualizar um inscrição: Evento e Inscrição ativos
+      if(!podeAtualizarInscricao(row)) {
+         return;
+      };
+
+      // Somente se Inscrição já credenciou
+      if (row.credenciou != 'SIM' ) {
+         showError('Somente <b>Inscrições com Credenciamento Efetuado</b> podem ser atualizadas.');
+         return;
+      }
+
+      // Somente se Inscrição já tem Quarto de Hotel definido
+      if (!row.hotel_quarto_id) {
+         showError('Somente <b>Inscrições com Quarto de HOTEL definido</b> podem ser atualizadas.');
+         return;
+      }
+
+      // Somente se Inscrição já tem Check-In efetuado
+      if (row.hotel_checkin != 'SIM') {
+         showError('Somente <b>Inscrições com Check-In efetuado no HOTEL</b> podem ser atualizadas. Faça o Check-In primeiro.');
+         return;
+      }
 
       try {
          const response = await api.put(`/inscricao/marcarcheckout/${inscricaoId}`, {

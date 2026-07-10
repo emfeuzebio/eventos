@@ -17,7 +17,7 @@
 
       <!-- Corpo do toast com texto colorido simples -->
       <CToastBody :class="`bg-white text-${toast.color}`">
-        {{ toast.message || 'Sem mensagem' }}
+        <span v-html="toast.message || 'Sem mensagem'"></span>
       </CToastBody>      
 
       </CToast>
