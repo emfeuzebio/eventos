@@ -1015,6 +1015,8 @@ const {
    pessoas,
    fetchtodosEventos,
    todosEventos,
+   alternarInscricaoAtiva,
+   alternarCredenciamento,
 } = useEventos();
 
 fetchtodosEventos();
@@ -1296,7 +1298,19 @@ const columns = [
          const papel = row.funcao?.descricao || '';
          const modalidade = row.modalidade || 'Não informada';
          const entidade_sigla = row.pessoa?.entidade?.sigla ?? 'Sem Entidade';
-         return `<span class="fw-bold">${nome}</span> <small class="text-muted">${entidade_sigla}</small> <br/> <small class="text-muted">${papel} - ${modalidade}</small>`;
+
+         const canCredenciar = abilities.includes('inscricao.update') ? '': 'disabled';
+         const isCredenciado = row.credenciou	 === 'SIM' ? 'checked' : '';
+
+         return `<span class="fw-bold">${nome}</span> <small class="text-muted">${entidade_sigla}</small> <br/> <small class="text-muted">${papel} - ${modalidade}</small>
+                  <br/>
+                  <div class="text-left">         
+                     <div class="form-check form-switch d-inline-block">
+                        <label style="font-size: 12px; font-weight: bold;">Credenciou?</label>
+                        <input class="form-check-input" ${canCredenciar} data-custom-action="alternarCredenciamento" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isCredenciado} >
+                     </div>
+                  </div>
+         `;
       },
       className: 'text-left',
       width: '320px',
@@ -1311,7 +1325,19 @@ const columns = [
          const dh = row.chegada_data_hora
             ? formatToBrDateTime(`${row.chegada_data_hora}`)
             : 'Data/Hora';
-         return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>`;
+
+         const canMarcarTrasladoChegada = abilities.includes('inscricao.update') ? '': 'disabled';
+         const isTrasladoChegada = row.traslado_chegada_executou	=== 'SIM' ? 'checked' : '';
+
+         return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>
+                  <br/>
+                  <div class="text-left">         
+                     <div class="form-check form-switch d-inline-block">
+                        <label style="font-size: 12px; font-weight: bold;">Trasladou?</label>
+                        <input class="form-check-input" ${canMarcarTrasladoChegada} data-custom-action="alternarTrasladoChegada" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isTrasladoChegada} >
+                     </div>
+                  </div>
+         `;
       },
       className: 'text-left',
       width: '180px',
@@ -1325,7 +1351,19 @@ const columns = [
          const dh = row.partida_data_hora
             ? formatToBrDateTime(`${row.partida_data_hora}`)
             : 'Data/Hora';
-         return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>`;
+
+         const canMarcarTrasladoPartida = abilities.includes('inscricao.update') ? '': 'disabled';
+         const isTrasladoPartida = row.traslado_partida_executou	=== 'SIM' ? 'checked' : '';
+
+         return `<span class="">${meio} - ${cia}</span> <br/> <small class="text-muted">${dh}</small>
+                  <br/>
+                  <div class="text-left">         
+                     <div class="form-check form-switch d-inline-block">
+                        <label style="font-size: 12px; font-weight: bold;">Trasladou?</label>
+                        <input class="form-check-input" ${canMarcarTrasladoPartida} data-custom-action="alternarTrasladoPartida" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isTrasladoPartida} >
+                     </div>
+                  </div>
+         `;
       },
       className: 'text-left',
       width: '180px',
@@ -1336,7 +1374,26 @@ const columns = [
       data: null,
       width: '140px',
       render: function (data, type, row) {
-         return '';
+         const canAlternarHotel = abilities.includes('inscricao.update') ? '': 'disabled';
+         const isHotelCheckin = row.hotel_checkin  === 'SIM' ? 'checked' : '';
+         const isHotelCheckout = row.hotel_checkout	=== 'SIM' ? 'checked' : '';
+
+         return `<span class="">Hospedagem</span> <br/> <small class="text-muted"></small>
+                  <br/>
+                  <div class="text-left">         
+                     <div class="form-check form-switch d-inline-block">
+                        <label style="font-size: 12px; font-weight: bold;">Check-In?</label>
+                        <input class="form-check-input" ${canAlternarHotel} data-custom-action="alternarHotelCheckin" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isHotelCheckin} >
+                     </div>
+                  </div>
+                  <br/>
+                  <div class="text-left">         
+                     <div class="form-check form-switch d-inline-block">
+                        <label style="font-size: 12px; font-weight: bold;">Check-Out?</label>
+                        <input class="form-check-input" ${canAlternarHotel} data-custom-action="alternarHotelCheckout" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isHotelCheckout} >
+                     </div>
+                  </div>
+         `;         
       },
    },
    {
@@ -1367,16 +1424,19 @@ const defaultValues = {
  */
 const extraColumnRender = (row) => {
    // controle de acesso - recupera as abilities do usuário logado na ação
-   const canEditarRegiao = abilities.includes('inscricao.marcarchegada')
-      ? ''
-      : 'disabled';
+   const canMarcar = abilities.includes('inscricao.update') ? '': 'disabled';
 
-   return '';
+   // trasposição do checkbox para os dados da linha
+   const isInscricaoAtiva = row.ativo === 'SIM' ? 'checked' : '';
 
-   //    return `
-   //     <button class="btn btn-xs btn-outline-info" ${canEditarRegiao} data-custom-action="editarRegiao" data-param1="${row.regiao.id}" data-param2="${row.regiao.sigla}" >Editar Região</button>
-   //   `;
-   //       <button class="btn btn-xs btn-outline-info" ${canEditarRegiao} data-custom-action="editarCarro" data-param1="${row.regiao.id}" data-param2="${row.regiao.sigla}" >Editar Carro</button>
+   return `
+      <div class="text-center">         
+         <div class="form-check form-switch d-inline-block">
+            <label style="font-size: 12px; font-weight: bold;">Ativa?</label>
+            <input class="form-check-input" ${canMarcar} data-custom-action="alternarAtivo" type="checkbox" data-ativo="${row.ativo}" data-inscricao-id="${row.id}" ${isInscricaoAtiva} >
+         </div>
+      </div>
+   `;
 };
 
 /**
@@ -1438,23 +1498,195 @@ const filters = computed(() => [
  * ESPECIALIZAÇÃO CRUD: captura eventos disparado quando o usuário clica no botão extra da tabela de dados
  */
 const onExtraAction = async ({ id, row, action, dataset, target }) => {
-   if (action === 'editarRegiao') {
-      // console.log('ZAP: ', row, action, dataset, target);
-      // vamos chamar uma função editar a action 'editarRegiao'
-      // nesse caso estamos usando os dados da linha (row) para preencher o formulário
-      pessoaFormDados.value = { ...row }; // preenche os dados do formulário com os dados da linha
-      editarRegiao();
 
-      // mas poderiamos também apenas passar o id da região para a função editarRegiao(id) e carregar os dados da API novamente com os dados atualizados
+   if (action == 'alternarAtivo') {
+      const inscricaoId = row.id;
+      const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      try {
+         const response = await api.put(`/inscricao/alternarinscricaoativa/${inscricaoId}`, {
+            ativo: isChecked,
+         });
+
+         if (response.status === 200) {
+            showToast({
+               title: 'Sucesso',
+               message: response.data?.message || `Inscrição ${inscricaoId} atualizada com sucesso!`,
+            });
+         }
+      } catch (error) {
+         // Captura erro 500, 422, etc.
+         const errorMessage = error.response?.data?.message 
+            || error.response?.data?.error 
+            || 'Erro ao comunicar com o servidor.';
+         
+         showToast({
+            title: 'Erro',
+            message: errorMessage,
+            color: 'danger',
+         });
+      }
+
+      chamarRefresh();
    }
 
-   if (action == 'editarCarro') {
-      console.log('editarCarro: ', row, action, dataset, target);
-      // criar as refs(), ex: pessoaFormDados.value (ver acima)
-      // carregar os dados: usar o mesmos da row DataTables recebidos ou carregar via
-      // chamar função editEntidade()
-      // depois chamar a função para persistir os dados ex. salvarRegiao() ver abaixo como foi usado
+   if (action == 'alternarCredenciamento') {
+      const inscricaoId = row.id;
+      const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      try {
+         const response = await api.put(`/inscricao/alternarcredenciamento/${inscricaoId}`, {
+            credenciou: isChecked,
+         });
+
+         if (response.status === 200) {
+            showToast({
+               title: 'Sucesso',
+               message: response.data?.message || `Inscrição ${inscricaoId} atualizada com sucesso!`,
+            });
+         }
+      } catch (error) {
+         // Captura erro 500, 422, etc.
+         const errorMessage = error.response?.data?.message 
+            || error.response?.data?.error 
+            || 'Erro ao comunicar com o servidor.';
+         
+         showToast({
+            title: 'Erro',
+            message: errorMessage,
+            color: 'danger',
+         });
+      }
+
+      chamarRefresh();
    }
+
+   if (action == 'alternarTrasladoChegada') {
+      const inscricaoId = row.id;
+      const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      try {
+         const response = await api.put(`/inscricao/marcarchegada/${inscricaoId}`, {
+            traslado_chegada_executou: isChecked,
+         });
+
+         if (response.status === 200) {
+            showToast({
+               title: 'Sucesso',
+               message: response.data?.message || `Inscrição ${inscricaoId} atualizada com sucesso!`,
+            });
+         }
+      } catch (error) {
+         // Captura erro 500, 422, etc.
+         const errorMessage = error.response?.data?.message 
+            || error.response?.data?.error 
+            || 'Erro ao comunicar com o servidor.';
+         
+         showToast({
+            title: 'Erro',
+            message: errorMessage,
+            color: 'danger',
+         });
+      }
+
+      chamarRefresh();
+   }
+
+   // TODO erro na API nesse metodo
+   if (action == 'alternarTrasladoPartida') {
+      const inscricaoId = row.id;
+      const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      try {
+         const response = await api.put(`/inscricao/marcarpartida/${inscricaoId}`, {
+            traslado_partida_executou: isChecked,
+         });
+
+         if (response.status === 200) {
+            showToast({
+               title: 'Sucesso',
+               message: response.data?.message || `Inscrição ${inscricaoId} atualizada com sucesso!`,
+            });
+         }
+      } catch (error) {
+         // Captura erro 500, 422, etc.
+         const errorMessage = error.response?.data?.message 
+            || error.response?.data?.error 
+            || 'Erro ao comunicar com o servidor.';
+         
+         showToast({
+            title: 'Erro',
+            message: errorMessage,
+            color: 'danger',
+         });
+      }
+
+      chamarRefresh();
+   }
+
+   if (action == 'alternarHotelCheckin') {
+      const inscricaoId = row.id;
+      const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      try {
+         const response = await api.put(`/inscricao/marcarcheckin/${inscricaoId}`, {
+            hotel_checkin: isChecked,
+         });
+
+         if (response.status === 200) {
+            showToast({
+               title: 'Sucesso',
+               message: response.data?.message || `Inscrição ${inscricaoId} atualizada com sucesso!`,
+            });
+         }
+      } catch (error) {
+         // Captura erro 500, 422, etc.
+         const errorMessage = error.response?.data?.message 
+            || error.response?.data?.error 
+            || 'Erro ao comunicar com o servidor.';
+         
+         showToast({
+            title: 'Erro',
+            message: errorMessage,
+            color: 'danger',
+         });
+      }
+
+      chamarRefresh();
+   }
+
+   if (action == 'alternarHotelCheckout') {
+      const inscricaoId = row.id;
+      const isChecked = target[0].checked ? 'SIM' : 'NÃO';
+
+      try {
+         const response = await api.put(`/inscricao/marcarcheckout/${inscricaoId}`, {
+            hotel_checkout: isChecked,
+         });
+
+         if (response.status === 200) {
+            showToast({
+               title: 'Sucesso',
+               message: response.data?.message || `Inscrição ${inscricaoId} atualizada com sucesso!`,
+            });
+         }
+      } catch (error) {
+         // Captura erro 500, 422, etc.
+         const errorMessage = error.response?.data?.message 
+            || error.response?.data?.error 
+            || 'Erro ao comunicar com o servidor.';
+         
+         showToast({
+            title: 'Erro',
+            message: errorMessage,
+            color: 'danger',
+         });
+      }
+
+      chamarRefresh();
+   }
+
+
 };
 
 const editarRegiao = async () => {

@@ -207,6 +207,29 @@ export function useEventos(ativo = true) {
       }
    };
 
+   const alternarInscricaoAtiva = async (id, dados) => {
+      try {
+         error.value = null;
+         const response = await api.put(`/inscricao/alternarinscricaoativa/${id}`, dados);
+         return response; // retorna o objeto completo
+      } catch (err) {
+         error.value = err;
+         return null;
+      }
+   };
+
+   const alternarCredenciamento = async (id, dados) => {
+      try {
+         error.value = null;
+         const response = await api.put(`/inscricao/alternarcredenciamento/${id}`, dados);
+         return response; // retorna o objeto completo
+      } catch (err) {
+         error.value = err;
+         return null;
+      }
+   };
+
+
    const fetchQuartosDoHotel = async (eventoId, hotelId) => {
       // console.log('fetchQuartosDoHotel:', eventoId, hotelId);
 
@@ -324,6 +347,8 @@ export function useEventos(ativo = true) {
       fetchQuartoTipos,
 
       getInscricao,           // recupera uma Inscrição 
+      alternarInscricaoAtiva, // alterna Ativo na Inscrição
+      alternarCredenciamento, // alterna o Credenciamento na Inscrição
 
       marcarTrasladoChegada,  // marcar que a Pessoa "trasladou" na Viagem de Chegada
       marcarTrasladoPartida,  // marcar que a Pessoa "trasladou" na Viagem de Partida
