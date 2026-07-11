@@ -62,7 +62,7 @@
             </div>
          </div>
 
-         <!-- ACESSO RÁPIDO (neutro - info) -->
+         <!-- ACESSO RÁPIDO -->
          <div class="card mb-4">
             <div class="card-header bg-white">
                <h5 class="mb-0">
@@ -78,16 +78,19 @@
                      ><i class="fas fa-clipboard-list me-2"></i> Gestão de
                      Inscrições</span
                   >
-                  <button class="btn btn-sm btn-info">Acessar</button>
+                  <button class="btn btn-sm btn-info" @click="navegarPara('/inscricoes/inscricoes')">
+                     Acessar
+                  </button>
                </div>
                <div
                   class="alert alert-info d-flex justify-content-between align-items-center mb-2"
                >
                   <span
-                     ><i class="fas fa-bed me-2"></i> Gestão de
-                     Hospedagens</span
+                     ><i class="fas fa-bed me-2"></i> Gestão de Hospedagens</span
                   >
-                  <button class="btn btn-sm btn-info">Acessar</button>
+                  <button class="btn btn-sm btn-info" @click="navegarPara('/hospedagem/ghospedagem')">
+                     Acessar
+                  </button>
                </div>
                <div
                   class="alert alert-info d-flex justify-content-between align-items-center mb-2"
@@ -95,20 +98,25 @@
                   <span
                      ><i class="fas fa-bus me-2"></i> Gestão de Traslados</span
                   >
-                  <button class="btn btn-sm btn-info">Acessar</button>
+                  <button class="btn btn-sm btn-info" @click="navegarPara('/transportes/chegadas')">
+                     Chegadas
+                  </button>
+                  <button class="btn btn-sm btn-info" @click="navegarPara('/transportes/partidas')">
+                     Partidas
+                  </button>
                </div>
                <div
                   class="alert alert-info d-flex justify-content-between align-items-center"
                >
                   <span
-                     ><i class="fas fa-utensils me-2"></i> Gestão de
-                     Alimentação</span
+                     ><i class="fas fa-utensils me-2"></i> Gestão de Alimentação</span
                   >
-                  <button class="btn btn-sm btn-info">Acessar</button>
+                  <button class="btn btn-sm btn-info" @click="navegarPara('/relatorios/alimentacao')">
+                     Acessar
+                  </button>
                </div>
             </div>
          </div>
-
          <!-- PRÓXIMOS EVENTOS (neutro - light) -->
          <div class="card">
             <div class="card-header bg-white">
@@ -154,19 +162,25 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 // State
 const loading = ref(true);
 const tarefasPendentes = ref([]);
 const proximosEventos = ref([]);
 
+// Navegação
+const navegarPara = (rota) => {
+  router.push(rota);
+};
+
 // Dados mockados (depois substituir pela API)
 const carregarDados = async () => {
    loading.value = true;
 
-   // Simula chamada API
    setTimeout(() => {
-      // Tarefas pendentes (usa WARNING)
       tarefasPendentes.value = [
          {
             id: 1,
@@ -185,7 +199,6 @@ const carregarDados = async () => {
          },
       ];
 
-      // Próximos eventos (usa LIGHT - neutro)
       proximosEventos.value = [
          {
             id: 1,
