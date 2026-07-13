@@ -219,45 +219,34 @@ export function removeRefreshToken() {
 }
 
 /**
- * Tenta renovar o token usando o refresh token
+ * Tenta renovar o token usando o token atual (enviado no header)
  * Retorna o novo token ou null em caso de erro
  */
 export async function refreshAccessToken() {
-  const refreshToken = getRefreshToken()
-  
-  if (!refreshToken) {
-    console.warn('Refresh token não encontrado')
-    return null
-  }
-
   try {
-    // Cria uma instância separada do axios para evitar loop no interceptor
-    const axiosInstance = axios.create({
-      baseURL: api.defaults.baseURL,
-      headers: { 'Content-Type': 'application/json' }
-    })
+    // ✅ Usa a instância principal do api (já tem o token no header)
+    // const response = await api.post('/auth/refresh');
 
-    const response = await axiosInstance.post('/auth/refresh', {
-      refresh_token: refreshToken
-    })
-
-    const newToken = response.data.token
-    const newRefreshToken = response.data.refresh_token
-
+    // ✅ Usar a URL do ACL4, não a do apieventos
+    const response = await api.post(`${aclURL}api/auth/refresh`);    
+    
+    const newToken = response.data.token;
+    
     if (newToken) {
-      setToken(newToken)
+      setToken(newToken);
       
-      if (newRefreshToken) {
-        setRefreshToken(newRefreshToken)
-      }
+      // Atualiza o store se necessário
+      const userStore = useUserStore();
+      userStore.token = newToken;
       
-      return newToken
+      return newToken;
     }
-
-    return null
+    
+    console.warn('⚠️ Nenhum token retornado pelo refresh');
+    return null;
   } catch (error) {
-    console.error('Erro ao renovar token:', error)
-    return null
+    console.error('❌ Erro ao renovar token:', error);
+    return null;
   }
 }
 
