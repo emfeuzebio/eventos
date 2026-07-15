@@ -6,6 +6,7 @@ import { useColorModes } from '@coreui/vue';
 import { useThemeStore } from '@/stores/theme.js';
 import GlobalErrorModal from '@/components/GlobalErrorModal.vue';
 import GlobalToast from '@/components/GlobalToast.vue';
+import { useTokenRenewal } from '@/composables/useTokenRenewal';
 
 import { useGlobalLoading } from '@/stores/loading';
 import { CSpinner } from '@coreui/vue';
@@ -19,6 +20,9 @@ const { isColorModeSet, setColorMode } = useColorModes(
    'coreui-free-vue-admin-template-theme'
 );
 const currentTheme = useThemeStore();
+
+// Iniciar renovação automática do token
+useTokenRenewal();
 
 onBeforeMount(() => {
    const urlParams = new URLSearchParams(window.location.href.split('?')[1]);
