@@ -17,10 +17,7 @@ const globalEventoId = ref(eventStore.currentEvent?.id || '');
 
 watch(globalEventoId, (newId) => {
    const selected = eventosStore.ativos.find((e) => e.id === parseInt(newId));
-   //   if (selected) {
    eventStore.setEvent(selected);
-   // console.log('Evento selecionado:', selected)
-   //   }
 });
 
 const headerClassNames = ref('mb-4 p-0');
@@ -62,6 +59,7 @@ onMounted(async () => {
          </CHeaderToggler>
 
          <!-- <h1 class="h5 m-0">{{ appName }}</h1> -->
+
          <CCol sm="1">
             <label class="me-2 mb-0 fw-bold">Evento: </label>
          </CCol>
@@ -79,9 +77,9 @@ onMounted(async () => {
          </CCol>
 
          <CHeaderNav class="d-none d-md-flex">
-            <CNavItem>
+            <!-- <CNavItem> -->
                <!-- <CNavLink href="/dashboard"> Dashboard </CNavLink> -->
-            </CNavItem>
+            <!-- </CNavItem> -->
             <!-- 
         <CNavItem>
           <CNavLink href="#">Users</CNavLink>

@@ -3,7 +3,7 @@ import { RouterLink, useRoute } from 'vue-router'
 
 import { cilExternalLink } from '@coreui/icons'
 import { CBadge, CSidebarNav, CNavItem, CNavGroup, CNavTitle } from '@coreui/vue'
-import { getNavMenus } from '@/_nav.js' // ✅ pega menus do userStore / JWT
+import { getNavMenus } from '@/_nav.js'
 import simplebar from 'simplebar-vue'
 import 'simplebar-vue/dist/simplebar.min.css'
 
@@ -39,10 +39,11 @@ export const AppSidebarNav = defineComponent({
       firstRender.value = false
     })
 
-    // ✅ Aqui pegamos dinamicamente os menus do userStore
     const nav = getNavMenus()
 
     const renderItem = (item) => {
+      const iconFallback = item.icon || 'cil-menu'
+
       if (item.items) {
         return h(
           CNavGroup,
@@ -55,9 +56,7 @@ export const AppSidebarNav = defineComponent({
           },
           {
             togglerContent: () => [
-              item.icon
-                ? h(resolveComponent('CIcon'), { customClassName: 'nav-icon', name: item.icon })
-                : null,
+              h(resolveComponent('CIcon'), { customClassName: 'nav-icon', name: iconFallback }),
               item.name,
             ],
             default: () => item.items.map(renderItem),
@@ -75,9 +74,7 @@ export const AppSidebarNav = defineComponent({
           },
           {
             default: () => [
-              item.icon
-                ? h(resolveComponent('CIcon'), { customClassName: 'nav-icon', name: item.icon })
-                : h('span', { class: 'nav-icon' }, h('span', { class: 'nav-icon-bullet' })),
+              h(resolveComponent('CIcon'), { customClassName: 'nav-icon', name: iconFallback }),
               item.name,
               item.external &&
                 h(resolveComponent('CIcon'), { class: 'ms-2', name: 'cil-external-link', size: 'sm' }),
@@ -103,9 +100,7 @@ export const AppSidebarNav = defineComponent({
                   { active: props.isActive, as: 'div', href: props.href, onClick: () => props.navigate() },
                   {
                     default: () => [
-                      item.icon
-                        ? h(resolveComponent('CIcon'), { customClassName: 'nav-icon', name: item.icon })
-                        : h('span', { class: 'nav-icon' }, h('span', { class: 'nav-icon-bullet' })),
+                      h(resolveComponent('CIcon'), { customClassName: 'nav-icon', name: iconFallback }),
                       item.name,
                       item.badge &&
                         h(

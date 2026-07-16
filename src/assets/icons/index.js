@@ -23,6 +23,9 @@ import {
   cibCcPaypal,
   cibCcApplePay,
   cibCcAmex,
+  cilTruck,      // ← caminhão
+  cilMap,
+  cilBike,
 } from '@coreui/icons'
 import { cifUs, cifBr, cifIn, cifFr, cifEs, cifPl } from '@coreui/icons'
 import {
@@ -85,6 +88,9 @@ import {
 export const iconsSet = Object.assign(
   {},
   {
+    cilTruck,      // ← caminhão
+    cilMap,
+    cilBike,
     cilArrowBottom,
     cilArrowRight,
     cilArrowTop,

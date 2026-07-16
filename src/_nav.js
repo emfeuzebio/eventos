@@ -1,7 +1,21 @@
 // src/_nav.js
 import { getUserMenusFromToken } from '@/services/authService'
 
-// Converte menus do JWT para CoreUI
+const ICON_MAP = {
+  'Inscrições': 'cil-people',
+  'Transportes': 'cil-truck',
+  'Hospedagem': 'cil-bed',
+  'Eventos': 'cil-calendar',
+  'Relatórios': 'cil-chart-pie',
+  'Cadastros': 'cil-list',
+  'Dashboard': 'cil-speedometer',
+  'Operacional': 'cil-home',
+}
+
+function getIcon(menu) {
+  return menu.icon || ICON_MAP[menu.name] || 'cil-menu'
+}
+
 function convertToCoreUIFormat(menus) {
   const coreUiNavItems = []
   const menuMap = new Map()
@@ -14,7 +28,10 @@ function convertToCoreUIFormat(menus) {
   
   rootMenus.forEach(rootMenu => {
     if (!rootMenu.route) {
-      coreUiNavItems.push({ component: 'CNavTitle', name: rootMenu.name })
+      coreUiNavItems.push({ 
+        component: 'CNavTitle', 
+        name: rootMenu.name 
+      })
     } else {
       const childMenus = menus
         .filter(menu => menu.menu_id === rootMenu.id && menu.active === 'Y')
@@ -25,12 +42,12 @@ function convertToCoreUIFormat(menus) {
           component: 'CNavGroup',
           name: rootMenu.name,
           to: rootMenu.route,
-          icon: rootMenu.icon,
+          icon: getIcon(rootMenu),
           items: childMenus.map(child => ({
             component: 'CNavItem',
             name: child.name,
             to: child.route,
-            icon: child.icon,
+            icon: getIcon(child),
           })),
         })
       } else {
@@ -38,7 +55,7 @@ function convertToCoreUIFormat(menus) {
           component: 'CNavItem',
           name: rootMenu.name,
           to: rootMenu.route,
-          icon: rootMenu.icon,
+          icon: getIcon(rootMenu),
         }
         if (rootMenu.badge) item.badge = rootMenu.badge
         coreUiNavItems.push(item)
@@ -49,15 +66,17 @@ function convertToCoreUIFormat(menus) {
   return coreUiNavItems
 }
 
-// ✅ Função que retorna menus do usuário
 export function getNavMenus() {
   try {
     const userMenus = getUserMenusFromToken()
-    return convertToCoreUIFormat(userMenus)
+    const menus = convertToCoreUIFormat(userMenus)
+    return menus.length > 0 ? menus : [
+      { component: 'CNavItem', name: 'Operacional', to: '/operacional', icon: 'cil-home' }
+    ]
   } catch (err) {
     console.error('Erro ao carregar menus do JWT', err)
     return [
-      { component: 'CNavItem', name: 'Dashboard', to: '/dashboard', icon: 'cil-speedometer' }
+      { component: 'CNavItem', name: 'Operacional', to: '/operacional', icon: 'cil-home' }
     ]
   }
 }

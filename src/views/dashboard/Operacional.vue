@@ -285,7 +285,7 @@ const carregarDados = async () => {
       // proximosEventos.value = [];
       tarefasPendentes.value = [];
       loading.value = false;
-      return;
+      // return;
    }
 
    loading.value = true;
@@ -344,7 +344,8 @@ const navegarPara = (rota) => {
 };
 
 const verDetalhesEvento = (eventoId) => {
-   router.push(`/inscricoes/eventos/${eventoId}`);
+   // router.push(`/inscricoes/eventos/${eventoId}`);
+   router.push(`/inscricoes/eventos`);
 };
 
 // ==============================================

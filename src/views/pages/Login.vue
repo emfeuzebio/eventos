@@ -30,7 +30,6 @@
                               <CInputGroupText>
                                  <CIcon icon="cil-user" />
                               </CInputGroupText>
-                              <!-- <CFormInput placeholder="Username" autocomplete="username" v-model="username"/> -->
                               <div ref="emailWrapper" style="flex: 1">
                                  <CFormInput
                                     :placeholder="$t('login.email')"
@@ -40,21 +39,30 @@
                                  />
                               </div>
                            </CInputGroup>
-                           <CInputGroup class="mb-4">
-                              <CInputGroupText>
-                                 <CIcon icon="cil-lock-locked" />
-                              </CInputGroupText>
-                              <!-- <CFormInput type="password" placeholder="Password" autocomplete="current-password" v-model="password"/> -->
-                              <CFormInput
-                                 type="password"
-                                 :placeholder="$t('login.password')"
-                                 autocomplete="current-password"
-                                 v-model="password"
-                              />
-                           </CInputGroup>
+
+                           <!-- 🔐 Campo de senha com pestana/olho -->
+<!-- Campo de senha com pestana/olho -->
+<CInputGroup class="mb-4">
+   <CInputGroupText>
+      <CIcon icon="cil-lock-locked" />
+   </CInputGroupText>
+   <CFormInput
+      :type="showPassword ? 'text' : 'password'"
+      :placeholder="$t('login.password')"
+      autocomplete="current-password"
+      v-model="password"
+      @keyup.enter="handleLogin"
+   />
+   <CInputGroupText
+      @click="togglePasswordVisibility"
+      style="cursor: pointer; user-select: none;"
+   >
+      <i :class="showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+   </CInputGroupText>
+</CInputGroup>
+
                            <CRow>
                               <CCol :xs="5">
-                                 <!-- <CButton color="primary" class="px-4" @click="handleLogin" :disabled="loading"> Login </CButton> -->
                                  <CButton
                                     color="primary"
                                     class="px-4"
@@ -64,7 +72,6 @@
                                  >
                               </CCol>
                               <CCol :xs="7" class="text-right">
-                                 <!-- <CButton color="link" class="px-0" @click="goToForgotPassword">Forgot password?</CButton> -->
                                  <CButton
                                     color="link"
                                     class="px-0"
@@ -121,6 +128,7 @@ import {
 } from '@/services/authService';
 import { useUserStore } from '@/stores/userStore';
 import { useI18n } from 'vue-i18n';
+import { CIcon } from '@coreui/icons-vue';
 
 const appId = import.meta.env.VITE_APP_ID;
 const appName = import.meta.env.VITE_APP_NAME;
@@ -142,17 +150,24 @@ const loading = ref(false);
 const error = ref(null);
 const { locale } = useI18n();
 
+// 👁️ Estado da senha visível
+const showPassword = ref(false);
+
+const togglePasswordVisibility = () => {
+   showPassword.value = !showPassword.value;
+};
+
 const changeLocale = (event) => {
    locale.value = event.target.value;
    localStorage.setItem('lang', locale.value);
 };
 
 const goToRegister = () => {
-   router.push('/pages/register'); // ou o nome da rota que você definiu
+   router.push('/pages/register');
 };
 
 const goToForgotPassword = () => {
-   router.push('/pages/forgotpassword'); // ou o nome da rota que você definiu
+   router.push('/pages/forgotpassword');
 };
 
 const focusEmail = async () => {
@@ -161,7 +176,6 @@ const focusEmail = async () => {
    input?.focus();
 };
 
-// ✅ 1. Funções para validação do formulário
 const validateForm = () => {
    if (!email.value.trim() || !password.value.trim()) {
       return 'Preencha email e senha';
@@ -183,7 +197,6 @@ const handleLogin = async () => {
    errorMessage.value = '';
    loading.value = true;
 
-   // ✅ 2. Chama Validação do formulário
    const validationError = validateForm();
    if (validationError) {
       errorMessage.value = validationError;
@@ -192,44 +205,32 @@ const handleLogin = async () => {
    }
 
    try {
-      // ✅ 3. Limpa os dados anteriores (CRÍTICO!)
       userStore.clear();
 
-      // ✅ 4. Requisição de login na API ACL - usando o interceptor em api.js
       const response = await api.post(aclURL + 'api/auth/login', {
-         email: email.value.trim().toLowerCase(), // Normaliza email
-         password: password.value.trim(), // Senha sem espaços
-         systemId: appId, // informa o System ID
+         email: email.value.trim().toLowerCase(),
+         password: password.value.trim(),
+         systemId: appId,
       });
 
       if (!response.data.token) {
          throw new Error('Token não recebido do servidor');
       }
 
-      // ✅ 5. Salva o Token na store
       setToken(response.data.token);
 
-      // ✅ 6. Recupera dados do token e carrega no store do User
-      // Aqui carrega todos os dados do usuário: id, name, email, roles, menus, abilities, etc.
       const userLoaded = userStore.loadFromToken();
       if (!userLoaded) {
          throw new Error('Falha ao carregar dados do usuário');
       }
 
-      // ✅ 7. Verifica se os menus foram carregados
       if (!userStore.menus || userStore.menus.length === 0) {
          console.warn('Usuário logado mas sem menus definidos');
       }
 
-      // ✅ 8. Redireciona com sucesso para o Dashboard
       router.push('/dashboard');
 
-      // const decoded = decodeToken();
-      // // console.log('Decoded token:', decoded)
-      // systems.value = decoded?.user_systems || [];
-      // userName.value = getUserNameFromToken();
    } catch (error) {
-      // ✅ 9. Tratamento de erros
       let message = 'Erro durante login';
 
       if (error.response) {
@@ -245,19 +246,7 @@ const handleLogin = async () => {
       }
 
       errorMessage.value = message;
-
-      // ✅ 10. Garantir a limpeza em caso de erro
       userStore.clear();
-
-      // if (error.response) {
-      //    errorMessage.value =
-      //       error.response.status + ' - ' + error.response.data.error;
-      // } else if (error.request) {
-      //    errorMessage.value =
-      //       'Sem resposta do servidor. Verifique sua conexão.';
-      // } else {
-      //    errorMessage.value = 'Erro inesperado: ' + error.message;
-      // }
    } finally {
       loading.value = false;
    }
@@ -266,13 +255,11 @@ const handleLogin = async () => {
 onMounted(() => {
    isMobile.value = window.innerWidth < 768;
 
-   // Foca no campo email
    nextTick(() => {
       const input = inputWrapper.value?.querySelector('input');
       input?.focus();
    });
 
-   // foca no campo email
    focusEmail();
 });
 </script>
