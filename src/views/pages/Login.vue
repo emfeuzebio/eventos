@@ -129,6 +129,7 @@ import {
 import { useUserStore } from '@/stores/userStore';
 import { useI18n } from 'vue-i18n';
 import { CIcon } from '@coreui/icons-vue';
+import { useToast } from '@/composables/useToast'
 
 const appId = import.meta.env.VITE_APP_ID;
 const appName = import.meta.env.VITE_APP_NAME;
@@ -149,6 +150,7 @@ const router = useRouter();
 const loading = ref(false);
 const error = ref(null);
 const { locale } = useI18n();
+const { showToast } = useToast()
 
 // 👁️ Estado da senha visível
 const showPassword = ref(false);
@@ -254,6 +256,19 @@ const handleLogin = async () => {
 
 onMounted(() => {
    isMobile.value = window.innerWidth < 768;
+
+   // ✅ Exibe mensagem se houver no sessionStorage
+   const msg = sessionStorage.getItem('login_message')
+   const message = localStorage.getItem('login_message');
+
+   if (message) {
+      showToast({
+         title: 'Aviso',
+         message: message,
+         color: 'danger',
+      });
+      localStorage.removeItem('login_message');
+   }
 
    nextTick(() => {
       const input = inputWrapper.value?.querySelector('input');

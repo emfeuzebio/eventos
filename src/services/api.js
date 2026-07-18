@@ -115,7 +115,7 @@ api.interceptors.response.use(
     // Se já tentou renovar, não tenta de novo
     if (originalRequest._retry) {
       removeAllTokens();
-      redirectToLogin();
+      redirectToLogin(message);
       return Promise.reject(error);
     }
 
@@ -145,13 +145,23 @@ api.interceptors.response.use(
       } else {
         processQueue(error, null);
         removeAllTokens();
-        redirectToLogin();
+        redirectToLogin(message);
         return Promise.reject(error);
       }
     } catch (refreshError) {
       processQueue(refreshError, null);
       removeAllTokens();
-      redirectToLogin();
+
+      // ✅ Captura a mensagem de erro
+      const errorMessage = refreshError?.response?.data?.error
+        || refreshError?.error	
+        || 'Sua sessão expirou. Faça login novamente.';
+
+      // ✅ Exibe erro para o usuário (antes de redirecionar)
+      // showError(`<b>Sessão expirada</b><br/>${errorMessage}`);
+
+      // ✅ Redireciona para login com a mensagem
+      redirectToLogin(errorMessage);
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

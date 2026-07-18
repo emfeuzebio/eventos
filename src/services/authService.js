@@ -245,8 +245,9 @@ export async function refreshAccessToken() {
     console.warn('⚠️ Nenhum token retornado pelo refresh');
     return null;
   } catch (error) {
-    console.error('❌ Erro ao renovar token:', error);
-    return null;
+    // console.error('❌ Erro ao renovar token:', error);
+    throw error;
+    // return null;
   }
 }
 
