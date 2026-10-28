@@ -100,11 +100,10 @@ const handleForgotPassword = async () => {
    loading.value = true;
 
    try {
-      // const response = await api.post('/auth/forgotpassword', {
       const response = await api.post(aclURL + 'api/auth/forgotpassword', {
          email: email.value,
-         systemId: appId.value, // Id do Site de Eventos
-      });
+         system_id: appId,        // vem de import.meta.env, já é string
+      });      
 
       if (response.status === 200) {
          successMessage.value =

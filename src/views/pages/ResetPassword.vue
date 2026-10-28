@@ -1,84 +1,3 @@
-<script setup>
-import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import api from '@/services/api';
-
-const route = useRoute();
-const router = useRouter();
-
-const token = ref(route.query.token || '');
-const email = ref(route.query.email || '');
-
-const password = ref('');
-const password_confirmation = ref('');
-const aclURL = import.meta.env.VITE_API_ACL_URL; // https://acl4.azcomphp.com.br/
-
-const loading = ref(false);
-const successMessage = ref('');
-const errorMessage = ref('');
-
-const goToLogin = () => {
-   router.push('/pages/login'); // ou { name: 'Login' } se estiver usando name
-};
-
-const handleReset = async () => {
-   errorMessage.value = '';
-   successMessage.value = '';
-   loading.value = true;
-
-   if (!email.value || !token.value) {
-      errorMessage.value = 'E-Mail não capturado.';
-      loading.value = false;
-      return;
-   }
-
-   if (!token.value) {
-      errorMessage.value = 'Token não capturado.';
-      loading.value = false;
-      return;
-   }
-
-   if (!password.value || !password_confirmation.value) {
-      errorMessage.value = 'Preencha todos os campos.';
-      loading.value = false;
-      return;
-   }
-
-   if (password.value !== password_confirmation.value) {
-      errorMessage.value = 'As senhas não coincidem.';
-      loading.value = false;
-      return;
-   }
-
-   try {
-      // const response = await api.post('/auth/resetPassword', {
-      const response = await api.post(aclURL + 'api/auth/resetPassword', {
-         token: token.value,
-         email: email.value,
-         password: password.value,
-         password_confirmation: password_confirmation.value,
-      });
-
-      successMessage.value =
-         response.data.message || 'Senha redefinida com sucesso!';
-      setTimeout(() => {
-         this.$router.push('/pages/login');
-      }, 2000);
-   } catch (error) {
-      // errorMessage.value = error.response?.data?.message || 'Erro ao redefinir a senha.'
-      errorMessage.value =
-         error.response.status + ' - ' + error.response.data.message ||
-         'Erro ao redefinir a senha.';
-   } finally {
-      loading.value = false;
-   }
-};
-
-/*
-// http://localhost:3000/#/pages/resetpassword/?token=j5kwlJMts3JziUKzjaY0Qw657tZpkQHy55YBFDCcKKEjk0aMaWgrfTVyc8p3j2YY&email=emfeuzebio72%40gmail.com
-*/
-</script>
-
 <template>
    <div class="bwrapper min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
@@ -87,60 +6,47 @@ const handleReset = async () => {
                <CCard class="mx-4">
                   <CCardBody class="p-4">
                      <CForm>
-                        <h1>Reset Password</h1>
+                        <h1 class="pb-2">
+                           {{ appName }}
+                           <span class="fs-6 !text-sm !font-normal">v{{ appVersion }}</span>
+                        </h1>
+                        <h1>{{ $t('reset.title') || 'Reset Password' }}</h1>
                         <p class="text-body-secondary">
-                           Reset your Password after request
+                           {{ $t('reset.subtitle') || 'Set your new password' }}
                         </p>
 
+                        <CAlert v-if="successMessage" color="success" dismissible>
+                           {{ successMessage }}
+                        </CAlert>
                         <CAlert v-if="errorMessage" color="danger" dismissible>
                            {{ errorMessage }}
                         </CAlert>
 
-                        <CAlert
-                           v-if="successMessage"
-                           color="success"
-                           dismissible
-                        >
-                           {{ successMessage }}
-                        </CAlert>
-
                         <CInputGroup class="mb-3">
-                           <CInputGroupText>
-                              <CIcon icon="cil-lock-locked" />
-                           </CInputGroupText>
                            <CFormInput
                               type="password"
-                              placeholder="Password"
-                              autocomplete="new-password"
+                              :placeholder="$t('reset.password') || 'New password'"
                               v-model="password"
+                              autocomplete="new-password"
                            />
-                           <div class="form-text">
-                              A senha deve conter no mínimo 6 caracteres, uma
-                              letra maiúscula, um número e um caractere
-                              especial.
-                           </div>
                         </CInputGroup>
+
                         <CInputGroup class="mb-4">
-                           <CInputGroupText>
-                              <CIcon icon="cil-lock-locked" />
-                           </CInputGroupText>
                            <CFormInput
                               type="password"
-                              placeholder="Repeat password"
+                              :placeholder="$t('reset.passwordConfirm') || 'Confirm password'"
+                              v-model="passwordConfirmation"
                               autocomplete="new-password"
-                              v-model="password_confirmation"
                            />
                         </CInputGroup>
+
                         <div class="d-grid">
-                           <CButton
-                              color="primary"
-                              @click="handleReset"
-                              :disabled="loading"
-                              >Reset Password</CButton
-                           >
-                           <CButton color="link" class="mt-3" @click="goToLogin"
-                              >Already have an account? Login</CButton
-                           >
+                           <CButton color="primary" @click="handleReset" :disabled="loading">
+                              {{ $t('reset.btn') || 'Reset Password' }}
+                           </CButton>
+                           <CButton color="link" class="mt-3" @click="goToLogin">
+                              {{ $t('reset.lnkBackToLogin') || 'Back to Login' }}
+                           </CButton>
                         </div>
                      </CForm>
                   </CCardBody>
@@ -150,3 +56,71 @@ const handleReset = async () => {
       </CContainer>
    </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useI18n } from 'vue-i18n';
+import api from '@/services/api';
+
+const appName = import.meta.env.VITE_APP_NAME;
+const appVersion = import.meta.env.VITE_APP_VERSION;
+const aclURL = import.meta.env.VITE_API_ACL_URL;
+
+const router = useRouter();
+const route = useRoute();
+const { t, locale } = useI18n();
+
+const token = ref('');
+const email = ref('');
+const password = ref('');
+const passwordConfirmation = ref('');
+const errorMessage = ref('');
+const successMessage = ref('');
+const loading = ref(false);
+
+onMounted(() => {
+   const savedLang = localStorage.getItem('lang');
+   if (savedLang) locale.value = savedLang;
+
+   // lê token e email da query (?token=...&email=...)
+   token.value = route.query.token || '';
+   email.value = route.query.email || '';
+
+   if (!token.value || !email.value) {
+      errorMessage.value = 'Link inválido ou incompleto.';
+   }
+});
+
+const goToLogin = () => router.push('/pages/login');
+
+const handleReset = async () => {
+   errorMessage.value = '';
+   successMessage.value = '';
+   loading.value = true;
+
+   try {
+      const response = await api.post(aclURL + 'api/auth/resetPassword', {
+         email: email.value,
+         token: token.value,
+         password: password.value,
+         password_confirmation: passwordConfirmation.value,
+      });
+
+      if (response.status === 200) {
+         successMessage.value = response.data.message || 'Senha redefinida com sucesso.';
+         setTimeout(() => router.push('/pages/login'), 2000);
+      } else {
+         errorMessage.value = 'Resposta inesperada do servidor.';
+      }
+   } catch (error) {
+      if (error.response?.data?.message) {
+         errorMessage.value = error.response.status + ' - ' + error.response.data.message;
+      } else {
+         errorMessage.value = 'Ocorreu um erro. Tente novamente.';
+      }
+   } finally {
+      loading.value = false;
+   }
+};
+</script>
