@@ -20,29 +20,43 @@
                            {{ errorMessage }}
                         </CAlert>
 
+                        <!-- Campo senha com olho -->
                         <CInputGroup class="mb-3">
                            <CInputGroupText>
                               <CIcon icon="cil-lock-locked" />
                            </CInputGroupText>
                            <CFormInput
-                              type="password"
+                              :type="showPassword ? 'text' : 'password'"
                               :placeholder="$t('reset.password')"
                               autocomplete="new-password"
                               v-model="password"
                            />
-                           <div class="form-text">{{ $t('reset.passwordHint') }}</div>
+                           <CInputGroupText
+                              @click="togglePasswordVisibility"
+                              style="cursor: pointer; user-select: none;"
+                           >
+                              <i :class="showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+                           </CInputGroupText>
                         </CInputGroup>
+                        <div class="form-text mb-3">{{ $t('reset.passwordHint') }}</div>
 
+                        <!-- Campo confirmar senha com olho -->
                         <CInputGroup class="mb-4">
                            <CInputGroupText>
                               <CIcon icon="cil-lock-locked" />
                            </CInputGroupText>
                            <CFormInput
-                              type="password"
+                              :type="showPasswordConfirm ? 'text' : 'password'"
                               :placeholder="$t('reset.passwordConfirm')"
                               autocomplete="new-password"
                               v-model="password_confirmation"
                            />
+                           <CInputGroupText
+                              @click="togglePasswordConfirmVisibility"
+                              style="cursor: pointer; user-select: none;"
+                           >
+                              <i :class="showPasswordConfirm ? 'fas fa-eye' : 'fas fa-eye-slash'"></i>
+                           </CInputGroupText>
                         </CInputGroup>
 
                         <div class="d-grid">
@@ -76,18 +90,34 @@ const appName = import.meta.env.VITE_APP_NAME;
 const appVersion = import.meta.env.VITE_APP_VERSION;
 const aclURL = import.meta.env.VITE_API_ACL_URL;
 
-const token = ref(route.query.token || '');
-const email = ref(route.query.email || '');
+const token = ref('');
+const email = ref('');
 const password = ref('');
 const password_confirmation = ref('');
 const loading = ref(false);
 const successMessage = ref('');
 const errorMessage = ref('');
 
+// olho de senha
+const showPassword = ref(false);
+const showPasswordConfirm = ref(false);
+
+const togglePasswordVisibility = () => {
+   showPassword.value = !showPassword.value;
+};
+
+const togglePasswordConfirmVisibility = () => {
+   showPasswordConfirm.value = !showPasswordConfirm.value;
+};
+
 onMounted(() => {
-   // força releitura dos query params a cada acesso
+   // sempre relê a query (evita estado velho do cache/instância)
    token.value = route.query.token || '';
    email.value = route.query.email || '';
+   password.value = '';
+   password_confirmation.value = '';
+   errorMessage.value = '';
+   successMessage.value = '';
 
    const savedLang = localStorage.getItem('lang');
    if (savedLang) {
