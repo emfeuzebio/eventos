@@ -85,9 +85,16 @@ const successMessage = ref('');
 const errorMessage = ref('');
 
 onMounted(() => {
+   // força releitura dos query params a cada acesso
+   token.value = route.query.token || '';
+   email.value = route.query.email || '';
+
    const savedLang = localStorage.getItem('lang');
    if (savedLang) {
       locale.value = savedLang;
+   } else {
+      const nav = (navigator.language || 'en').slice(0, 2).toLowerCase();
+      locale.value = ['en', 'pt'].includes(nav) ? nav : 'en';
    }
 });
 

@@ -34,6 +34,20 @@
       "email": "Enter your email",
       "btnSendResetLink": "Send Reset Link",
       "lnkBackToLogin": "Back to Login"
-    }
+    },
+    "reset": {
+      "title": "Reset Password",
+      "subtitle": "Set your new password",
+      "password": "New password",
+      "passwordConfirm": "Confirm password",
+      "passwordHint": "The password must contain at least 6 characters, one uppercase letter, one number and one special character.",
+      "btn": "Reset Password",
+      "lnkBackToLogin": "Back to Login",
+      "errLink": "Invalid or incomplete link.",
+      "errFill": "Fill in all fields.",
+      "errMatch": "Passwords do not match.",
+      "errGeneric": "An error occurred. Please try again.",
+      "success": "Password reset successfully!"
+    }    
   }
   
