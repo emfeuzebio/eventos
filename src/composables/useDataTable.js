@@ -4,6 +4,7 @@ import 'datatables.net-dt';
 import api from '@/services/api';
 import { createTooltip } from 'floating-vue';
 import { useCurrentEventStore } from '@/stores/currentEvent';
+import { Dropdown } from 'bootstrap';
 
 export function useDataTable({
    tableId,
@@ -73,20 +74,34 @@ export function useDataTable({
             [5, 10, 25, 50, 100, 'Todos'],
          ],
          pageLength: 10,
-         drawCallback() {
-            bindTableEvents();
+            drawCallback() {
+               bindTableEvents();
 
-            const tooltipEls = document.querySelectorAll('[data-v-tooltip]');
-            tooltipEls.forEach((el) => {
-               if (!el._tooltipInstance) {
-                  const content = el.getAttribute('data-v-tooltip');
-                  el._tooltipInstance = createTooltip(el, {
-                     content,
-                     placement: 'top',
-                  });
-               }
-            });
-         },
+               // Reaplica tooltips após o DataTable ser renderizado
+               const tooltipEls = document.querySelectorAll('[data-v-tooltip]');
+               tooltipEls.forEach((el) => {
+                  if (!el._tooltipInstance) {
+                     const content = el.getAttribute('data-v-tooltip');
+                     el._tooltipInstance = createTooltip(el, {
+                        content,
+                        placement: 'top',
+                     });
+                  }
+               });
+
+               // Inicializa dropdowns do Bootstrap (data-bs-toggle="dropdown")
+               const dropdownToggles = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+               dropdownToggles.forEach((el) => {
+                  // Evita reinicializar o mesmo elemento
+                  if (el._dropdownInstance) {
+                     el._dropdownInstance.dispose();
+                  }
+                  // el._dropdownInstance = new window.bootstrap.Dropdown(el, {
+                  //    autoClose: true,
+                  // });
+                  el._dropdownInstance = new Dropdown(el, { autoClose: true });
+               });
+            },        
       });
    }
 

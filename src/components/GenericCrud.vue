@@ -240,7 +240,7 @@ props.filters.forEach((filtro) => {
 
 // Estados e ações
 const alert = ref({ type: '', message: '' });
-const tableId = `datatable-${props.endpoint}`;
+const tableId = `datatable-${props.endpoint.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 
 function btnImprimir() {
    showToast({

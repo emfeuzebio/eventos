@@ -3,8 +3,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import routes from './routeList'
 import { isAuthenticated, isTokenExpired, logout } from '@/services/authService'
-// import { isAuthenticated } from '@/services/authService'
-// import { getToken } from '@/services/authService'
+import { useUserStore } from '@/stores/userStore'
 
 const router = createRouter({
    history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -23,15 +22,12 @@ router.beforeEach((to, from, next) => {
       '/pages/register',
       '/pages/forgotpassword',
       '/pages/resetpassword',
+      '/pages/accept-invite',
    ]
 
    // Checa se a rota atual é pública
    const isPublic = publicPaths.some((path) => to.path.startsWith(path))
    const requiresAuth = !isPublic
-
-   // console.log('to.path:', to.path)
-   // console.log('isAuthenticated:', isAuthenticated())
-   // console.log('isTokenExpired:', isTokenExpired?.())
 
    // Redireciona usuários autenticados tentando acessar login
    if (
@@ -45,6 +41,14 @@ router.beforeEach((to, from, next) => {
    if (requiresAuth && (!isAuthenticated() || isTokenExpired())) {
       logout()
       return next({ path: '/pages/login', replace: true }) // <- Evita deixar no histórico
+   }
+
+   // Valida perfil exigido pela rota (ex.: /admin/*)
+   if (to.meta.requiredProfile) {
+      const userStore = useUserStore();
+      if (!userStore.roles?.includes(to.meta.requiredProfile)) {
+         return next({ path: '/dashboard', replace: true });
+      }
    }
 
    next()

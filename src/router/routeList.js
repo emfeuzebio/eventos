@@ -441,6 +441,33 @@ const routes = [
           ],
         },
 
+        // Admin
+        {
+          path: '/admin',
+          name: 'Admin',
+          component: {
+              render() {
+                return h(resolveComponent('router-view'))
+              },
+          },
+          redirect: '/admin/users',
+          meta: { requiresAuth: true },
+          children: [
+              {
+                path: '/admin/users',
+                name: 'AdminUsers',
+                component: () => import('@/views/admin/users/UserAdminView.vue'),
+                meta: { requiresAuth: true, requiredProfile: 'Administrador de Eventos' },
+              },
+              // {
+              //   path: '/admin/audit',
+              //   name: 'AdminAudit',
+              //   component: () => import('@/views/admin/audit/AuditView.vue'),
+              //   meta: { requiresAuth: true, requiredProfile: 'Administrador de Eventos' },
+              // },
+          ],
+        },
+
         // Notifications
         {
           path: '/notifications',

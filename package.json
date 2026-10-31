@@ -34,7 +34,7 @@
     "@popperjs/core": "^2.11.8",
     "@vueform/multiselect": "^2.6.11",
     "axios": "^1.8.4",
-    "bootstrap": "^5.3.7",
+    "bootstrap": "^5.3.8",
     "chart.js": "^4.4.7",
     "datatables.net-bs5": "^2.3.2",
     "datatables.net-dt": "^2.2.2",

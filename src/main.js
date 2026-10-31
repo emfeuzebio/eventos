@@ -13,6 +13,7 @@ import DocsExample from '@/components/DocsExample'
 import DocsIcons from '@/components/DocsIcons'
 
 import CoreUIMultiselect from '@/components/CoreUIMultiselect.vue'
+import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 
 // novo
 import { setRouterInstance } from '@/utils/routerHelper'
