@@ -39,6 +39,7 @@
          <CFormInput
             v-model="form.value.phone"
             :class="{ 'is-invalid': errors.value.phone }"
+            @input="maskPhone($event, form)"
          />
          <div class="form-error" v-if="errors.value.phone">{{ errors.value.phone[0] }}</div>
       </template>
@@ -134,6 +135,7 @@ import userAdminService from '@/services/userAdminService';
 import { useAbilities, getAbilities } from '@/services/AuthorizationsService';
 import { useToast } from '@/composables/useToast';
 import { useGlobalError } from '@/composables/useGlobalError';
+import DataTablesLib from 'datatables.net-bs5';
 
 const crudRef = ref(null);
 const { showToast } = useToast();
@@ -381,4 +383,30 @@ function formatDateTime(dt) {
    if (!dt) return '-';
    return new Date(dt).toLocaleString('pt-BR');
 }
+
+function maskPhone(e, form) {
+   let v = e.target.value.replace(/\D/g, '');
+
+   if (v.length === 0) {
+      e.target.value = '';
+      form.value.phone = null;   // ou '' — depende do que o back espera
+      return;
+   }
+
+   v = v.substring(0, 11);
+
+   if (v.length > 10) {
+      v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, '($1) $2-$3');
+   } else if (v.length > 6) {
+      v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+   } else if (v.length > 2) {
+      v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+   } else {
+      v = v.replace(/^(\d{1,2})/, '($1');
+   }
+
+   e.target.value = v;
+   form.value.phone = v;
+}
+
 </script>
