@@ -78,7 +78,11 @@ export function useForm({
 
    async function insertNewModal() {
       clearFieldData();
-      await load();
+      // Só carrega dados auxiliares se houver endpoint de "novo" (id = 0).
+      // No módulo admin, não há — o form usa só defaultValues.
+      if (includeEventoId) {
+         await load();
+      }
       editModalVisible.value = true;
    }
 
