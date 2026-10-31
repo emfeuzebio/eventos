@@ -16,13 +16,9 @@
                         :key="filter.field"
                         class="me-2"
                      >
-                        <!-- Filtrar por: -->
                         <label class="form-label fw-bold">
                            {{ filter.label }}</label
                         >
-                        <!-- {{ filtros }} -->
-                        <!-- {{ [filter.field] }} -->
-                        <!-- {{ filters[0].options }} -->
 
                         <select
                            v-if="filter.type === 'select'"
@@ -47,8 +43,6 @@
                            class="form-control-sm"
                            @change="refreshTable"
                         />
-
-                        <!-- Você pode expandir aqui para tipos como date, checkbox etc -->
                      </div>
                   </div>
                </div>
@@ -153,7 +147,6 @@
                'Nome ou Descrição não encontrada.'
             }}</b>
             ?
-            <!-- <pre>{{ JSON.stringify(form.selectedToDelete.value, null, 2) }}</pre> -->
          </CModalBody>
          <CModalFooter>
             <CButton
@@ -222,36 +215,28 @@ const props = defineProps({
    order: String,
    filters: Array,
    extraColumnRender: Function,
-   // canInsert: Boolean,
-   // canUpdate: Boolean,
-   // canDelete: Boolean,
-   // canPrint: Boolean,
    onSaved: Function,
    afterSave: Function,
+
+   // NOVO — instância axios (default: api local) e controle de evento_id
+   apiInstance: {
+      type: Object,
+      default: null,
+   },
+   includeEventoId: {
+      type: Boolean,
+      default: true,
+   },
 });
 
-// controe os order
-// const filtros = ref({});
-// console.log('Ref para os Filtros da Página:', props.filters);
-
-// controe os filtros
+// controi os filtros
 const filtros = ref({});
-// console.log('Ref para os Filtros da Página:', props.filters);
 
 props.filters.forEach((filtro) => {
    if (filtro?.field) {
       filtros.value[filtro.field] = filtro.default ?? '';
    }
 });
-// console.log('Filtros aplicados à Página:',filtros);
-
-// controe dos pageButtons (InsertNew e Refresh)
-// console.log('Ref para os pageButtons da Página:', props.pageButtons);
-
-// controe dos pageExtraButtons
-// console.log('Ref para os pageExtraButtons da Página:', props.pageExtraButtons);
-
-// console.log('Ref para os Buttons das Linhas:', props.buttons);
 
 // Estados e ações
 const alert = ref({ type: '', message: '' });
@@ -272,22 +257,15 @@ const emit = defineEmits([
    'extraAction',
    'pageExtraButtonsActions',
    'afterSave',
-   'afterLoad',  // ← ADICIONAR ESTA LINHA
+   'afterLoad',
 ]);
 
 const onClickpageExtraButtonsActions = (label, action) => {
-   // showToast({
-   //    title: 'Ação',
-   //    message: 'Clicou no page Buttom ' + label + ', Ação: ' + action,
-   // });
-
    emit('pageExtraButtonsActions', {
       label: label,
       action: action,
    });
 };
-
-// console.log(`Abilities:`, props.abilities);
 
 // Tabela de Dados
 const { init, refreshTable } = useDataTable(
@@ -296,7 +274,7 @@ const { init, refreshTable } = useDataTable(
       endpoint: props.endpoint,
       order: props.order,
       externalFilters: filtros,
-      autoWidth: false, // desativa o ajuste automático para que a largura definida funcione
+      autoWidth: false,
       columns: [
          ...props.columns,
          {
@@ -354,6 +332,10 @@ const { init, refreshTable } = useDataTable(
       onClickExtraAction: (id, action, row, dataset, target) => {
          emit('extraAction', { id, action, row, dataset, target });
       },
+
+      // NOVO — repasse das props
+      apiInstance: props.apiInstance ?? undefined,
+      includeEventoId: props.includeEventoId,
    },
    emit
 );
@@ -368,7 +350,6 @@ const form = useForm({
          title: 'Sucesso',
          message: 'Registro salvo com sucesso!',
       });
-      // console.log('onSaved executado');
 
       emit('afterSave', {
          saved: true,
@@ -383,18 +364,15 @@ const form = useForm({
          message: 'Registro excluído com sucesso!',
       });
    },
-   // ADICIONAR A LINHA ABAIXO
    onLoaded: (data) => {
       emit('afterLoad', data);
    },
+
+   // NOVO — repasse das props
+   apiInstance: props.apiInstance ?? undefined,
+   includeEventoId: props.includeEventoId,
 });
 
-/**
- * defineExpose() - Expõe o método pro componente pai
- * refreshTable é uma função dentro do composable useDataTable() exposta acima.
- * Mas para expô-la para a view Pai acima desta que estamos que é filha
- * precisamos usar defineExpose()
- */
 defineExpose({
    refreshTable,
    form,
@@ -414,13 +392,7 @@ watch(form.editModalVisible, (newValue) => {
    }
 });
 
-// console.log('defaultValues recebidos', props.defaultValues);
-// console.log('canUpdate', props.canUpdate);
-// console.log('Todas as abilities:', props.abilities);
-
 const descricaoParaExcluir = computed(() => {
-   // TODO - mostrar descrição do registro selecionado para exclusão
-   // return form.selectedToDelete.value?.descricao || 'Carregando...'
    return JSON.stringify(form.selectedToDelete.value.descricao);
 });
 
@@ -429,7 +401,6 @@ onMounted(init);
 </script>
 
 <style>
-/* @import 'datatables.net-dt/css/dataTables.dataTables.min.css'; */
 @import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 
 .btn-xs {
@@ -448,8 +419,6 @@ onMounted(init);
 
 .dataTable tbody td {
    font-size: 15px;
-   /* font-weight: bold; */
-   /* font-size: medium; */
 }
 
 /* Fonte dos botões Primeiro/Anterior/... */
