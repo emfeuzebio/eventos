@@ -1,8 +1,8 @@
 <template>
    <!-- DataTables principal do CRUD -->
    <GenericCrud
-      title="Lista de Hotéis "
-      description="Gerenciamento de Hotéis"
+      title="Cadastro de Hotéis e Quartos "
+      description="Gerenciamento dos Hotéis do Evento e dos Quartos disponíveis em cada um"
       endpoint="hotel"
       :filters="filters"
       :columns="columns"

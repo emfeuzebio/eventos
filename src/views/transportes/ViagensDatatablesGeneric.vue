@@ -179,8 +179,8 @@ const filters = computed(() => [
 
 <template>
    <GenericCrud
-      title="Lista de Viagens "
-      description="Gerenciamento de Viagens"
+      title="Cadastro de Viagens "
+      description="Gerenciamento das Viagens de Traslados do Evento, com suas Rotas e Veículos"
       endpoint="viagem"
       columnActionsWidth="150px"
       :filters="filters"

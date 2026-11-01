@@ -1,7 +1,5 @@
-<!-- src/views/ajuda/admin-users.vue -->
 <template>
    <div class="help-admin-users">
-
       <!-- Cabeçalho com ícone e subtítulo -->
       <div class="d-flex align-items-start mb-4">
          <div class="help-icon-box me-3">
@@ -10,7 +8,8 @@
          <div>
             <h5 class="fw-bold mb-1">Administração de Usuários</h5>
             <p class="text-body-secondary mb-0 small">
-               Gerencie convites, perfis, ativação e histórico dos usuários do sistema.
+               Gerencie convites, perfis, ativação e histórico dos usuários do
+               sistema.
             </p>
          </div>
       </div>
@@ -159,7 +158,32 @@
          <li><i class="fa fa-check-circle text-success me-2"></i> Você não pode excluir a si próprio por esta tela.</li>
       </ul>
 
-      <!-- Seção 6: FAQ (accordion) -->
+      <!-- Seção 6: Autorizações e Perfis de Acesso -->
+      <h6 class="help-section-title">
+         <i class="fa fa-shield-alt me-2 text-primary"></i> Autorizações e Perfis de Acesso
+      </h6>
+      <div class="table-responsive mb-4">
+         <table class="table table-sm table-bordered help-table">
+            <thead class="table-light">
+               <tr>
+                  <th style="width: 220px;">Perfil</th>
+                  <th>O que pode fazer nesta tela</th>
+               </tr>
+            </thead>
+            <tbody>
+               <tr>
+                  <td class="help-col-label">Exclusivo do Administrador de Eventos</td>
+                  <td>
+                     <strong>Acesso irrestrito</strong> a todas as operações
+                     desta tela. Gerencia usuários, perfis, ativação, convites e
+                     histórico sem restrição.
+                  </td>
+               </tr>
+            </tbody>
+         </table>
+      </div>
+
+      <!-- Seção 7: FAQ (accordion) -->
       <h6 class="help-section-title">
          <i class="fa fa-question-circle me-2 text-primary"></i> Dúvidas frequentes
       </h6>
@@ -184,7 +208,9 @@
             </h2>
             <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#helpFaq">
                <div class="accordion-body small">
-                  O usuário não tem perfil de acesso no sistema. Conceda um perfil pelo botão <strong>Perfis</strong> antes de ativar.
+                  O usuário não tem perfil de acesso no sistema. Conceda um perfil pelo botão <strong>Perfis</strong> antes de ativar. Veja a seção
+                  <strong>Autorizações e Perfis de Acesso</strong> acima para
+                  entender quem pode fazer o quê.
                </div>
             </div>
          </div>
@@ -213,7 +239,6 @@
             </div>
          </div>
       </div>
-
    </div>
 </template>
 
