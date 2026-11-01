@@ -67,6 +67,14 @@
                   </span>
 
                   <CButton
+                     v-if="props.showHelp && hasHelp"
+                        class="btn btn-sm btn-outline-info me-1"
+                        @click="openHelp"
+                     >
+                     <i class="fa fa-question-circle"></i> Ajuda
+                  </CButton>
+
+                  <CButton
                      class="btn btn-sm btn-outline-success me-1"
                      v-if="
                         props.pageButtons.btnInsertNew &&
@@ -161,14 +169,47 @@
             >
          </CModalFooter>
       </CModal>
+      
+      <!-- Modal Ajuda (genérico) -->
+      <CModal :visible="helpVisible" @close="helpVisible = false" backdrop="static" size="lg" scrollable fade>
+         <CModalHeader>
+            <strong>Ajuda — {{ title }}</strong>
+         </CModalHeader>
+         <CModalBody>
+            <component :is="helpComponent" v-if="helpComponent" />
+            <div v-else class="text-center text-muted py-4">Carregando ajuda…</div>
+         </CModalBody>
+         <CModalFooter>
+            <CButton color="secondary" size="sm" @click="helpVisible = false">Fechar</CButton>
+         </CModalFooter>
+      </CModal>
+
    </CCol>
 </template>
-
 <script setup>
 import { onMounted, ref, computed, nextTick, watch } from 'vue';
 import { useDataTable } from '@/composables/useDataTable';
 import { useForm } from '@/composables/useForm';
 import { useToast } from '@/composables/useToast';
+// ===== Ajuda genérica =====
+const helpModules = import.meta.glob('@/views/help/*.vue');
+
+const helpKey = computed(() => {
+   const sanitized = props.endpoint.replace(/[^a-zA-Z0-9_-]/g, '-');
+   return `/src/views/help/${sanitized}.vue`;
+});
+
+const hasHelp = computed(() => !!helpModules[helpKey.value]);
+const helpVisible = ref(false);
+const helpComponent = ref(null);
+
+async function openHelp() {
+   const loader = helpModules[helpKey.value];
+   if (!loader) return;
+   const mod = await loader();
+   helpComponent.value = mod.default;
+   helpVisible.value = true;
+}
 
 const { showToast } = useToast();
 
@@ -227,6 +268,10 @@ const props = defineProps({
       type: Boolean,
       default: true,
    },
+   showHelp: {
+      type: Boolean,
+      default: true,
+   },   
 });
 
 // controi os filtros
