@@ -272,6 +272,9 @@ const salvarRegiao = async () => {
          <div class="form-error" v-if="errors.value.nome_social">
             {{ errors.value.nome_social[0] }}
          </div>
+         <div class="form-text ms-2">
+            Usado no crachá. Importante que sejam dois nomes para evitar homonímia. Ex.: João da Silva, Maria de Souza, José dos Santos.
+         </div>
 
          <label class="form-label fw-bold">Sexo</label>
          <CFormSelect
@@ -286,7 +289,6 @@ const salvarRegiao = async () => {
             {{ errors.value.sexo[0] }}
          </div>
 
-
          <label class="form-label fw-bold">E-Mail</label>
          <CFormInput
             v-model="form.value.email"
@@ -294,6 +296,9 @@ const salvarRegiao = async () => {
          />
          <div class="form-error" v-if="errors.value.email">
             {{ errors.value.email[0] }}
+         </div>
+         <div class="form-text ms-2">
+            A pessoa receberá notificaçõe e atualizações nesse e-mail.
          </div>
 
          <label class="form-label fw-bold">Telefone</label>
@@ -303,6 +308,9 @@ const salvarRegiao = async () => {
          />
          <div class="form-error" v-if="errors.value.telefone">
             {{ errors.value.telefone[0] }}
+         </div>
+         <div class="form-text ms-2">
+            Use o formato 99 99999 9999 caso extrangeiro adicione +99.
          </div>
 
          <label class="form-label fw-bold">Entidade</label>

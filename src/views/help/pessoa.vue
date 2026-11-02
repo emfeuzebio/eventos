@@ -149,7 +149,7 @@
             <span class="help-step-number">3</span>
             <div class="small">
                Selecione o <strong>Sexo</strong>, informe o
-               <strong>E-mail</strong> e o <strong>Telefone</strong>, e escolha a
+               <strong>E-mailllll</strong> e o <strong>Telefone</strong>, e escolha a
                <strong>Entidade</strong>.
             </div>
          </div>

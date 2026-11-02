@@ -1,4 +1,4 @@
-<template>
+<template>  
    <div class="help-content">
       <!-- CABEÇALHO -->
       <div class="d-flex align-items-center gap-3 mb-4">
