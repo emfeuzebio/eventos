@@ -48,6 +48,21 @@
       "errMatch": "As senhas não coincidem.",
       "errGeneric": "Ocorreu um erro. Tente novamente.",
       "success": "Senha redefinida com sucesso!"
+    },
+    "accept": {
+      "title": "Definir Senha",
+      "subtitle": "Crie sua senha para ativar sua conta",
+      "password": "Nova senha",
+      "passwordConfirm": "Confirme a nova senha",
+      "passwordHint": "A senha deve conter no mínimo 6 caracteres, uma letra maiúscula, um número e um caractere especial.",
+      "btn": "Definir Senha",
+      "lnkBackToLogin": "Voltar ao Login",
+      "errLink": "Link inválido ou incompleto.",
+      "errInvalid": "Convite inválido ou expirado.",
+      "errFill": "Preencha todos os campos.",
+      "errMatch": "As senhas não coincidem.",
+      "errGeneric": "Ocorreu um erro. Tente novamente.",
+      "success": "Senha definida com sucesso. Faça login."
     }    
   }
   

@@ -557,7 +557,13 @@ const routes = [
           meta: { guest: true },
           meta: { requiresAuth: false },
           meta: { isAuthenticated: false },
-        }
+        },
+        {
+          path: 'accept-invite',
+          name: 'AcceptInvite',
+          component: () => import('@/views/pages/AcceptInvite'),
+          meta: { requiresAuth: false },
+        },        
       ],
     },
   ]

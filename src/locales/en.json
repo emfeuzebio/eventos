@@ -48,6 +48,21 @@
       "errMatch": "Passwords do not match.",
       "errGeneric": "An error occurred. Please try again.",
       "success": "Password reset successfully!"
-    }    
+    },
+      "accept": {
+        "title": "Set Password",
+        "subtitle": "Create your password to activate your account",
+        "password": "New password",
+        "passwordConfirm": "Confirm password",
+        "passwordHint": "The password must contain at least 6 characters, one uppercase letter, one number and one special character.",
+        "btn": "Set Password",
+        "lnkBackToLogin": "Back to Login",
+        "errLink": "Invalid or incomplete link.",
+        "errInvalid": "Invalid or expired invitation.",
+        "errFill": "Fill in all fields.",
+        "errMatch": "Passwords do not match.",
+        "errGeneric": "An error occurred. Please try again.",
+        "success": "Password set successfully. Please log in."
+      }    
   }
   
