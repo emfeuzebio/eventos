@@ -161,6 +161,7 @@ const handleReset = async () => {
          email: email.value,
          password: password.value,
          password_confirmation: password_confirmation.value,
+         system_id: import.meta.env.VITE_APP_ID,   // ← ADICIONADO
       });
 
       successMessage.value = response.data.message || t('reset.success');
