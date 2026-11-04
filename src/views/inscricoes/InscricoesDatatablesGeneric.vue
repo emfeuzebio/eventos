@@ -1230,46 +1230,92 @@ const onpageExtraButtonsActions = async ({ label, action }) => {
    }
 };
 
-async function printRelPessoasInscritas() {
-   const response = await api.get(
-      `/inscricao/relpessoasinscritas/${currentEvent.value?.id}`,
-      {
-         params: { orderby: 'chegada' },
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// RELATÓRIOS PDF — helper único com timeout estendido e tratamento de erro
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+/**
+ * Baixa um PDF como blob, abre em nova aba e trata erros corretamente.
+ * Sobrescreve o timeout global (10s) do Axios apenas nesta chamada.
+ */
+async function abrirRelatorioPdf(url, params, nomeRelatorio) {
+   try {
+      const response = await api.get(url, {
+         params,
          responseType: 'blob',
+         timeout: 60000,                     // resolve o ECONNABORTED
+         headers: { 'Accept': 'application/pdf' },
+      });
+
+      // Verifica se o backend devolveu PDF de verdade
+      const contentType = response.headers['content-type'] || '';
+      if (!contentType.includes('application/pdf')) {
+         const texto = await response.data.text();
+         throw new Error(
+            `Resposta inesperada do servidor: ${texto.substring(0, 200)}`
+         );
       }
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Abre em nova aba
+      const janela = window.open(blobUrl, '_blank');
+      if (!janela) {
+         // Pop-up bloqueado: fallback para download
+         const a = document.createElement('a');
+         a.href = blobUrl;
+         a.download = `${nomeRelatorio}.pdf`;
+         document.body.appendChild(a);
+         a.click();
+         a.remove();
+      }
+
+      // Revogar DEPOIS de um tempo (não imediatamente!)
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60000);
+
+      showToast({
+         title: 'Sucesso',
+         message: `${nomeRelatorio} gerado com sucesso.`,
+      });
+   } catch (error) {
+      // Se o erro veio como Blob (401/500 com responseType blob), lê o texto
+      let mensagem = 'Erro ao gerar relatório.';
+      if (error.response?.data instanceof Blob) {
+         try {
+            const texto = await error.response.data.text();
+            const json = JSON.parse(texto);
+            mensagem = json.message || json.error || mensagem;
+         } catch { /* mantém mensagem padrão */ }
+      } else if (error.response?.data?.message) {
+         mensagem = error.response.data.message;
+      } else if (error.message) {
+         mensagem = error.message;
+      }
+
+      showToast({
+         title: 'Erro',
+         message: mensagem,
+         color: 'danger',
+      });
+   }
+}
+
+async function printRelPessoasInscritas() {
+   await abrirRelatorioPdf(
+      `/inscricao/relpessoasinscritas/${currentEvent.value?.id}`,
+      { orderby: 'chegada' },
+      'Pessoas Inscritas'
    );
-
-   const blob = new Blob([response.data], { type: 'application/pdf' });
-   const url = window.URL.createObjectURL(blob);
-   window.open(url, '_blank');
-   window.URL.revokeObjectURL(url); // Liberar URL da memória
-
-   showToast({
-      title: 'Sucesso',
-      message: `Relatório gerado com sucesso.`,
-   });
 }
 
 async function printRelInscricoes() {
-   const response = await api.get(
+   await abrirRelatorioPdf(
       `/inscricao/relinscricoes/${currentEvent.value?.id}`,
-      {
-         params: { orderby: 'chegada' },
-         responseType: 'blob',
-      }
+      { orderby: 'chegada' },
+      'Inscrições'
    );
-
-   const blob = new Blob([response.data], { type: 'application/pdf' });
-   const url = window.URL.createObjectURL(blob);
-   window.open(url, '_blank');
-   window.URL.revokeObjectURL(url); // Liberar URL da memória
-
-   showToast({
-      title: 'Sucesso',
-      message: `Relatório gerado com sucesso.`,
-   });
 }
-
 
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
