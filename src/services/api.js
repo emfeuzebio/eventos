@@ -115,7 +115,7 @@ api.interceptors.response.use(
     // Se já tentou renovar, não tenta de novo
     if (originalRequest._retry) {
       removeAllTokens();
-      redirectToLogin(message);
+      redirectToLogin('Sua sessão expirou. Faça login novamente.'); // ✅ mensagem fixa
       return Promise.reject(error);
     }
 
@@ -145,7 +145,7 @@ api.interceptors.response.use(
       } else {
         processQueue(error, null);
         removeAllTokens();
-        redirectToLogin(message);
+        redirectToLogin('Sua sessão expirou. Faça login novamente.'); // ✅ mensagem fixa
         return Promise.reject(error);
       }
     } catch (refreshError) {
